@@ -2,80 +2,40 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Gestor Turnos - Login Microsoft</title>
+  <title>Login Microsoft - Saesa (tenantId Alemania)</title>
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
-  <style>
-    body { font-family: Arial, sans-serif; margin: 40px; }
-    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 6px; cursor: pointer; }
-    #loginBtn { background-color: #0078d4; color: white; }
-    #logoutBtn { background-color: #d83b01; color: white; display:none; }
-    #userInfo { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 6px; display:none; }
-  </style>
 </head>
 <body>
-  <h1>Gestor Turnos</h1>
-  <p>Autenticación con Microsoft (Cloud Alemania)</p>
-
-  <button id="loginBtn">Conectar con Microsoft</button>
-  <button id="logoutBtn">Cerrar sesión</button>
-
-  <div id="userInfo">
-    <h3>Usuario autenticado:</h3>
-    <p><strong>Nombre:</strong> <span id="userName"></span></p>
+  <h1>Prueba Login con tenantId</h1>
+  <button id="loginBtn">Conectar con Microsoft (tenantId)</button>
+  <div id="userInfo" style="display:none;">
+    <p><strong>Usuario:</strong> <span id="userName"></span></p>
     <p><strong>Email:</strong> <span id="userEmail"></span></p>
   </div>
 
   <script>
     const msalConfig = {
       auth: {
-        clientId: "3246b16d-65db-465a-b3de-fd638e589cd", // ID de aplicación
+        clientId: "3246b16d-65db-465a-b3de-fd638e589cd",
         authority: "https://login.microsoftonline.de/136d6ab5-5b55-496f-97cb-242447715ed/",
         redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
-      }
+      },
+      knownAuthorities: ["login.microsoftonline.de"]
     };
 
-    const loginRequest = {
-      scopes: ["User.Read"]
-    };
-
+    const loginRequest = { scopes: ["User.Read"] };
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
     document.getElementById("loginBtn").onclick = () => {
-      msalInstance.loginPopup(loginRequest).then(response => {
-        showUserInfo(response.account);
-      }).catch(error => {
-        console.error("Error de login:", error);
-        alert("Error autenticando: " + error);
-      });
-    };
-
-    document.getElementById("logoutBtn").onclick = () => {
-      const logoutRequest = {
-        account: msalInstance.getActiveAccount()
-      };
-      msalInstance.logoutPopup(logoutRequest).then(() => {
-        document.getElementById("userInfo").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "none";
-        document.getElementById("loginBtn").style.display = "inline-block";
-      });
-    };
-
-    function showUserInfo(account) {
-      if (account) {
-        msalInstance.setActiveAccount(account);
-        document.getElementById("userName").textContent = account.name;
-        document.getElementById("userEmail").textContent = account.username;
+      msalInstance.loginPopup(loginRequest).then(resp => {
         document.getElementById("userInfo").style.display = "block";
-        document.getElementById("loginBtn").style.display = "none";
-        document.getElementById("logoutBtn").style.display = "inline-block";
-      }
-    }
-
-    // Revisa si ya hay sesión activa
-    const currentAccounts = msalInstance.getAllAccounts();
-    if (currentAccounts.length > 0) {
-      showUserInfo(currentAccounts[0]);
-    }
+        document.getElementById("userName").textContent = resp.account.name;
+        document.getElementById("userEmail").textContent = resp.account.username;
+      }).catch(err => {
+        console.error("Error login:", err);
+        alert("Error: " + err);
+      });
+    };
   </script>
 </body>
 </html>
