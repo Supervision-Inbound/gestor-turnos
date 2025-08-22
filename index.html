@@ -2,7 +2,7 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Test MSAL en GitHub Pages</title>
+  <title>Test Login Microsoft</title>
   <script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
 </head>
 <body>
@@ -11,35 +11,31 @@
   <div id="status"></div>
 
   <script>
+    // ⚠️ Usa los datos reales de tu app
     const msalConfig = {
       auth: {
-        clientId: "7d5a8e5f-4d3e-45fa-b3de-f634b9c6b0f8",
-        authority: "https://login.microsoftonline.com/common/", // también puedes usar tu tenant
+        clientId: "3246b16d-65db-465a-b3de-fd638e589cd", // de tu captura
+        authority: "https://login.microsoftonline.com/136d5ab5-5b55-496f-97cb-24244771f5ed/", // tenant ID
         redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
       }
     };
 
     const msalInstance = new msal.PublicClientApplication(msalConfig);
-    const loginRequest = { scopes: ["Files.ReadWrite", "offline_access"] };
+    const loginRequest = { scopes: ["User.Read"] };
 
     function setStatus(msg) {
       document.getElementById("status").innerText = msg;
+      console.log(msg);
     }
 
     async function login() {
       try {
+        setStatus("🔄 Abriendo login...");
         const response = await msalInstance.loginPopup(loginRequest);
-        console.log("✅ Login response:", response);
-        setStatus("✅ Autenticado: " + response.account.username);
-
-        const tokenResponse = await msalInstance.acquireTokenSilent({
-          ...loginRequest,
-          account: response.account
-        });
-        console.log("🔑 Token:", tokenResponse.accessToken);
-        setStatus("✅ Token obtenido correctamente.");
+        setStatus("✅ Autenticado como: " + response.account.username);
+        console.log("Login completo:", response);
       } catch (e) {
-        console.error("❌ Error en login:", e);
+        console.error("❌ Error login:", e);
         setStatus("❌ Error: " + e.message);
       }
     }
@@ -48,3 +44,4 @@
   </script>
 </body>
 </html>
+
