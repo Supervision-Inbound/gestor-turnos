@@ -2,18 +2,49 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Test JS GitHub Pages</title>
+  <title>Test MSAL en GitHub Pages</title>
+  <script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
 </head>
 <body>
-  <h1>Prueba de botón</h1>
-  <button id="connectBtn">Conectar</button>
+  <h1>Prueba de login con Microsoft</h1>
+  <button id="connectBtn">Conectar con Microsoft</button>
+  <div id="status"></div>
 
   <script>
-    document.getElementById("connectBtn").addEventListener("click", () => {
-      console.log("🔑 Botón conectar presionado");
-      alert("¡El botón funciona!");
-    });
+    const msalConfig = {
+      auth: {
+        clientId: "7d5a8e5f-4d3e-45fa-b3de-f634b9c6b0f8",
+        authority: "https://login.microsoftonline.com/common/", // también puedes usar tu tenant
+        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
+      }
+    };
+
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    const loginRequest = { scopes: ["Files.ReadWrite", "offline_access"] };
+
+    function setStatus(msg) {
+      document.getElementById("status").innerText = msg;
+    }
+
+    async function login() {
+      try {
+        const response = await msalInstance.loginPopup(loginRequest);
+        console.log("✅ Login response:", response);
+        setStatus("✅ Autenticado: " + response.account.username);
+
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account: response.account
+        });
+        console.log("🔑 Token:", tokenResponse.accessToken);
+        setStatus("✅ Token obtenido correctamente.");
+      } catch (e) {
+        console.error("❌ Error en login:", e);
+        setStatus("❌ Error: " + e.message);
+      }
+    }
+
+    document.getElementById("connectBtn").addEventListener("click", login);
   </script>
 </body>
 </html>
-
