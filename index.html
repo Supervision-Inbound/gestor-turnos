@@ -1,41 +1,88 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Login Microsoft - Saesa (dominio)</title>
-  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
+  <meta charset="UTF-8" />
+  <title>Gestor Turnos - OneDrive/Excel</title>
+  <script src="https://alcdn.msauth.net/browser/2.32.2/js/msal-browser.min.js"></script>
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      margin: 40px;
+      text-align: center;
+    }
+    button {
+      padding: 12px 20px;
+      font-size: 16px;
+      margin: 10px;
+      cursor: pointer;
+      border-radius: 8px;
+      border: none;
+      background-color: #0078d4;
+      color: white;
+    }
+    button:hover {
+      background-color: #005a9e;
+    }
+    #status {
+      margin-top: 20px;
+      font-weight: bold;
+    }
+  </style>
 </head>
 <body>
-  <h1>Prueba Login con dominio</h1>
-  <button id="loginBtn">Conectar con Microsoft (saesa.cl)</button>
-  <div id="userInfo" style="display:none;">
-    <p><strong>Usuario:</strong> <span id="userName"></span></p>
-    <p><strong>Email:</strong> <span id="userEmail"></span></p>
-  </div>
+  <h1>Gestor de Turnos - Integración Microsoft 365</h1>
+  <button onclick="signIn()">Conectar con Microsoft</button>
+  <p id="status">Desconectado</p>
 
   <script>
     const msalConfig = {
       auth: {
-        clientId: "3246b16d-65db-465a-b3de-fd638e589cd",
-        authority: "https://login.microsoftonline.com/saesa.cl/",
-        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
+        clientId: "476f7692-c830-4270-8fe5-d06714e678a3", // tu Client ID en SAESA
+        authority: "https://login.microsoftonline.com/saesa.cl/", // tu tenant corporativo
+        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/" // GitHub Pages
       }
     };
 
-    const loginRequest = { scopes: ["User.Read"] };
+    const loginRequest = {
+      scopes: ["User.Read", "Files.Read", "Files.ReadWrite", "Sites.Read.All", "offline_access"]
+    };
+
     const msalInstance = new msal.PublicClientApplication(msalConfig);
 
-    document.getElementById("loginBtn").onclick = () => {
-      msalInstance.loginPopup(loginRequest).then(resp => {
-        document.getElementById("userInfo").style.display = "block";
-        document.getElementById("userName").textContent = resp.account.name;
-        document.getElementById("userEmail").textContent = resp.account.username;
-      }).catch(err => {
-        console.error("Error login:", err);
-        alert("Error: " + err);
-      });
-    };
+    async function signIn() {
+      try {
+        const loginResponse = await msalInstance.loginPopup(loginRequest);
+        console.log("✅ Login exitoso:", loginResponse);
+        document.getElementById("status").innerText =
+          "Conectado como " + loginResponse.account.username;
+
+        // Obtener un token de acceso
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          ...loginRequest,
+          account: loginResponse.account
+        }).catch(async () => {
+          return await msalInstance.acquireTokenPopup(loginRequest);
+        });
+
+        console.log("🔑 Access Token:", tokenResponse.accessToken);
+
+        // Aquí podrías probar llamando a Graph (ejemplo: info del usuario)
+        fetch("https://graph.microsoft.com/v1.0/me", {
+          headers: { Authorization: `Bearer ${tokenResponse.accessToken}` }
+        })
+        .then(res => res.json())
+        .then(data => {
+          console.log("👤 Info del usuario:", data);
+          document.getElementById("status").innerText =
+            "Conectado como " + data.displayName + " (" + data.userPrincipalName + ")";
+        });
+
+      } catch (error) {
+        console.error("❌ Error autenticando:", error);
+        document.getElementById("status").innerText =
+          "Error autenticando: " + error.message;
+      }
+    }
   </script>
 </body>
 </html>
-
