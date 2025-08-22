@@ -2,45 +2,80 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Test Login Microsoft</title>
-  <script src="https://alcdn.msauth.net/browser/2.38.2/js/msal-browser.min.js"></script>
+  <title>Gestor Turnos - Login Microsoft</title>
+  <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
+  <style>
+    body { font-family: Arial, sans-serif; margin: 40px; }
+    button { padding: 10px 20px; margin: 5px; border: none; border-radius: 6px; cursor: pointer; }
+    #loginBtn { background-color: #0078d4; color: white; }
+    #logoutBtn { background-color: #d83b01; color: white; display:none; }
+    #userInfo { margin-top: 20px; padding: 15px; border: 1px solid #ccc; border-radius: 6px; display:none; }
+  </style>
 </head>
 <body>
-  <h1>Prueba de login con Microsoft</h1>
-  <button id="connectBtn">Conectar con Microsoft</button>
-  <div id="status"></div>
+  <h1>Gestor Turnos</h1>
+  <p>Autenticación con Microsoft (Cloud Alemania)</p>
+
+  <button id="loginBtn">Conectar con Microsoft</button>
+  <button id="logoutBtn">Cerrar sesión</button>
+
+  <div id="userInfo">
+    <h3>Usuario autenticado:</h3>
+    <p><strong>Nombre:</strong> <span id="userName"></span></p>
+    <p><strong>Email:</strong> <span id="userEmail"></span></p>
+  </div>
 
   <script>
-    // ⚠️ Usa los datos reales de tu app
     const msalConfig = {
       auth: {
-        clientId: "3246b16d-65db-465a-b3de-fd638e589cd", // de tu captura
-        authority: "https://login.microsoftonline.com/136d5ab5-5b55-496f-97cb-24244771f5ed/", // tenant ID
+        clientId: "3246b16d-65db-465a-b3de-fd638e589cd", // ID de aplicación
+        authority: "https://login.microsoftonline.de/136d6ab5-5b55-496f-97cb-242447715ed/",
         redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
       }
     };
 
+    const loginRequest = {
+      scopes: ["User.Read"]
+    };
+
     const msalInstance = new msal.PublicClientApplication(msalConfig);
-    const loginRequest = { scopes: ["User.Read"] };
 
-    function setStatus(msg) {
-      document.getElementById("status").innerText = msg;
-      console.log(msg);
-    }
+    document.getElementById("loginBtn").onclick = () => {
+      msalInstance.loginPopup(loginRequest).then(response => {
+        showUserInfo(response.account);
+      }).catch(error => {
+        console.error("Error de login:", error);
+        alert("Error autenticando: " + error);
+      });
+    };
 
-    async function login() {
-      try {
-        setStatus("🔄 Abriendo login...");
-        const response = await msalInstance.loginPopup(loginRequest);
-        setStatus("✅ Autenticado como: " + response.account.username);
-        console.log("Login completo:", response);
-      } catch (e) {
-        console.error("❌ Error login:", e);
-        setStatus("❌ Error: " + e.message);
+    document.getElementById("logoutBtn").onclick = () => {
+      const logoutRequest = {
+        account: msalInstance.getActiveAccount()
+      };
+      msalInstance.logoutPopup(logoutRequest).then(() => {
+        document.getElementById("userInfo").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "none";
+        document.getElementById("loginBtn").style.display = "inline-block";
+      });
+    };
+
+    function showUserInfo(account) {
+      if (account) {
+        msalInstance.setActiveAccount(account);
+        document.getElementById("userName").textContent = account.name;
+        document.getElementById("userEmail").textContent = account.username;
+        document.getElementById("userInfo").style.display = "block";
+        document.getElementById("loginBtn").style.display = "none";
+        document.getElementById("logoutBtn").style.display = "inline-block";
       }
     }
 
-    document.getElementById("connectBtn").addEventListener("click", login);
+    // Revisa si ya hay sesión activa
+    const currentAccounts = msalInstance.getAllAccounts();
+    if (currentAccounts.length > 0) {
+      showUserInfo(currentAccounts[0]);
+    }
   </script>
 </body>
 </html>
