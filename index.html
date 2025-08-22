@@ -2,12 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Login Microsoft - Saesa (tenantId Alemania)</title>
+  <title>Login Microsoft - Saesa (dominio)</title>
   <script src="https://alcdn.msauth.net/browser/2.37.0/js/msal-browser.min.js"></script>
 </head>
 <body>
-  <h1>Prueba Login con tenantId</h1>
-  <button id="loginBtn">Conectar con Microsoft (tenantId)</button>
+  <h1>Prueba Login con dominio</h1>
+  <button id="loginBtn">Conectar con Microsoft (saesa.cl)</button>
   <div id="userInfo" style="display:none;">
     <p><strong>Usuario:</strong> <span id="userName"></span></p>
     <p><strong>Email:</strong> <span id="userEmail"></span></p>
@@ -17,10 +17,9 @@
     const msalConfig = {
       auth: {
         clientId: "3246b16d-65db-465a-b3de-fd638e589cd",
-        authority: "https://login.microsoftonline.de/136d6ab5-5b55-496f-97cb-242447715ed/",
+        authority: "https://login.microsoftonline.com/saesa.cl/",
         redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
-      },
-      knownAuthorities: ["login.microsoftonline.de"]
+      }
     };
 
     const loginRequest = { scopes: ["User.Read"] };
