@@ -1,0 +1,877 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Gestiones Inbound - Generador Transporte</title>
+    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+    <style>
+        :root {
+            --color-bg: #f4f7fe;
+            --color-surface: #ffffff;
+            --color-primary-start: #6a11cb;
+            --color-primary-end: #2575fc;
+            --color-success-start: #16a34a;
+            --color-success-end: #15803d;
+            --color-text: #1e293b;
+            --color-text-secondary: #64748b;
+            --color-border: #e2e8f0;
+            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --font-family: 'Manrope', sans-serif;
+        }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+        body {
+            font-family: var(--font-family); background-color: var(--color-bg); min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            color: var(--color-text); position: relative; overflow: hidden;
+        }
+        .main-container {
+            display: grid; grid-template-columns: 1fr; max-width: 1000px; width: 100%;
+            background: var(--color-surface); border-radius: 24px; box-shadow: var(--shadow-lg);
+            border: 1px solid white; overflow: hidden; z-index: 10;
+        }
+        @media (min-width: 800px) { .main-container { grid-template-columns: 40% 60%; } }
+        .illustration-panel {
+            background: linear-gradient(160deg, #f0f5ff, #e6efff); padding: 40px;
+            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+        }
+        
+        .route-animation {
+            width: 280px;
+            height: 180px;
+            position: relative;
+            transform: perspective(800px) rotateX(10deg) rotateY(-20deg);
+        }
+        .road {
+            position: absolute;
+            bottom: 40px;
+            left: 0;
+            width: 100%;
+            height: 4px;
+            background-color: var(--color-border);
+            border-radius: 2px;
+        }
+        .van {
+            position: absolute;
+            bottom: 44px;
+            left: -60px;
+            width: 55px;
+            height: 30px;
+            background-image: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end));
+            border-radius: 6px 6px 4px 4px;
+            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
+            animation: drive-route 8s ease-in-out infinite;
+        }
+        .van::before {
+            content: '';
+            position: absolute;
+            top: 5px;
+            left: 5px;
+            width: 12px;
+            height: 10px;
+            background: #f0f5ff;
+            border-radius: 2px;
+        }
+        .stop {
+            position: absolute;
+            bottom: 44px;
+            width: 24px;
+            height: 24px;
+        }
+        .stop-pin {
+            width: 100%;
+            height: 100%;
+            background-color: #cbd5e1;
+            border-radius: 50% 50% 50% 0;
+            transform: rotate(-45deg);
+        }
+        .stop-pin::after {
+            content: '';
+            position: absolute;
+            top: 50%;
+            left: 50%;
+            transform: translate(-50%, -50%);
+            width: 8px;
+            height: 8px;
+            background-color: #fff;
+            border-radius: 50%;
+        }
+        .person-icon {
+            position: absolute;
+            top: -22px;
+            left: 2px;
+            width: 18px;
+            height: 18px;
+            background-color: var(--color-primary-end);
+            border-radius: 50%;
+            opacity: 1;
+            animation-iteration-count: infinite;
+            animation-duration: 8s;
+        }
+        .person-icon::after {
+            content: '';
+            position: absolute;
+            bottom: -8px;
+            left: 2px;
+            width: 14px;
+            height: 10px;
+            background-color: var(--color-primary-end);
+            border-radius: 4px 4px 0 0;
+        }
+        .stop1 { left: 20%; }
+        .stop2 { left: 50%; }
+        .stop3 { left: 80%; }
+
+        .stop1 .person-icon { animation-name: person-pickup-1; }
+        .stop2 .person-icon { animation-name: person-pickup-2; }
+        .stop3 .person-icon { animation-name: person-pickup-3; }
+        
+        @keyframes drive-route {
+            0%   { left: -60px; }
+            15%  { left: calc(20% - 15px); }
+            30%  { left: calc(20% - 15px); }
+            45%  { left: calc(50% - 15px); }
+            60%  { left: calc(50% - 15px); }
+            75%  { left: calc(80% - 15px); }
+            90%  { left: calc(80% - 15px); }
+            100% { left: 110%; }
+        }
+        @keyframes person-pickup-1 {
+            0%, 14% { opacity: 1; transform: scale(1); }
+            20% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 0; }
+        }
+        @keyframes person-pickup-2 {
+            0%, 44% { opacity: 1; transform: scale(1); }
+            50% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 0; }
+        }
+        @keyframes person-pickup-3 {
+            0%, 74% { opacity: 1; transform: scale(1); }
+            80% { opacity: 0; transform: scale(0.5); }
+            100% { opacity: 0; }
+        }
+        
+        .illustration-panel h2 { margin-top: 20px; font-size: 22px; color: var(--color-text); }
+        .illustration-panel p { margin-top: 8px; font-size: 15px; color: var(--color-text-secondary); max-width: 300px; line-height: 1.6; }
+        .content-panel { padding: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 { color: var(--color-text); font-size: 28px; font-weight: 700; }
+        .upload-area {
+            border: 2px dashed var(--color-border); border-radius: 12px; padding: 40px 20px;
+            text-align: center; transition: all 0.3s ease; cursor: pointer; background-color: #fafbff;
+            display: flex;
+            flex-direction: column;
+            align-items: center;
+            justify-content: center;
+        }
+        .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
+        .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
+        .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
+        
+        /* --- INICIO: ESTILOS MODIFICADOS PARA LA ZONA DE CARGA --- */
+        .upload-area.file-loaded #uploadDefaultContent {
+            display: none;
+        }
+        .upload-area #uploadSuccessContent {
+            display: none; /* Oculto por defecto */
+        }
+        .upload-area.file-loaded #uploadSuccessContent {
+            display: block; /* Visible cuando hay un archivo */
+        }
+        #fileNameDisplay {
+            font-size: 18px;
+            font-weight: 600;
+            color: var(--color-primary-end);
+            word-break: break-all;
+        }
+        #changeFileText {
+            font-size: 13px;
+            color: var(--color-text-secondary);
+            margin-top: 8px;
+        }
+        /* --- FIN: ESTILOS MODIFICADOS --- */
+
+        input[type="file"] { display: none; }
+        .button-container { text-align: center; margin-top: 25px; }
+        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
+        .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+
+        .button.is-success {
+            background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%);
+        }
+        .button.is-success:hover {
+            box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3);
+        }
+
+        .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
+        .progress-bar.active { display: block; }
+        .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
+        .status-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none; animation: slideDown 0.5s; }
+        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
+        .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
+        #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
+        #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
+        .custom-select-wrapper { position: relative; }
+        .custom-select-trigger { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--color-border); background-color: #f8fafc; font-family: var(--font-family); font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
+        .custom-select-trigger:hover { border-color: var(--color-primary-end); }
+        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--color-text-secondary); transition: transform 0.3s ease; }
+        .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
+        .custom-options { position: absolute; top: 105%; left: 0; right: 0; background: var(--color-surface); border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 100; max-height: 200px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid var(--color-border); }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: #f4f7fe; }
+        .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
+        #weekSelector { display: none; }
+        
+        .settings-container {
+            display: none;
+            position: relative;
+            margin-top: 15px;
+            text-align: right;
+        }
+        .settings-button {
+            background: transparent;
+            border: none;
+            cursor: pointer;
+            color: var(--color-text-secondary);
+            padding: 5px;
+            border-radius: 50%;
+            transition: all 0.2s ease;
+        }
+        .settings-button:hover {
+            background-color: #eef2ff;
+            color: var(--color-primary-end);
+        }
+        .settings-button.is-active {
+            color: var(--color-primary-end);
+            animation: blink-active 1.5s infinite;
+        }
+        @keyframes blink-active {
+            50% { opacity: 0.4; }
+        }
+        .settings-panel {
+            display: none;
+            position: absolute;
+            bottom: 100%;
+            right: 0;
+            margin-bottom: 8px;
+            background: var(--color-surface);
+            border-radius: 12px;
+            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px;
+            z-index: 100;
+            width: 320px;
+            text-align: left;
+            border: 1px solid var(--color-border);
+        }
+        .settings-panel h3 {
+            font-size: 16px;
+            margin-bottom: 15px;
+            color: var(--color-text);
+        }
+        .holiday-options-container {
+            display: flex;
+            flex-direction: column;
+            gap: 12px;
+            margin-bottom: 15px;
+        }
+        .holiday-option {
+            display: flex;
+            align-items: center;
+            gap: 10px;
+        }
+        .holiday-option label {
+            font-size: 15px;
+            cursor: pointer;
+            text-transform: capitalize;
+        }
+        .holiday-checkbox {
+            width: 18px;
+            height: 18px;
+            cursor: pointer;
+        }
+        .button-small {
+            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
+            color: white;
+            border: none;
+            padding: 8px 16px;
+            border-radius: 8px;
+            font-size: 14px;
+            font-weight: 600;
+            cursor: pointer;
+            transition: transform 0.2s ease;
+        }
+        .button-small:hover {
+            transform: translateY(-2px);
+        }
+
+    </style>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+</head>
+<body>
+    <div class="main-container">
+        <div class="illustration-panel">
+            <div class="route-animation">
+                <div class="road"></div>
+                <div class="stop stop1">
+                    <div class="person-icon"></div>
+                    <div class="stop-pin"></div>
+                </div>
+                <div class="stop stop2">
+                    <div class="person-icon"></div>
+                    <div class="stop-pin"></div>
+                </div>
+                <div class="stop stop3">
+                    <div class="person-icon"></div>
+                    <div class="stop-pin"></div>
+                </div>
+                <div class="van"></div>
+            </div>
+            <h2>Guía Rápida</h2>
+            <p>Sube tu archivo Excel, selecciona la semana y genera un informe con los agentes que necesitan transporte.</p>
+        </div>
+        <div class="content-panel">
+            <div class="header"><h1>Generador de Reporte de Transporte</h1></div>
+            <div class="upload-area" id="uploadArea">
+                <input type="file" id="fileInput" accept=".xlsx,.xls, .csv">
+                <div id="uploadDefaultContent">
+                    <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" class="button-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></div>
+                    <div class="upload-text">Haz clic para seleccionar o arrastra tu archivo</div>
+                </div>
+                <div id="uploadSuccessContent">
+                    <div id="fileNameDisplay"></div>
+                    <div id="changeFileText">Haz clic para cambiar el archivo</div>
+                </div>
+            </div>
+            <div id="weekSelectorContainer">
+                <label for="weekSelector">2. Selecciona la semana a generar</label>
+                <div class="custom-select-wrapper" id="customSelect">
+                    <select id="weekSelector"></select>
+                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando archivo --</div>
+                    <div class="custom-options" id="customOptions"></div>
+                </div>
+            </div>
+            
+            <div class="settings-container" id="settingsContainer">
+                <button id="settingsBtn" class="settings-button" title="Configurar Feriado">
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+                </button>
+                <div class="settings-panel" id="settingsPanel">
+                    <h3>Activar arribo 08:00 en feriados</h3>
+                    <div class="holiday-options-container" id="holidayOptionsContainer">
+                    </div>
+                    <button id="holidayAcceptBtn" class="button-small">Aceptar</button>
+                </div>
+            </div>
+
+            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
+            <div class="button-container">
+                <button class="button" id="generateBtn" disabled>Generar Excel</button>
+            </div>
+            <div class="status-message" id="statusMessage"></div>
+        </div>
+    </div>
+    
+    <script>
+        let allData = null, turnosData = null, generatedWorkbook = null, fileName = '', addressMap = null;
+        let selectedHolidays = []; 
+        
+        const uploadArea = document.getElementById('uploadArea');
+        const fileInput = document.getElementById('fileInput');
+        const fileNameDisplay = document.getElementById('fileNameDisplay'); // Nuevo elemento
+        const generateBtn = document.getElementById('generateBtn');
+        const progressBar = document.getElementById('progressBar');
+        const progressFill = document.getElementById('progressFill');
+        const statusMessage = document.getElementById('statusMessage');
+        const weekSelectorContainer = document.getElementById('weekSelectorContainer');
+        const weekSelector = document.getElementById('weekSelector');
+        const customSelect = document.getElementById('customSelect');
+        const customSelectTrigger = document.getElementById('customSelectTrigger');
+        const customOptions = document.getElementById('customOptions');
+
+        const settingsContainer = document.getElementById('settingsContainer');
+        const settingsBtn = document.getElementById('settingsBtn');
+        const settingsPanel = document.getElementById('settingsPanel');
+        const holidayOptionsContainer = document.getElementById('holidayOptionsContainer');
+        const holidayAcceptBtn = document.getElementById('holidayAcceptBtn');
+
+        customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
+        
+        settingsBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
+            settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
+        });
+
+        holidayAcceptBtn.addEventListener('click', () => {
+            const checkedBoxes = document.querySelectorAll('.holiday-checkbox:checked');
+            selectedHolidays = Array.from(checkedBoxes).map(cb => cb.value);
+            
+            if (selectedHolidays.length > 0) {
+                settingsBtn.classList.add('is-active');
+            } else {
+                settingsBtn.classList.remove('is-active');
+            }
+            settingsPanel.style.display = 'none';
+        });
+        
+        window.addEventListener('click', (e) => { 
+            if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
+            if (!settingsContainer.contains(e.target)) settingsPanel.style.display = 'none';
+        });
+
+        uploadArea.addEventListener('click', () => fileInput.click());
+        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+        
+        function handleFile(file) {
+            // --- INICIO: LÓGICA MODIFICADA PARA MOSTRAR NOMBRE DE ARCHIVO DENTRO ---
+            fileNameDisplay.textContent = file.name;
+            uploadArea.classList.add('file-loaded');
+            // --- FIN: LÓGICA MODIFICADA ---
+
+            generateBtn.disabled = true;
+            settingsContainer.style.display = 'none';
+            addressMap = null;
+
+            const reader = new FileReader();
+            reader.onload = (e) => {
+                try {
+                    const data = new Uint8Array(e.target.result);
+                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                    allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+                    
+                    let addressSheetName = null;
+                    for (const name of workbook.SheetNames) {
+                        if (name.toLowerCase().trim() === 'direcciones') {
+                            addressSheetName = name;
+                            break; 
+                        }
+                    }
+
+                    if (!addressSheetName) {
+                        showStatus('Error: No se encontró la hoja "Direcciones" en el archivo.', 'error');
+                        return;
+                    }
+                    
+                    const addressSheet = workbook.Sheets[addressSheetName];
+                    const addressJson = XLSX.utils.sheet_to_json(addressSheet);
+                    addressMap = new Map();
+                    addressJson.forEach(row => {
+                        const rut = row['Rut'] || row['rut'] || row['RUT'];
+                        if (rut) {
+                            addressMap.set(String(rut).trim(), {
+                                direccion: row['Direcciones'] || row['direcciones'] || row['DIRECCIONES'] || row['DIRECCION'] || row['Direccion'] || row['direccion'] || '',
+                                fono: row['Fono'] || row['fono'] || row['FONO'] || ''
+                            });
+                        }
+                    });
+
+                    populateWeekSelector(allData);
+                    weekSelectorContainer.style.display = 'block';
+                    showStatus('Archivo cargado. Por favor, selecciona una semana.', 'success');
+                } catch(error) {
+                    showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
+                    console.error(error);
+                }
+            };
+            reader.readAsArrayBuffer(file);
+        }
+
+        weekSelector.addEventListener('change', handleWeekSelection);
+
+        function getMonday(d) {
+            d = new Date(d);
+            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            const monday = new Date(d.setDate(diff));
+            monday.setHours(0, 0, 0, 0);
+            return monday;
+        }
+
+        function populateWeekSelector(data) {
+            const weekSet = new Set();
+            data.forEach(row => {
+                if (row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString());
+            });
+
+            const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
+            const last4Weeks = sortedWeeks.slice(0, 4); 
+
+            weekSelector.innerHTML = '';
+            customOptions.innerHTML = '';
+            customSelectTrigger.textContent = '-- Selecciona una semana --';
+            
+            last4Weeks.forEach(mondayISO => {
+                const monday = new Date(mondayISO);
+                const sunday = new Date(monday);
+                sunday.setDate(monday.getDate() + 6);
+                
+                const monthName = sunday.toLocaleString('es-ES', { month: 'long' });
+                const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${monthName}`;
+                
+                const option = document.createElement('option');
+                option.value = mondayISO;
+                option.textContent = optionText;
+                weekSelector.appendChild(option);
+
+                const customOption = document.createElement('div');
+                customOption.classList.add('custom-option');
+                customOption.textContent = optionText;
+                customOption.dataset.value = mondayISO;
+
+                customOption.addEventListener('click', () => {
+                    customSelectTrigger.textContent = customOption.textContent;
+                    weekSelector.value = customOption.dataset.value;
+                    weekSelector.dispatchEvent(new Event('change'));
+                    document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+                    customOption.classList.add('selected');
+                    customSelect.classList.remove('open');
+                });
+                customOptions.appendChild(customOption);
+            });
+        }
+
+        function handleWeekSelection(event) {
+            const selectedMondayISO = event.target.value;
+            if (!selectedMondayISO) {
+                turnosData = null;
+                generateBtn.disabled = true;
+                settingsContainer.style.display = 'none';
+                return;
+            }
+            const selectedMonday = new Date(selectedMondayISO);
+            const nextMonday = new Date(selectedMonday);
+            nextMonday.setDate(selectedMonday.getDate() + 7);
+            turnosData = allData.filter(row => {
+                const rowDate = new Date(row.Fecha);
+                return rowDate >= selectedMonday && rowDate < nextMonday;
+            });
+            generateBtn.disabled = false;
+
+            holidayOptionsContainer.innerHTML = '';
+            selectedHolidays = [];
+            settingsBtn.classList.remove('is-active');
+
+            for (let i = 0; i < 5; i++) {
+                const currentDay = new Date(selectedMonday);
+                currentDay.setDate(selectedMonday.getDate() + i);
+                
+                const valueFormat = currentDay.toISOString().split('T')[0];
+                const displayFormat = { weekday: 'long', day: 'numeric', month: 'long' };
+                const dayName = currentDay.toLocaleDateString('es-ES', displayFormat);
+
+                const optionDiv = document.createElement('div');
+                optionDiv.className = 'holiday-option';
+
+                const checkbox = document.createElement('input');
+                checkbox.type = 'checkbox';
+                checkbox.className = 'holiday-checkbox';
+                checkbox.id = `holiday-${valueFormat}`;
+                checkbox.value = valueFormat;
+                
+                const label = document.createElement('label');
+                label.htmlFor = `holiday-${valueFormat}`;
+                label.textContent = dayName;
+
+                optionDiv.appendChild(checkbox);
+                optionDiv.appendChild(label);
+                holidayOptionsContainer.appendChild(optionDiv);
+            }
+            settingsContainer.style.display = 'block';
+            settingsPanel.style.display = 'none';
+        }
+        
+        function parseExcelTime(excelValue) {
+            if (!excelValue) return null;
+            if (excelValue instanceof Date && !isNaN(excelValue)) return excelValue;
+            if (typeof excelValue === 'number' && excelValue > 0 && excelValue < 1) {
+                const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+                const date = new Date(excelEpoch.getTime() + excelValue * 24 * 60 * 60 * 1000);
+                const timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
+                return new Date(date.getTime() + timezoneOffset);
+            }
+            if (typeof excelValue === 'string') {
+                const parts = excelValue.match(/(\d+):(\d+)(:(\d+))?/);
+                if (parts) {
+                    const hours = parseInt(parts[1], 10), minutes = parseInt(parts[2], 10), seconds = parts[4] ? parseInt(parts[4], 10) : 0;
+                    if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
+                        const date = new Date();
+                        date.setHours(hours, minutes, seconds, 0);
+                        return date;
+                    }
+                }
+            }
+            const parsedDate = new Date(excelValue);
+            if (!isNaN(parsedDate)) return parsedDate;
+            return null;
+        }
+        
+        generateBtn.addEventListener('click', generateTransportExcel);
+        
+        async function triggerDownload() {
+            if (generatedWorkbook && fileName) {
+                const buffer = await generatedWorkbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = fileName;
+                a.click();
+                URL.revokeObjectURL(url);
+            }
+        }
+
+        async function generateTransportExcel() {
+            if (!turnosData || turnosData.length === 0) {
+                showStatus('No hay datos válidos para procesar.', 'error');
+                return;
+            }
+            if (!addressMap) {
+                showStatus('Faltan datos de direcciones. Vuelve a cargar el archivo.', 'error');
+                return;
+            }
+
+            generateBtn.disabled = true;
+            progressBar.classList.add('active');
+            let progress = 0;
+            const progressInterval = setInterval(() => {
+                progress += 10;
+                progressFill.style.width = progress + '%';
+                if (progress >= 100) clearInterval(progressInterval);
+            }, 100);
+            
+            setTimeout(async () => {
+                try {
+                    await createTransportWorkbook(); 
+                    progressBar.classList.remove('active');
+                    progressFill.style.width = '0%';
+
+                    if (fileName) { 
+                        generateBtn.classList.add('is-success');
+                        generateBtn.textContent = 'Descargando...';
+                        showStatus('¡Listo! Iniciando descarga...', 'success');
+                        
+                        await triggerDownload();
+
+                        setTimeout(() => {
+                            generateBtn.classList.remove('is-success');
+                            generateBtn.textContent = 'Generar Excel';
+                            generateBtn.disabled = false;
+                        }, 2000);
+
+                    } else {
+                        generateBtn.disabled = false;
+                    }
+                } catch (error) {
+                    showStatus('Ocurrió un error al generar el archivo.', 'error');
+                    console.error(error);
+                    generateBtn.disabled = false;
+                }
+            }, 1500);
+        }
+        
+        async function createTransportWorkbook() {
+            fileName = '';
+            const workbook = new ExcelJS.Workbook();
+            const transportList = [];
+
+            turnosData.forEach(row => {
+                const estado = row['Estado'] || row['estado'] || row['ESTADO'];
+                if ((estado || '').toLowerCase() !== 'activo') { return; }
+
+                const fecha = row['Fecha'] ? new Date(row['Fecha']) : null;
+                if (!fecha) { return; }
+                
+                const iniValue = row['Ini'] || row['ini'] || row['INI'];
+                const finValue = row['FIN'] || row['Fin'] || row['fin'] || row['FIN '];
+                const ini = parseExcelTime(iniValue);
+                const fin = parseExcelTime(finValue);
+                const nombre = row['Nombre'] || row['nombre'];
+                const rutValue = row['Rut'] || row['RUT'] || row['rut'] || '';
+                
+                let direccion = '';
+                let fono = '';
+                if (addressMap && rutValue) {
+                    const contactInfo = addressMap.get(String(rutValue).trim());
+                    if (contactInfo) {
+                        direccion = contactInfo.direccion;
+                        fono = contactInfo.fono;
+                    }
+                }
+                
+                if (!nombre) { return; }
+                
+                const formattedDate = fecha.toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' });
+                const dayOfWeek = fecha.getDay();
+
+                const itemData = {
+                    rawDate: fecha,
+                    fecha: formattedDate,
+                    rut: rutValue,
+                    nombre: nombre,
+                    direccion: direccion,
+                    fono: fono,
+                    servicio: 'Saesa',
+                    confirmacion: 'No Confirmado'
+                };
+
+                if (ini) {
+                    const iniHour = ini.getHours(), iniMinutes = ini.getMinutes();
+                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const rowDateStr = fecha.toISOString().split('T')[0];
+                    const isHoliday = selectedHolidays.includes(rowDateStr);
+
+                    if (iniHour === 0 && iniMinutes === 0) transportList.push({ ...itemData, hora: '00:00', sentido: 'Arribo' });
+                    else if (iniHour === 7 && iniMinutes === 0 && dayOfWeek >= 1 && dayOfWeek <= 5) transportList.push({ ...itemData, hora: '07:00', sentido: 'Arribo' });
+                    else if (iniHour === 8 && iniMinutes === 0 && (isWeekend || isHoliday)) {
+                        transportList.push({ ...itemData, hora: '08:00', sentido: 'Arribo' });
+                    }
+                }
+
+                if (fin) {
+                    const finHour = fin.getHours(), finMinutes = fin.getMinutes();
+                    if (finHour === 22 && finMinutes === 0) transportList.push({ ...itemData, hora: '22:00', sentido: 'Zarpe' });
+                    else if (finHour === 0 && finMinutes === 0) transportList.push({ ...itemData, hora: '00:00', sentido: 'Zarpe' });
+                }
+            });
+
+            if (transportList.length === 0) {
+                showStatus('No se encontraron agentes "Activos" que requieran transporte.', 'error');
+                fileName = '';
+                return;
+            }
+
+            const getSortOrder = (sentido, hora) => {
+                if (sentido === 'Arribo') {
+                    if (hora === '00:00') return 1; if (hora === '07:00') return 2; if (hora === '08:00') return 3;
+                }
+                if (sentido === 'Zarpe') {
+                    if (hora === '22:00') return 4; if (hora === '00:00') return 5;
+                }
+                return 99;
+            };
+
+            transportList.sort((a, b) => {
+                const dateDiff = a.rawDate - b.rawDate;
+                if (dateDiff !== 0) return dateDiff;
+                const orderA = getSortOrder(a.sentido, a.hora);
+                const orderB = getSortOrder(b.sentido, b.hora);
+                if (orderA !== orderB) return orderA - orderB;
+                return a.nombre.localeCompare(b.nombre);
+            });
+
+            const firstDay = transportList[0].rawDate;
+            const lastDayInList = transportList[transportList.length - 1].rawDate;
+            const d1 = String(firstDay.getDate()).padStart(2, '0');
+            const d2 = String(lastDayInList.getDate()).padStart(2, '0');
+            const monthName = firstDay.toLocaleString('es-ES', { month: 'long' });
+            const sheetName = `semana del ${d1} al ${d2} de ${monthName} ${firstDay.getFullYear()}`;
+            
+            const worksheet = workbook.addWorksheet(sheetName);
+
+            worksheet.columns = [
+                { header: 'Transporte', key: 'transporteId', width: 12 },
+                { header: 'Sentido del viaje', key: 'sentido', width: 20 },
+                { header: 'Fecha', key: 'fecha', width: 15 },
+                { header: 'Hora', key: 'hora', width: 15 },
+                { header: 'Servicio', key: 'servicio', width: 15 },
+                { header: 'RUT', key: 'rut', width: 15 },
+                { header: 'Nombre', key: 'nombre', width: 40 },
+                { header: 'Direcciones', key: 'direccion', width: 50 },
+                { header: 'Fono', key: 'fono', width: 15 },
+                { header: 'Confirmacion', key: 'confirmacion', width: 20 }
+            ];
+            
+            const styleHeaderRow = (row) => {
+                row.eachCell(cell => {
+                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF538DD5' } };
+                    cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                });
+                row.commit();
+            };
+
+            styleHeaderRow(worksheet.getRow(1));
+
+            let transportCounter = 1;
+            let currentDay = null;
+
+            transportList.forEach(item => {
+                if (currentDay !== null && currentDay !== item.rawDate.toDateString()) {
+                    const newHeaderRow = worksheet.addRow(worksheet.columns.map(c => c.header));
+                    styleHeaderRow(newHeaderRow);
+                    transportCounter = 1;
+                }
+                
+                currentDay = item.rawDate.toDateString();
+                
+                const rowData = { transporteId: transportCounter, ...item };
+                const row = worksheet.addRow(rowData);
+
+                let rowColor = '';
+                if (item.sentido === 'Arribo' && item.hora === '00:00') rowColor = 'FFFBE2D5';
+                else if (item.sentido === 'Arribo' && (item.hora === '07:00' || item.hora === '08:00')) rowColor = 'FFF2CEEF';
+                else if (item.sentido === 'Zarpe' && item.hora === '22:00') rowColor = 'FFDAE9F8';
+                else if (item.sentido === 'Zarpe' && item.hora === '00:00') rowColor = 'FFDAF2D0';
+                
+                if (rowColor) {
+                    row.eachCell({ includeEmpty: true }, (cell) => {
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } };
+                    });
+                }
+
+                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                    const key = worksheet.columns[colNumber - 1].key;
+                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(key)) {
+                        cell.alignment = { horizontal: 'center' };
+                    }
+                });
+                transportCounter++;
+            });
+            
+            const confirmacionColRef = `J2:J${worksheet.rowCount}`;
+            worksheet.addConditionalFormatting({
+                ref: confirmacionColRef,
+                rules: [
+                    {
+                        type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'],
+                        style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } },
+                    },
+                    {
+                        type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'],
+                        style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } },
+                    }
+                ]
+            });
+
+            const confirmacionColNumber = 10;
+            worksheet.eachRow((row, rowNumber) => {
+                if (rowNumber > 1 && row.getCell(confirmacionColNumber).value !== 'Confirmacion') {
+                    row.getCell(confirmacionColNumber).dataValidation = {
+                        type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'],
+                        showErrorMessage: true, errorStyle: 'stop', errorTitle: 'Valor no válido',
+                        error: 'Por favor, selecciona "Confirmado" o "No Confirmado".'
+                    };
+                }
+            });
+
+            fileName = `Transporte ${sheetName}.xlsx`;
+            generatedWorkbook = workbook;
+        }
+
+        function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
+    </script>
+</body>
+</html>
