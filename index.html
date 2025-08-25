@@ -1,135 +1,89 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-  <title>Gestor Operativo — Plataforma de Automatización</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-  <style>
-    :root {
-      --color-bg: #f4f7fe;
-      --color-surface: #ffffff;
-      --color-primary-start: #6a11cb;
-      --color-primary-end: #2575fc;
-      --color-disabled: #cbd5e1;
-      --color-text: #0f172a;
-      --color-text-secondary: #64748b;
-      --shadow-lg: 0 20px 40px -12px rgba(0,0,0,0.15);
-      --font: 'Manrope', sans-serif;
-    }
-    * { box-sizing: border-box; }
-    body { margin: 0; font-family: var(--font); background: var(--color-bg); color: var(--color-text); display: flex; min-height: 100vh; overflow: hidden; }
-    .background { position: fixed; inset: 0; overflow: hidden; z-index: -1; }
-    .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; }
-    .blob1 { width: 400px; height: 400px; background: #6a11cb; top: -100px; left: -100px; animation: move1 30s infinite alternate ease-in-out; }
-    .blob2 { width: 350px; height: 350px; background: #2575fc; bottom: -150px; right: -120px; animation: move2 40s infinite alternate ease-in-out; }
-    .blob3 { width: 300px; height: 300px; background: #16a34a; top: 40%; left: 60%; animation: move3 35s infinite alternate ease-in-out; }
-    @keyframes move1 { 0% { transform: translate(0,0);} 100% { transform: translate(150px,200px);} }
-    @keyframes move2 { 0% { transform: translate(0,0);} 100% { transform: translate(-200px,-100px);} }
-    @keyframes move3 { 0% { transform: translate(0,0);} 100% { transform: translate(100px,-150px);} }
-    .sidebar { width: 260px; background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 28px 18px 22px; display: flex; flex-direction: column; align-items: center; box-shadow: var(--shadow-lg); z-index: 10; }
-    .sidebar h1 { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
-    .sidebar h2 { margin: 6px 0 20px; font-size: 12px; font-weight: 400; opacity: .9; text-align: center; }
-    .sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
-    .sidebar a {
-      background: rgba(255,255,255,.16); padding: 12px 14px; border-radius: 10px;
-      font-size: 14px; cursor: pointer; display: flex; justify-content: space-between;
-      align-items: center; transition: background .25s; color: #fff; text-decoration: none;
-    }
-    .sidebar a:hover { background: rgba(255,255,255,.28); }
-    .sidebar a.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; animation: blink 1.2s infinite; }
-    @keyframes blink { 0%,50%,100%{opacity:1} 25%,75%{opacity:0} }
-    .top-banner { position: fixed; top: 0; left: 260px; right: 0; background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 18px 36px; box-shadow: var(--shadow-lg); display: flex; align-items: baseline; gap: 14px; z-index: 5; }
-    .top-banner h1 { margin: 0; font-size: 26px; font-weight: 700; }
-    .top-banner p { margin: 0; font-size: 14px; opacity: .95; }
-    .main { flex: 1; padding: 110px 36px 28px; overflow-y: auto; }
-    .inicio { max-width: 1100px; margin: 0 auto; text-align: center; }
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; margin-top: 26px; }
-    a.card {
-      background: var(--color-surface); border-radius: 18px; padding: 26px; box-shadow: var(--shadow-lg);
-      cursor: pointer; transition: transform .22s, box-shadow .22s; position: relative;
-      text-decoration: none; color: inherit;
-    }
-    a.card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px -15px rgba(106,17,203,.22); }
-    a.card h2 { margin: 12px 0 4px; font-size: 20px; }
-    a.card p { margin: 0; color: var(--color-text-secondary); font-size: 14px; }
-    .card-icon { width: 58px; height: 58px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); font-size: 26px; }
-    .status-pill { position: absolute; top: 12px; right: 12px; background: #e6f7f0; color: #16a34a; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
-    a.card.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
-    .ia-helper { position: fixed; right: 18px; bottom: 18px; display: flex; align-items: flex-end; gap: 10px; z-index: 100;}
-    .ia-msg { background: var(--color-surface); padding: 11px 14px; border-radius: 12px; box-shadow: var(--shadow-lg); font-size: 13px; max-width: 280px; color: var(--color-text-secondary); }
-    .ia-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; display: grid; place-items: center; font-size: 24px; animation: float 3s ease-in-out infinite; }
-    @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
-  </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0" />
+  <title>Gestor Operativo — Plataforma de Automatización</title>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <style>
+    :root {
+      --color-bg: #f4f7fe;
+      --color-surface: #ffffff;
+      --color-primary-start: #6a11cb;
+      --color-primary-end: #2575fc;
+      --color-disabled: #cbd5e1;
+      --color-text: #0f172a;
+      --color-text-secondary: #64748b;
+      --shadow-lg: 0 20px 40px -12px rgba(0,0,0,0.15);
+      --font: 'Manrope', sans-serif;
+    }
+    * { box-sizing: border-box; }
+    body { margin: 0; font-family: var(--font); background: var(--color-bg); color: var(--color-text); display: flex; min-height: 100vh; overflow: hidden; }
+    .background { position: fixed; inset: 0; overflow: hidden; z-index: -1; }
+    .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; }
+    .blob1 { width: 400px; height: 400px; background: #6a11cb; top: -100px; left: -100px; animation: move1 30s infinite alternate ease-in-out; }
+    .blob2 { width: 350px; height: 350px; background: #2575fc; bottom: -150px; right: -120px; animation: move2 40s infinite alternate ease-in-out; }
+    .blob3 { width: 300px; height: 300px; background: #16a34a; top: 40%; left: 60%; animation: move3 35s infinite alternate ease-in-out; }
+    @keyframes move1 { 0% { transform: translate(0,0);} 100% { transform: translate(150px,200px);} }
+    @keyframes move2 { 0% { transform: translate(0,0);} 100% { transform: translate(-200px,-100px);} }
+    @keyframes move3 { 0% { transform: translate(0,0);} 100% { transform: translate(100px,-150px);} }
+    .sidebar { width: 260px; background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 28px 18px 22px; display: flex; flex-direction: column; align-items: center; box-shadow: var(--shadow-lg); z-index: 10; }
+    .sidebar h1 { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
+    .sidebar h2 { margin: 6px 0 20px; font-size: 12px; font-weight: 400; opacity: .9; text-align: center; }
+    .sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
+    .sidebar a {
+      background: rgba(255,255,255,.16); padding: 12px 14px; border-radius: 10px;
+      font-size: 14px; cursor: pointer; display: flex; justify-content: space-between;
+      align-items: center; transition: background .25s; color: #fff; text-decoration: none;
+    }
+    .sidebar a:hover { background: rgba(255,255,255,.28); }
+    .sidebar a.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
+    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; animation: blink 1.2s infinite; }
+    @keyframes blink { 0%,50%,100%{opacity:1} 25%,75%{opacity:0} }
+    .top-banner { position: fixed; top: 0; left: 260px; right: 0; background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 18px 36px; box-shadow: var(--shadow-lg); display: flex; align-items: baseline; gap: 14px; z-index: 5; }
+    .top-banner h1 { margin: 0; font-size: 26px; font-weight: 700; }
+    .top-banner p { margin: 0; font-size: 14px; opacity: .95; }
+    .main { flex: 1; padding: 110px 36px 28px; overflow-y: auto; }
+    /* Estilos del iframe */
+    .content-frame { width: 100%; height: 100%; border: none; background: var(--color-surface); border-radius: 18px; box-shadow: var(--shadow-lg); }
+    .ia-helper { position: fixed; right: 18px; bottom: 18px; display: flex; align-items: flex-end; gap: 10px; z-index: 100;}
+    .ia-msg { background: var(--color-surface); padding: 11px 14px; border-radius: 12px; box-shadow: var(--shadow-lg); font-size: 13px; max-width: 280px; color: var(--color-text-secondary); }
+    .ia-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; display: grid; place-items: center; font-size: 24px; animation: float 3s ease-in-out infinite; }
+    @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+  </style>
 </head>
 <body>
-  <div class="background">
-    <div class="blob blob1"></div>
-    <div class="blob blob2"></div>
-    <div class="blob blob3"></div>
-  </div>
+  <div class="background">
+    <div class="blob blob1"></div>
+    <div class="blob blob2"></div>
+    <div class="blob blob3"></div>
+  </div>
 
-  <aside class="sidebar">
-    <h1>Gestor Operativo</h1>
-    <h2>Plataforma de automatización</h2>
-    <ul>
-      <li><a href="index.html">🏠 Inicio</a></li>
-      <li><a href="transporte.html">🚐 Gestión de Transporte <span class='status-dot'></span></a></li>
-      <li><a href="calendario.html">📅 Calendario Teletrabajo <span class='status-dot'></span></a></li>
-      <li><a href="turnos.html">📊 Turnos Diarios <span class='status-dot'></span></a></li>
-      <li><a href="cartas.html">📄 Carta Amonestación <span class='status-dot'></span></a></li>
-      <li><a href="cambio-turnos.html">🔄 Cambio de Turnos <span class='status-dot'></span></a></li>
-    </ul>
-  </aside>
+  <aside class="sidebar">
+    <h1>Gestor Operativo</h1>
+    <h2>Plataforma de automatización</h2>
+    <ul>
+            <li><a href="bienvenida.html" target="marco_contenido">🏠 Inicio</a></li>
+      <li><a href="transporte.html" target="marco_contenido">🚐 Gestión de Transporte <span class='status-dot'></span></a></li>
+      <li><a href="calendario.html" target="marco_contenido">📅 Calendario Teletrabajo <span class='status-dot'></span></a></li>
+      <li><a href="turnos.html" target="marco_contenido">📊 Turnos Diarios <span class='status-dot'></span></a></li>
+      <li><a href="cartas.html" target="marco_contenido">📄 Carta Amonestación <span class='status-dot'></span></a></li>
+      <li><a href="cambio-turnos.html" target="marco_contenido">🔄 Cambio de Turnos <span class='status-dot'></span></a></li>
+    </ul>
+  </aside>
 
-  <header class="top-banner" id="topBanner">
-    <h1>⚡ Gestor Operativo</h1>
-    <p>Plataforma de automatización inteligente</p>
-  </header>
+  <header class="top-banner" id="topBanner">
+    <h1>⚡ Gestor Operativo</h1>
+    <p>Plataforma de automatización inteligente</p>
+  </header>
 
-  <main class="main">
-    <section id="inicio" class="inicio">
-      <h1>🚀 Bienvenido</h1>
-      <p>Selecciona el módulo que deseas utilizar</p>
-      <div class="card-grid">
-        <a href="transporte.html" class="card">
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-          <div class="card-icon">🚐</div>
-          <h2>Gestión de Transporte</h2>
-          <p>Genera reportes de arribo y zarpe de personal.</p>
-        </a>
-        <a href="calendario.html" class="card">
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-          <div class="card-icon">📅</div>
-          <h2>Calendario Teletrabajo</h2>
-          <p>Gestiona la presencialidad y el trabajo remoto.</p>
-        </a>
-        <a href="turnos.html" class="card">
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-          <div class="card-icon">📊</div>
-          <h2>Turnos Diarios</h2>
-          <p>Genera turnos de forma automática y optimizada.</p>
-        </a>
-        <a href="cartas.html" class="card">
-            <div class="status-pill"><span class="status-dot"></span>Activo</div>
-          <div class="card-icon">📄</div>
-          <h2>Carta de Amonestación</h2>
-          <p>Crea documentos formales en segundos.</p>
-        </a>
-        <a href="cambio-turnos.html" class="card">
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-          <div class="card-icon">🔄</div>
-          <h2>Cambio de Turnos</h2>
-          <p>Gestiona solicitudes de cambio de turno entre agentes.</p>
-        </a>
-      </div>
-    </section>
-  </main>
+  <main class="main">
+    <iframe name="marco_contenido" src="bienvenida.html" class="content-frame"></iframe>
+  </main>
 
-  <div class="ia-helper">
-    <div class="ia-msg" id="iaMsg">💡 Consejo: Haz clic en un módulo para comenzar.</div>
-    <div class="ia-avatar">🤖</div>
-  </div>
+  <div class="ia-helper">
+    <div class="ia-msg" id="iaMsg">💡 Consejo: Haz clic en un módulo para comenzar.</div>
+    <div class="ia-avatar">🤖</div>
+  </div>
 </body>
 </html>
