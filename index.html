@@ -412,15 +412,15 @@
           'transporte.html': {
             name: 'Gestión de Transporte',
             tips: [
-              '📋 Asegúrate de que tu archivo tenga la hoja "Direcciones" para mapear contactos',
-              '🚐 El sistema detecta automáticamente turnos que requieren transporte (00:00, 07:00, 08:00, 22:00)',
-              '📅 Puedes configurar feriados especiales para activar arribos a las 08:00',
-              '⚠️ Solo se procesan agentes con estado "Activo" en el sistema'
+              '🚐 Gestiona quién necesita transporte y sus direcciones de recogida',
+              '✅ Sistema de confirmación: "Confirmado" vs "No Confirmado"',
+              '📍 Requiere hoja "Direcciones" con RUT, direcciones y teléfonos',
+              '⏰ Detecta horarios: 00:00, 07:00, 08:00 (arribo) y 22:00, 00:00 (zarpe)'
             ],
-            fileUploaded: '¡Perfecto! He detectado tu archivo. Ahora selecciona la semana que necesitas procesar.',
-            weekSelected: '✅ Semana configurada. El sistema generará rutas optimizadas automáticamente.',
-            generating: '🚐 Analizando turnos y generando rutas de transporte inteligentes...',
-            success: '🎉 ¡Excelente! Tu reporte de transporte está listo. El archivo incluye confirmaciones automáticas.',
+            fileUploaded: '🚐 Archivo cargado. Verificando hoja "Direcciones" y datos de contacto...',
+            weekSelected: '✅ Semana seleccionada. Identificando agentes que requieren transporte.',
+            generating: '📍 Mapeando direcciones y generando rutas de transporte...',
+            success: '🎉 ¡Reporte de transporte listo! Incluye direcciones, teléfonos y estado de confirmación.',
             errors: {
               noDirections: '❌ Falta la hoja "Direcciones". Sin ella no puedo mapear las ubicaciones.',
               noActiveAgents: '⚠️ No encontré agentes activos que necesiten transporte en esta semana.'
@@ -429,47 +429,52 @@
           'calendario.html': {
             name: 'Calendario Teletrabajo',
             tips: [
-              '🏠 Sistema inteligente de distribución TT/Presencial basado en patrones',
-              '⚙️ Configuraciones especiales para turnos AM, PM, Noche y Fines de semana',
-              '📈 16 agentes preconfigurados con modalidades 3x2, 4x1 y especiales',
-              '🎯 Puedes agregar nuevos agentes y personalizar sus patrones'
+              '🏠 Distribuye automáticamente días de Teletrabajo vs Presencial',
+              '👥 16 agentes preconfigurados con patrones 3x2, 4x1 y especiales',
+              '⚙️ Configuraciones especiales para AM, PM, Noche y Fines de semana',
+              '🎯 Modalidad "Especial" para horarios específicos por agente'
             ],
-            fileUploaded: '📊 Archivo cargado. He detectado los agentes y estoy preparando las configuraciones.',
-            weekSelected: '📅 Perfecto. Generaré el calendario basado en los patrones inteligentes configurados.',
+            fileUploaded: '📊 Archivo procesado. Cargando configuraciones de agentes preestablecidas...',
+            weekSelected: '📅 Semana lista. Aplicaré los patrones de TT/Presencial configurados.',
             generating: '🧠 Aplicando inteligencia artificial para distribuir TT y presencialidad...',
-            success: '🎊 ¡Calendario generado con éxito! Distribución optimizada aplicada.',
-            configuring: '⚙️ Ajusta las configuraciones de los agentes para personalizar la distribución.'
+            success: '📋 ¡Calendario generado! Distribución TT/Presencial aplicada según patrones.',
+            configuring: '⚙️ Personaliza los patrones de cada agente según sus necesidades.'
           },
           'cartas.html': {
             name: 'Generador de Cartas',
             tips: [
-              '📝 Genera cartas de amonestación y compromiso automáticamente',
-              '⏰ Filtra por rango de fechas para procesar incidencias específicas',
-              '🔄 Agrupa múltiples incidencias del mismo agente en una sola carta',
-              '📄 Formato profesional listo para impresión y archivo'
+              '📄 Genera cartas de amonestación y compromiso automáticamente',
+              '🔍 Detecta: atrasos, ausencias y abandonos de trabajo',
+              '📅 Filtra por rangos de fecha para procesar incidencias específicas',
+              '📝 Agrupa múltiples incidencias del mismo agente en una carta'
             ],
-            fileUploaded: '📋 Datos cargados. Detectando incidencias de atrasos, ausencias y abandonos...',
-            filtering: '🔍 Filtro por fechas activo. Ajusta el rango según tus necesidades.',
-            generating: '✍️ Redactando cartas personalizadas con formato legal corporativo...',
-            success: '📜 ¡Cartas generadas exitosamente! Documentos listos para revisión y envío.'
+            fileUploaded: '📋 Analizando incidencias: atrasos, ausencias y abandonos de trabajo...',
+            filtering: '🔍 Filtro de fechas configurado. Procesando incidencias del período seleccionado.',
+            generating: '✍️ Redactando cartas con formato legal y agrupando por agente...',
+            success: '📜 ¡Cartas generadas! Documentos legales listos con formato corporativo.'
           },
           'turnos.html': {
             name: 'Turnos Diarios',
             tips: [
-              '🔄 Genera turnos automatizados con distribución inteligente',
-              '📊 Optimización basada en disponibilidad y cargas de trabajo',
-              '⚖️ Balanceo automático de recursos por franjas horarias'
+              '📅 Organiza turnos en 7 hojas Excel (Lunes a Domingo)',
+              '👥 Separa: Supervisores → Agentes Site → Teletrabajo → Inactivos',
+              '🌙 Turnos de madrugada (00:00) se muestran en sección especial',
+              '⚙️ Configura texto de "Permanencia" personalizado'
             ],
-            generating: '⚙️ Procesando algoritmos de optimización de turnos...'
+            fileUploaded: '📊 Turnos cargados. Organizando por días de la semana...',
+            weekSelected: '📅 Semana seleccionada. Preparando 7 hojas de turnos diarios.',
+            generating: '📋 Creando hojas por día y separando por tipos de servicio...',
+            success: '📈 ¡Turnos listos! Excel con 7 hojas organizadas por día.',
+            permanenciaConfigured: '⚙️ Texto de permanencia configurado correctamente.'
           },
           'cambio-turnos.html': {
             name: 'Cambio de Turnos',
             tips: [
               '🔄 Gestiona solicitudes de intercambio entre agentes',
               '✅ Validación automática de compatibilidad de horarios',
-              '📋 Tracking completo de solicitudes y aprobaciones'
+              '📋 Seguimiento de solicitudes y aprobaciones'
             ],
-            generating: '🔄 Procesando cambios y validando compatibilidades...'
+            generating: '🔄 Procesando solicitudes de cambio y validando compatibilidades...'
           }
         };
         
@@ -558,15 +563,21 @@
             });
           });
           
-          // Monitor button clicks
-          const buttons = iframeDoc.querySelectorAll('.button');
-          buttons.forEach(button => {
+          // Monitor for settings configuration (specific to modules with settings)
+          const settingsButtons = iframeDoc.querySelectorAll('#settingsBtn, #toggleAgentConfigBtn, #permanenciaAcceptBtn');
+          settingsButtons.forEach(button => {
             button.addEventListener('click', () => {
-              if (button.textContent.toLowerCase().includes('generar')) {
-                this.onGenerationStarted();
-              }
+              this.onSettingsConfigured();
             });
           });
+          
+          // Monitor for permanencia configuration in turnos module
+          const permanenciaInput = iframeDoc.querySelector('#permanenciaInput');
+          if (permanenciaInput) {
+            permanenciaInput.addEventListener('input', () => {
+              this.onPermanenciaConfigured();
+            });
+          }
           
           // Monitor for success states
           const observer = new MutationObserver((mutations) => {
@@ -654,6 +665,11 @@
           this.updateMessage(data.success, 'success');
           this.playAnimation('celebration');
           this.showCelebration();
+          
+          // Mostrar tip contextual después del éxito (sin saturar)
+          setTimeout(() => {
+            this.showContextualTip();
+          }, 4000);
         }
       }
       
@@ -662,15 +678,31 @@
         this.showCelebration();
       }
       
-      onProgressDetected() {
-        this.playAnimation('pulse');
+      onSettingsConfigured() {
+        const data = this.moduleData[this.currentModule];
+        if (this.currentModule === 'calendario.html') {
+          this.updateMessage('⚙️ Configuraciones de agentes actualizadas. Patrones personalizados aplicados.', 'info');
+        } else if (this.currentModule === 'transporte.html') {
+          this.updateMessage('🗓️ Feriados configurados. Arribos especiales activados para las fechas seleccionadas.', 'info');
+        }
+      }
+      
+      onPermanenciaConfigured() {
+        if (this.currentModule === 'turnos.html') {
+          const data = this.moduleData[this.currentModule];
+          if (data && data.permanenciaConfigured) {
+            this.updateMessage(data.permanenciaConfigured, 'success');
+            this.playAnimation('bounce');
+          }
+        }
       }
       
       analyzeCurrentModule() {
         const data = this.moduleData[this.currentModule];
-        if (data) {
-          const randomTip = data.tips[Math.floor(Math.random() * data.tips.length)];
-          this.updateMessage(randomTip, 'info');
+        if (data && this.currentModule !== 'home') {
+          // Solo mostrar un tip específico, no todos
+          const welcomeTip = data.tips[0]; // Solo el primer tip como bienvenida
+          this.updateMessage(`🚀 ${data.name}: ${welcomeTip}`, 'info');
         }
       }
       
@@ -686,7 +718,8 @@
       
       showModulePreview(moduleName) {
         const data = this.moduleData[moduleName];
-        if (data) {
+        if (data && this.currentModule === 'home') {
+          // Solo mostrar preview cuando estés en home
           this.updateMessage(`🔍 ${data.name}: ${data.tips[0]}`, 'preview');
         }
       }
@@ -694,12 +727,12 @@
       showQuickTip(element) {
         const text = element.textContent;
         const tips = {
-          'Inicio': '🏠 Centro de comando - Acceso rápido a todos los módulos',
-          'Gestión de Transporte': '🚐 Optimiza rutas y horarios de transporte automáticamente',
-          'Calendario Teletrabajo': '📅 IA que distribuye TT/Presencial de forma inteligente',
-          'Turnos Diarios': '📊 Algoritmos avanzados para turnos equilibrados',
-          'Carta Amonestación': '📝 Genera documentación legal automatizada',
-          'Cambio de Turnos': '🔄 Sistema inteligente de intercambios'
+          'Inicio': '🏠 Centro de comando - Acceso rápido a todos los módulos automatizados',
+          'Gestión de Transporte': '🚐 IA que optimiza rutas y detecta horarios de transporte automáticamente',
+          'Calendario Teletrabajo': '📅 Sistema inteligente que distribuye TT/Presencial con 16 patrones preconfigurados',
+          'Turnos Diarios': '📊 Generador que organiza turnos por días con separación automática por servicios',
+          'Carta Amonestación': '📝 Redacción automática de cartas legales con agrupación inteligente',
+          'Cambio de Turnos': '🔄 Sistema de intercambios con validación automática de compatibilidad'
         };
         
         Object.entries(tips).forEach(([key, tip]) => {
@@ -760,13 +793,19 @@
       setCurrentModule(moduleName) {
         this.currentModule = moduleName;
         
-        // Show contextual welcome message
-        setTimeout(() => {
-          const data = this.moduleData[moduleName];
-          if (data) {
-            this.updateMessage(`🚀 ${data.name} activado. ${data.tips[0]}`, 'info');
-          }
-        }, 500);
+        // Solo mostrar mensaje de bienvenida específico del módulo una vez
+        if (moduleName !== 'home') {
+          setTimeout(() => {
+            const data = this.moduleData[moduleName];
+            if (data) {
+              this.updateMessage(`✨ ${data.name} activado. ${data.tips[0]}`, 'info');
+            }
+          }, 800);
+        } else {
+          setTimeout(() => {
+            this.showWelcomeMessage();
+          }, 300);
+        }
       }
     }
     
