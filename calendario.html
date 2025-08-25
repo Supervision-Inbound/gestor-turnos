@@ -24,7 +24,7 @@
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font-family); background-color: var(--color-bg); 
+            font-family: var(--font-family); background-color: var(--color-bg);
             color: var(--color-text); position: relative;
             display: flex;
             padding: 40px 20px;
@@ -66,7 +66,7 @@
         .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
         .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
         .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
-        
+
         .upload-area.file-loaded #uploadDefaultContent { display: none; }
         .upload-area #uploadSuccessContent { display: none; }
         .upload-area.file-loaded #uploadSuccessContent { display: block; }
@@ -92,12 +92,12 @@
         .button.secondary { background: #f8fafc; color: var(--color-text); border: 1px solid var(--color-border); }
         .button.secondary:hover { background: #e2e8f0; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
         .button-icon { width: 20px; height: 20px; }
-        
+
         .button.icon-button {
             padding: 8px; width: 40px; height: 40px;
             border-radius: 50%; justify-content: center;
         }
-        
+
         .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
         .progress-bar.active { display: block; }
         .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
@@ -106,7 +106,7 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
         .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-        
+
         #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
         #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
         .custom-select-wrapper { position: relative; }
@@ -124,10 +124,10 @@
 
         #agentConfigContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
         .config-header { display: flex; justify-content: flex-end; margin-bottom: 15px; }
-        
+
         #toggleAgentConfigBtn {
             background: var(--color-primary-end);
-            color: white; 
+            color: white;
             animation: blink-blue 1.5s infinite ease-in-out;
         }
         #toggleAgentConfigBtn:hover {
@@ -143,7 +143,7 @@
                 box-shadow: 0 0 12px rgba(37, 117, 252, 0.7);
             }
         }
-        
+
         .agents-list { max-height: 60vh; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
         .agent-item { padding: 15px; border-bottom: 1px solid var(--color-border); display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 15px; align-items: start; }
         .agent-item:last-child { border-bottom: none; }
@@ -154,7 +154,7 @@
         .day-checkboxes { display: flex; gap: 5px; flex-wrap: wrap; }
         .day-checkbox-label { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--color-text-secondary); }
         .day-checkbox { width: 16px; height: 16px; cursor: pointer; }
-        
+
         .view-special-btn {
             padding: 6px 10px;
             font-size: 12px;
@@ -216,7 +216,7 @@
         </div>
         <div class="content-panel">
             <div class="header"><h1>Generador de Calendario de Presencialidad</h1></div>
-            
+
             <div class="upload-area" id="uploadArea">
                 <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
                 <div id="uploadDefaultContent">
@@ -248,9 +248,9 @@
                         <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
                     </button>
                 </div>
-                
+
                 <div class="agents-list" id="agentsList" style="display: none;"></div>
-                
+
                 <div class="add-agent-section" id="addAgentSection" style="display: none;">
                     <div class="add-agent-controls">
                         <select class="add-agent-select" id="addAgentSelect">
@@ -260,25 +260,30 @@
                     </div>
                 </div>
             </div>
-            
+
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
-            
+
             <div class="button-container">
                 <button class="button" id="generateBtn" disabled>Generar Calendario</button>
             </div>
-            
+
+            <div class="button-container" id="secondaryButtonContainer" style="display: none; margin-top: 15px;">
+                <button class="button secondary" id="downloadShiftsBtn">Descargar Malla de Turnos</button>
+            </div>
+
             <div class="status-message" id="statusMessage"></div>
         </div>
     </div>
-    
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
         let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
         let availableAgents = [], configuredAgents = new Map();
-        
+        let calendarResults = new Map();
+
         let defaultAgentsConfig = [
             { nombre: "Aros Medina Carla Yessenia", modalidad: "3x2", condicion: ["segundo", "cuarto"] },
             { nombre: "Alvarado Catalán Yocelyn Susana", modalidad: "4x1", condicion: ["segundo"] },
@@ -316,10 +321,11 @@
         const addAgentSection = document.getElementById('addAgentSection');
         const addAgentSelect = document.getElementById('addAgentSelect');
         const addAgentBtn = document.getElementById('addAgentBtn');
+        const downloadShiftsBtn = document.getElementById('downloadShiftsBtn');
 
         customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-        window.addEventListener('click', (e) => { 
-            if (!customSelect.contains(e.target)) customSelect.classList.remove('open'); 
+        window.addEventListener('click', (e) => {
+            if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
         });
 
         uploadArea.addEventListener('click', () => fileInput.click());
@@ -337,11 +343,13 @@
         addAgentBtn.addEventListener('click', addAgent);
         weekSelector.addEventListener('change', handleWeekSelection);
         generateBtn.addEventListener('click', generateCalendar);
-        
+        downloadShiftsBtn.addEventListener('click', downloadShiftRoster);
+
         function handleFile(file) {
             fileNameDisplay.textContent = file.name;
             uploadArea.classList.add('file-loaded');
             generateBtn.disabled = true;
+            document.getElementById('secondaryButtonContainer').style.display = 'none';
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -349,8 +357,21 @@
                     const data = new Uint8Array(e.target.result);
                     const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                     let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    
-                    allData = jsonData;
+
+                    const timeColumns = ['Ini', 'INI', 'FIN', 'Fin', 'Desc_1', 'Ini_ Colac', 'Fin_ Colac', 'Desc_2', 'INICIO TURNO', 'FIN DEL TURNO'];
+                    jsonData.forEach(row => {
+                        for (const key in row) {
+                            const keyTrimmedLower = key.trim().toLowerCase();
+                            const isTimeColumn = timeColumns.some(col => col.toLowerCase() === keyTrimmedLower);
+                            
+                            if (isTimeColumn && row[key] instanceof Date) {
+                                const date = row[key];
+                                date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
+                            }
+                        }
+                    });
+
+                    allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
 
                     extractAvailableAgents(allData);
                     populateWeekSelector(allData);
@@ -371,28 +392,28 @@
         function extractAvailableAgents(data) {
             const agentsSet = new Set();
             data.forEach(row => {
-                if (row.Nombre && row.Rut) {
-                    const normalizedRowName = row.Nombre.replace(/\s/g, '').toLowerCase();
-                    const isConfigured = defaultAgentsConfig.some(config => 
-                        config.nombre.replace(/\s/g, '').toLowerCase() === normalizedRowName
-                    );
-                    if (!isConfigured) {
-                        agentsSet.add(JSON.stringify({ nombre: row.Nombre, rut: row.Rut }));
-                    }
+                if (!row || typeof row.Nombre === 'undefined' || !row.Rut) return;
+
+                const normalizedRowName = String(row.Nombre).replace(/\s/g, '').toLowerCase();
+                const isConfigured = defaultAgentsConfig.some(config =>
+                    String(config.nombre).replace(/\s/g, '').toLowerCase() === normalizedRowName
+                );
+                if (!isConfigured) {
+                    agentsSet.add(JSON.stringify({ nombre: row.Nombre, rut: row.Rut }));
                 }
             });
             availableAgents = Array.from(agentsSet).map(agentStr => JSON.parse(agentStr));
         }
 
-        // CORRECCIÓN DEFINITIVA: Lógica de comparación de nombres mejorada para ignorar espacios en blanco
         function initializeDefaultConfigurations() {
             configuredAgents.clear();
             defaultAgentsConfig.forEach(defaultConfig => {
-                const normalizedConfigName = defaultConfig.nombre.replace(/\s/g, '').toLowerCase();
-                
-                const agentInFile = allData.find(row => 
-                    row.Nombre && row.Nombre.replace(/\s/g, '').toLowerCase() === normalizedConfigName
-                );
+                const normalizedConfigName = String(defaultConfig.nombre).replace(/\s/g, '').toLowerCase();
+
+                const agentInFile = allData.find(row => {
+                    if (!row || typeof row.Nombre === 'undefined') return false;
+                    return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
+                });
 
                 if (agentInFile) {
                     const key = `${defaultConfig.nombre}_${agentInFile.Rut || 'SIN_RUT'}`;
@@ -405,7 +426,7 @@
                 }
             });
         }
-        
+
         function fixIncoherentConfiguration(condicion) {
             const fixed = [];
             const types = ['am', 'pm', 'noche', 'weekend_festivos'];
@@ -465,7 +486,7 @@
                 const isNowSpecial = e.target.value === 'especial';
                 dayCheckboxContainer.style.display = isNowSpecial ? 'none' : 'flex';
                 viewSpecialBtn.style.display = isNowSpecial ? 'block' : 'none';
-                specialConfigContainer.classList.remove('active'); 
+                specialConfigContainer.classList.remove('active');
                 viewSpecialBtn.textContent = '[+] Ver detalles';
                 updateAgentConfig(key);
             });
@@ -474,7 +495,7 @@
                 const isActive = specialConfigContainer.classList.toggle('active');
                 viewSpecialBtn.textContent = isActive ? '[-] Ocultar' : '[+] Ver detalles';
             });
-            
+
             div.querySelectorAll('.day-checkbox, .special-checkbox').forEach(cb => cb.addEventListener('change', (e) => {
                 if (e.target.checked && e.target.classList.contains('special-checkbox')) {
                     let conflictingValue = e.target.value.includes('_tt') ? e.target.value.replace('_tt', '_site') : e.target.value.replace('_site', '_tt');
@@ -487,9 +508,10 @@
         }
 
         function updateAgentConfig(key) {
-            const agentItem = Array.from(agentsList.children).find(item => item.querySelector('.agent-name').textContent.trim() === configuredAgents.get(key).nombre.trim());
+            const config = configuredAgents.get(key);
+            if (!config) return;
+            const agentItem = Array.from(agentsList.children).find(item => item.querySelector('.agent-name').textContent.trim() === config.nombre.trim());
             if (agentItem) {
-                const config = configuredAgents.get(key);
                 config.modalidad = agentItem.querySelector('.modalidad-select').value;
                 config.condicion = config.modalidad === 'especial'
                     ? Array.from(agentItem.querySelectorAll('.special-checkbox:checked')).map(cb => cb.value)
@@ -533,7 +555,7 @@
 
         function populateWeekSelector(data) {
             const weekSet = new Set();
-            data.forEach(row => { if (row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
+            data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
             const last4Weeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)).slice(0, 4);
             weekSelector.innerHTML = ''; customOptions.innerHTML = '';
             customSelectTrigger.textContent = '-- Selecciona una semana --';
@@ -565,10 +587,12 @@
             if (!selectedMondayISO) {
                 turnosData = null; generateBtn.disabled = true; return;
             }
+            document.getElementById('secondaryButtonContainer').style.display = 'none';
             const selectedMonday = new Date(selectedMondayISO);
             const nextMonday = new Date(selectedMonday);
             nextMonday.setDate(selectedMonday.getDate() + 7);
             turnosData = allData.filter(row => {
+                if (!row || !row.Fecha) return false;
                 const rowDate = new Date(row.Fecha);
                 return rowDate >= selectedMonday && rowDate < nextMonday;
             });
@@ -592,6 +616,7 @@
             if (configuredAgents.size === 0) {
                 showStatus('Debes configurar al menos un agente.', 'error'); return;
             }
+            calendarResults.clear();
             generateBtn.disabled = true;
             progressBar.classList.add('active');
             let progress = 0;
@@ -611,13 +636,14 @@
                             generateBtn.classList.remove('is-success');
                             generateBtn.textContent = 'Generar Calendario';
                             generateBtn.disabled = false;
+                            document.getElementById('secondaryButtonContainer').style.display = 'block';
                         }, 2000);
                     } else {
                          generateBtn.disabled = false;
                     }
                 } catch (error) {
                     showStatus('Ocurrió un error al generar el archivo.', 'error');
-                    console.error(error);
+                    console.error("Error en generateCalendar:", error);
                     generateBtn.disabled = false;
                 }
             }, 1500);
@@ -627,13 +653,13 @@
             fileName = '';
             const workbook = new ExcelJS.Workbook();
             const worksheet = workbook.addWorksheet('Calendario TT');
-            
+
             const monday = getMonday(new Date(weekSelector.value));
             const monthName = monday.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
             const year = monday.getFullYear();
-            
+
             const weekDays = Array.from({length: 7}, (_, i) => new Date(new Date(monday).setDate(monday.getDate() + i)));
-            
+
             fileName = `Calendario TT semana del ${weekDays[0].getDate()} al ${weekDays[6].getDate()} de ${monthName} ${year}.xlsx`;
             createCalendarSheet(worksheet, weekDays, monthName, year);
 
@@ -677,15 +703,17 @@
 
             let agentNumber = 1;
             configuredAgents.forEach((config) => {
-                const normalizedConfigName = config.nombre.replace(/\s/g, '').toLowerCase();
-                const agentShifts = turnosData.filter(row => row.Nombre && row.Nombre.replace(/\s/g, '').toLowerCase() === normalizedConfigName);
-                
+                const normalizedConfigName = String(config.nombre).replace(/\s/g, '').toLowerCase();
+                const agentShifts = turnosData.filter(row => {
+                    if (!row || typeof row.Nombre === 'undefined' || row.Nombre === null) return false;
+                    return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
+                });
+
                 if (agentShifts.length > 0) {
                     const agentRow = worksheet.getRow(rowIndex++);
                     agentRow.getCell(1).value = agentNumber++;
-                    // Usamos el nombre de la configuración que es el "oficial" y completo
                     agentRow.getCell(2).value = config.nombre;
-                    
+
                     weekDays.forEach((day, dayIndex) => {
                         const dayShift = agentShifts.find(s => s.Fecha && new Date(s.Fecha).toDateString() === day.toDateString());
                         let status = 'LIBRE';
@@ -702,6 +730,8 @@
                         cell.value = status;
                         if (status === 'TT') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
                         else if (status === 'SITE') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+
+                        calendarResults.set(`${config.nombre}_${day.toDateString()}`, status);
                     });
 
                     agentRow.getCell(10).value = generateConditionText(config);
@@ -715,9 +745,123 @@
             });
         }
 
+        async function downloadShiftRoster() {
+            try {
+                if (!turnosData || turnosData.length === 0) {
+                    showStatus('No hay datos de turnos válidos para procesar.', 'error');
+                    return;
+                }
+                const validData = turnosData.filter(row => row && row.Nombre && row.Fecha && typeof row.Nombre === 'string');
+                if (validData.length === 0) {
+                    showStatus('No hay registros válidos con Nombre y Fecha.', 'error');
+                    return;
+                }
+
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Malla de Turnos');
+
+                // --- 1. Definir Estilos ---
+                const borderStyle = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                const centerAlignment = { vertical: 'middle', horizontal: 'center' };
+                
+                const headerStyle = {
+                    font: { bold: true, color: { argb: 'FFFFFFFF' }, name: 'Calibri', size: 11 },
+                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002060' } }, // Azul oscuro
+                    border: borderStyle,
+                    alignment: centerAlignment
+                };
+
+                // --- 2. Definir y Configurar Columnas ---
+                const originalHeaders = Object.keys(validData[0]);
+                worksheet.columns = originalHeaders.map(header => {
+                    let width = 15;
+                    const cleanHeader = header.trim().toLowerCase();
+                    if (cleanHeader === 'nombre') width = 30;
+                    else if (cleanHeader === 'fecha') width = 12;
+                    else if (cleanHeader.includes('ini') || cleanHeader.includes('fin')) width = 10;
+                    return { header: header.trim(), key: header, width: width };
+                });
+
+                // --- 3. Aplicar Estilo al Encabezado ---
+                worksheet.getRow(1).eachCell(cell => {
+                    cell.style = headerStyle;
+                });
+
+                // --- 4. Función Auxiliar para Búsqueda Insensible a Mayúsculas ---
+                const findVal = (row, possibleNames) => {
+                    const key = Object.keys(row).find(k => possibleNames.includes(k.trim().toLowerCase()));
+                    return key ? row[key] : null;
+                };
+
+                // --- 5. Procesar y Agregar Filas con Estilos ---
+                validData.forEach(row => {
+                    const turnoIni = findVal(row, ['ini', 'ini']);
+                    const esLibre = typeof turnoIni === 'string' && turnoIni.toUpperCase().includes('LIBRE');
+                    let lugar = 'SITE';
+                    
+                    if (!esLibre) {
+                        const nombreAgente = findVal(row, ['nombre']);
+                        const fechaTurno = findVal(row, ['fecha']);
+                        if (nombreAgente && fechaTurno) {
+                            const dateString = new Date(fechaTurno).toDateString();
+                            const key = `${nombreAgente}_${dateString}`;
+                            const status = calendarResults.get(key);
+                            if (status) lugar = status;
+                        }
+                    }
+
+                    const lugarKey = Object.keys(row).find(k => k.trim().toLowerCase() === 'lugar');
+                    if(lugarKey) row[lugarKey] = lugar;
+                    
+                    const addedRow = worksheet.addRow(row);
+
+                    addedRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                        const headerName = originalHeaders[colNumber - 1].trim().toLowerCase();
+                        
+                        cell.border = borderStyle;
+                        cell.alignment = centerAlignment;
+                        cell.font = { name: 'Calibri', size: 11 };
+
+                        if(headerName === 'fecha') cell.numFmt = 'dd/mm/yyyy';
+                        if(headerName.includes('ini') || headerName.includes('fin')) cell.numFmt = 'hh:mm';
+                    });
+                });
+
+                // --- 6. Generar y Descargar Archivo ---
+                const buffer = await workbook.xlsx.writeBuffer();
+                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                const monday = getMonday(new Date(weekSelector.value));
+                const monthName = monday.toLocaleString('es-ES', { month: 'long' });
+                const downloadFileName = `Malla de Turnos - Semana ${monday.getDate()} ${monthName} ${monday.getFullYear()}.xlsx`;
+                const url = URL.createObjectURL(blob);
+                const a = document.createElement('a');
+                a.href = url;
+                a.download = downloadFileName;
+                document.body.appendChild(a);
+                a.click();
+                document.body.removeChild(a);
+                URL.revokeObjectURL(url);
+                showStatus(`Malla de turnos descargada: ${downloadFileName}`, 'success');
+
+            } catch (error) {
+                console.error('Error detallado al generar la malla de turnos:', error);
+                showStatus(`Error al generar la malla: ${error.message}`, 'error');
+            }
+        }
+        
+        function isLibre(row) {
+            if (!row) return true;
+            const key = Object.keys(row).find(k => k.trim().toLowerCase() === 'ini' || k.trim().toLowerCase() === 'ini');
+            const ini = key ? row[key] : '';
+            return typeof ini === 'string' && String(ini).toUpperCase().includes('LIBRE');
+        }
+
         function applySpecialLogic(shift, specialConditions, day) {
-            if (!shift.Ini || typeof shift.Ini.getHours !== 'function') return 'SITE';
-            const hour = new Date(shift.Ini).getHours();
+            const key = Object.keys(shift).find(k => k.trim().toLowerCase() === 'ini' || k.trim().toLowerCase() === 'ini');
+            const iniValue = key ? shift[key] : null;
+
+            if (!iniValue || typeof iniValue.getHours !== 'function') return 'SITE';
+            const hour = new Date(iniValue).getHours();
             const dayOfWeek = day.getDay();
             const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
             const isFestivo = checkIfFestivo(day);
@@ -731,7 +875,7 @@
             if (specialConditions.includes(`${shiftType}_site`)) return 'SITE';
             return 'SITE';
         }
-        
+
         function checkIfFestivo(day) {
             const festivos = ['2024-01-01', '2024-03-29', '2024-03-30', '2024-05-01', '2024-05-21', '2024-06-29', '2024-07-16', '2024-08-15', '2024-09-18', '2024-09-19', '2024-10-12', '2024-11-01', '2024-12-08', '2024-12-25', '2025-01-01', '2025-04-18', '2025-04-19', '2025-05-01', '2025-05-21', '2025-06-29', '2025-07-16', '2025-08-15', '2025-09-18', '2025-09-19', '2025-10-12', '2025-11-01', '2025-12-08', '2025-12-25'];
             return festivos.includes(day.toISOString().split('T')[0]);
@@ -747,7 +891,7 @@
 
                 const ttText = format(config.condicion, '_tt');
                 const siteText = format(config.condicion, '_site');
-                
+
                 let result = 'PERSONALIZADO: ';
                 if(ttText) result += `${ttText} TT`;
                 if(ttText && siteText) result += ' X ';
@@ -762,11 +906,6 @@
         function getDayPosition(dayName) {
             const positions = { 'primer': 1, 'segundo': 2, 'tercer': 3, 'cuarto': 4, 'quinto': 5 };
             return positions[dayName] || 1;
-        }
-
-        function isLibre(row) {
-            const ini = row['Ini'];
-            return typeof ini === 'string' && ini.toUpperCase().includes('LIBRE');
         }
 
         function showStatus(message, type) {
