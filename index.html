@@ -38,7 +38,7 @@
 
     * { box-sizing: border-box; }
 
-    body { margin: 0; font-family: var(--font); background: var(--color-bg); color: var(--color-text); display: flex; min-height: 100vh; overflow: hidden; }
+    body { margin: 0; font-family: var(--font); background: var(--color-bg); color: var(--color-text); display: flex; min-height: 100vh; overflow-y: auto; }
 
     .background { position: fixed; inset: 0; overflow: hidden; z-index: -1; }
 
@@ -56,7 +56,29 @@
 
     @keyframes move3 { 0% { transform: translate(0,0);} 100% { transform: translate(100px,-150px);} }
 
-    .sidebar { width: 260px; background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 28px 18px 22px; display: flex; flex-direction: column; align-items: center; box-shadow: var(--shadow-lg); z-index: 10; }
+    /* Sidebar completo (oculto por defecto) */
+    .sidebar { 
+      width: 260px; 
+      background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end)); 
+      color: #fff; 
+      padding: 28px 18px 22px; 
+      display: flex; 
+      flex-direction: column; 
+      align-items: center; 
+      box-shadow: var(--shadow-lg); 
+      z-index: 10; 
+      position: fixed;
+      left: -200px;
+      top: 0;
+      height: 100vh;
+      transition: left 0.3s ease;
+      overflow: hidden;
+    }
+    
+    .sidebar:hover,
+    .sidebar.show {
+      left: 0;
+    }
 
     .sidebar h1 { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
 
@@ -80,17 +102,84 @@
 
     .sidebar a.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
 
+    /* Sidebar colapsado con íconos (siempre visible) */
+    .sidebar-collapsed {
+      position: fixed;
+      left: 0;
+      top: 0;
+      width: 60px;
+      height: 100vh;
+      background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end));
+      z-index: 9;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      padding: 28px 8px;
+      gap: 15px;
+      transition: opacity 0.3s ease;
+    }
+
+    .sidebar.show + .sidebar-collapsed {
+      opacity: 0;
+      pointer-events: none;
+    }
+
+    .icon-only {
+      width: 44px;
+      height: 44px;
+      border-radius: 12px;
+      background: rgba(255,255,255,.16);
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 20px;
+      cursor: pointer;
+      transition: background 0.25s;
+      color: #fff;
+      text-decoration: none;
+    }
+
+    .icon-only:hover {
+      background: rgba(255,255,255,.28);
+    }
+
+    .icon-only.active {
+      background: rgba(255,255,255,.35);
+    }
+
     .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; animation: blink 1.2s infinite; }
 
     @keyframes blink { 0%,50%,100%{opacity:1} 25%,75%{opacity:0} }
 
-    .top-banner { position: fixed; top: 0; left: 260px; right: 0; background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; padding: 18px 36px; box-shadow: var(--shadow-lg); display: flex; align-items: baseline; gap: 14px; z-index: 5; }
+    .top-banner { 
+      position: fixed; 
+      top: 0; 
+      left: 60px; 
+      right: 0; 
+      background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); 
+      color: #fff; 
+      padding: 18px 36px; 
+      box-shadow: var(--shadow-lg); 
+      display: flex; 
+      align-items: baseline; 
+      gap: 14px; 
+      z-index: 5; 
+      transition: left 0.3s ease; 
+    }
 
     .top-banner h1 { margin: 0; font-size: 26px; font-weight: 700; }
 
     .top-banner p { margin: 0; font-size: 14px; opacity: .95; }
 
-    .main { flex: 1; padding: 110px 36px 28px; overflow-y: auto; position: relative; max-height: calc(100vh - 0px); }
+    .main { 
+      flex: 1; 
+      margin-left: 60px;
+      padding: 110px 36px 28px 36px; 
+      overflow-y: auto; 
+      position: relative; 
+      max-height: 100vh;
+      transition: margin-left 0.3s ease;
+    }
 
     .inicio { max-width: 1100px; margin: 0 auto; text-align: center; }
 
@@ -126,7 +215,7 @@
 
     @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
 
-    /* Nuevos estilos para el iframe */
+    /* Estilos para el iframe */
     .content-frame {
       position: absolute;
       top: 20px;
@@ -169,8 +258,7 @@
 
   </div>
 
-
-
+  <!-- Sidebar completo (se desliza) -->
   <aside class="sidebar">
 
     <h1>Gestor Operativo</h1>
@@ -195,7 +283,15 @@
 
   </aside>
 
-
+  <!-- Sidebar colapsado con íconos (siempre visible) -->
+  <div class="sidebar-collapsed">
+    <a href="#" onclick="showHome()" class="icon-only" id="home-icon">🏠</a>
+    <a href="#" onclick="loadModule('transporte.html')" class="icon-only" data-page="transporte">🚐</a>
+    <a href="#" onclick="loadModule('calendario.html')" class="icon-only" data-page="calendario">📅</a>
+    <a href="#" onclick="loadModule('turnos.html')" class="icon-only" data-page="turnos">📊</a>
+    <a href="#" onclick="loadModule('cartas.html')" class="icon-only" data-page="cartas">📄</a>
+    <a href="#" onclick="loadModule('cambio-turnos.html')" class="icon-only" data-page="cambio-turnos">🔄</a>
+  </div>
 
   <header class="top-banner" id="topBanner">
 
@@ -205,9 +301,7 @@
 
   </header>
 
-
-
-  <main class="main">
+  <main class="main" id="mainContent">
 
     <!-- Contenido de inicio -->
     <section id="inicio" class="inicio home-content">
@@ -287,8 +381,6 @@
 
   </main>
 
-
-
   <div class="ia-helper">
 
     <div class="ia-msg" id="iaMsg">💡 Consejo: Haz clic en un módulo para comenzar.</div>
@@ -298,6 +390,446 @@
   </div>
 
   <script>
+    // Variables para elementos principales
+    const sidebar = document.querySelector('.sidebar');
+    const topBanner = document.querySelector('.top-banner');
+    const main = document.querySelector('.main');
+    
+    // ===== SISTEMA DE IA INTELIGENTE =====
+    class IntelligentAssistant {
+      constructor() {
+        this.currentModule = 'home';
+        this.moduleData = {
+          home: {
+            name: 'Panel Principal',
+            tips: [
+              '🎯 Desde aquí puedes acceder a todos los módulos de automatización',
+              '⚡ Cada módulo está optimizado para tareas específicas',
+              '📊 Los indicadores verdes muestran que todos los sistemas están operativos'
+            ],
+            welcome: '¡Hola! Soy tu asistente inteligente. Te ayudo a optimizar tu flujo de trabajo.'
+          },
+          'transporte.html': {
+            name: 'Gestión de Transporte',
+            tips: [
+              '📋 Asegúrate de que tu archivo tenga la hoja "Direcciones" para mapear contactos',
+              '🚐 El sistema detecta automáticamente turnos que requieren transporte (00:00, 07:00, 08:00, 22:00)',
+              '📅 Puedes configurar feriados especiales para activar arribos a las 08:00',
+              '⚠️ Solo se procesan agentes con estado "Activo" en el sistema'
+            ],
+            fileUploaded: '¡Perfecto! He detectado tu archivo. Ahora selecciona la semana que necesitas procesar.',
+            weekSelected: '✅ Semana configurada. El sistema generará rutas optimizadas automáticamente.',
+            generating: '🚐 Analizando turnos y generando rutas de transporte inteligentes...',
+            success: '🎉 ¡Excelente! Tu reporte de transporte está listo. El archivo incluye confirmaciones automáticas.',
+            errors: {
+              noDirections: '❌ Falta la hoja "Direcciones". Sin ella no puedo mapear las ubicaciones.',
+              noActiveAgents: '⚠️ No encontré agentes activos que necesiten transporte en esta semana.'
+            }
+          },
+          'calendario.html': {
+            name: 'Calendario Teletrabajo',
+            tips: [
+              '🏠 Sistema inteligente de distribución TT/Presencial basado en patrones',
+              '⚙️ Configuraciones especiales para turnos AM, PM, Noche y Fines de semana',
+              '📈 16 agentes preconfigurados con modalidades 3x2, 4x1 y especiales',
+              '🎯 Puedes agregar nuevos agentes y personalizar sus patrones'
+            ],
+            fileUploaded: '📊 Archivo cargado. He detectado los agentes y estoy preparando las configuraciones.',
+            weekSelected: '📅 Perfecto. Generaré el calendario basado en los patrones inteligentes configurados.',
+            generating: '🧠 Aplicando inteligencia artificial para distribuir TT y presencialidad...',
+            success: '🎊 ¡Calendario generado con éxito! Distribución optimizada aplicada.',
+            configuring: '⚙️ Ajusta las configuraciones de los agentes para personalizar la distribución.'
+          },
+          'cartas.html': {
+            name: 'Generador de Cartas',
+            tips: [
+              '📝 Genera cartas de amonestación y compromiso automáticamente',
+              '⏰ Filtra por rango de fechas para procesar incidencias específicas',
+              '🔄 Agrupa múltiples incidencias del mismo agente en una sola carta',
+              '📄 Formato profesional listo para impresión y archivo'
+            ],
+            fileUploaded: '📋 Datos cargados. Detectando incidencias de atrasos, ausencias y abandonos...',
+            filtering: '🔍 Filtro por fechas activo. Ajusta el rango según tus necesidades.',
+            generating: '✍️ Redactando cartas personalizadas con formato legal corporativo...',
+            success: '📜 ¡Cartas generadas exitosamente! Documentos listos para revisión y envío.'
+          },
+          'turnos.html': {
+            name: 'Turnos Diarios',
+            tips: [
+              '🔄 Genera turnos automatizados con distribución inteligente',
+              '📊 Optimización basada en disponibilidad y cargas de trabajo',
+              '⚖️ Balanceo automático de recursos por franjas horarias'
+            ],
+            generating: '⚙️ Procesando algoritmos de optimización de turnos...'
+          },
+          'cambio-turnos.html': {
+            name: 'Cambio de Turnos',
+            tips: [
+              '🔄 Gestiona solicitudes de intercambio entre agentes',
+              '✅ Validación automática de compatibilidad de horarios',
+              '📋 Tracking completo de solicitudes y aprobaciones'
+            ],
+            generating: '🔄 Procesando cambios y validando compatibilidades...'
+          }
+        };
+        
+        this.messageElement = document.getElementById('iaMsg');
+        this.avatarElement = document.querySelector('.ia-avatar');
+        this.initializeIntelligence();
+      }
+      
+      initializeIntelligence() {
+        // Mostrar mensaje de bienvenida inteligente
+        this.showWelcomeMessage();
+        
+        // Configurar observadores para iframe
+        this.setupIframeMonitoring();
+        
+        // Configurar detección de interacciones
+        this.setupInteractionDetection();
+      }
+      
+      showWelcomeMessage() {
+        const data = this.moduleData[this.currentModule];
+        this.updateMessage(data.welcome || data.tips[0]);
+      }
+      
+      setupIframeMonitoring() {
+        const iframe = document.getElementById('moduleFrame');
+        
+        iframe.addEventListener('load', () => {
+          if (iframe.src && this.currentModule !== 'home') {
+            this.analyzeCurrentModule();
+            this.monitorIframeActivity();
+          }
+        });
+      }
+      
+      setupInteractionDetection() {
+        // Detección de hover en cards
+        document.querySelectorAll('.card').forEach(card => {
+          card.addEventListener('mouseenter', () => {
+            const moduleName = this.getModuleNameFromCard(card);
+            this.showModulePreview(moduleName);
+          });
+          
+          card.addEventListener('mouseleave', () => {
+            if (this.currentModule === 'home') {
+              this.showWelcomeMessage();
+            }
+          });
+        });
+        
+        // Detección de actividad en sidebar
+        document.querySelectorAll('.sidebar a, .icon-only').forEach(link => {
+          link.addEventListener('mouseenter', () => {
+            this.showQuickTip(link);
+          });
+        });
+      }
+      
+      monitorIframeActivity() {
+        const iframe = document.getElementById('moduleFrame');
+        
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          
+          // Monitor file uploads
+          const fileInputs = iframeDoc.querySelectorAll('input[type="file"]');
+          fileInputs.forEach(input => {
+            input.addEventListener('change', () => {
+              this.onFileUploaded();
+            });
+          });
+          
+          // Monitor drag and drop
+          const uploadAreas = iframeDoc.querySelectorAll('.upload-area');
+          uploadAreas.forEach(area => {
+            area.addEventListener('drop', () => {
+              setTimeout(() => this.onFileUploaded(), 100);
+            });
+          });
+          
+          // Monitor selects and form interactions
+          const selects = iframeDoc.querySelectorAll('select');
+          selects.forEach(select => {
+            select.addEventListener('change', () => {
+              this.onSelectionMade();
+            });
+          });
+          
+          // Monitor button clicks
+          const buttons = iframeDoc.querySelectorAll('.button');
+          buttons.forEach(button => {
+            button.addEventListener('click', () => {
+              if (button.textContent.toLowerCase().includes('generar')) {
+                this.onGenerationStarted();
+              }
+            });
+          });
+          
+          // Monitor for success states
+          const observer = new MutationObserver((mutations) => {
+            mutations.forEach((mutation) => {
+              if (mutation.type === 'childList' || mutation.type === 'attributes') {
+                this.checkForSuccessIndicators(iframeDoc);
+              }
+            });
+          });
+          
+          observer.observe(iframeDoc.body, {
+            childList: true,
+            subtree: true,
+            attributes: true,
+            attributeFilter: ['class', 'style']
+          });
+          
+        } catch (error) {
+          // Cross-origin restrictions - use polling as fallback
+          this.setupPollingMonitor();
+        }
+      }
+      
+      setupPollingMonitor() {
+        setInterval(() => {
+          this.checkModuleState();
+        }, 2000);
+      }
+      
+      checkModuleState() {
+        const iframe = document.getElementById('moduleFrame');
+        try {
+          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
+          this.checkForSuccessIndicators(iframeDoc);
+        } catch (error) {
+          // Silently handle cross-origin restrictions
+        }
+      }
+      
+      checkForSuccessIndicators(doc) {
+        // Check for download indicators
+        const downloadButtons = doc.querySelectorAll('.button.is-success, .button[disabled]');
+        const successMessages = doc.querySelectorAll('.status-message.success, .status.success');
+        const progressBars = doc.querySelectorAll('.progress-bar.active');
+        
+        if (downloadButtons.length > 0) {
+          this.onDownloadReady();
+        }
+        
+        if (successMessages.length > 0) {
+          this.onOperationSuccess();
+        }
+        
+        if (progressBars.length > 0) {
+          this.onProgressDetected();
+        }
+      }
+      
+      onFileUploaded() {
+        const data = this.moduleData[this.currentModule];
+        if (data && data.fileUploaded) {
+          this.updateMessage(data.fileUploaded, 'success');
+          this.playAnimation('bounce');
+        }
+      }
+      
+      onSelectionMade() {
+        const data = this.moduleData[this.currentModule];
+        if (data && data.weekSelected) {
+          this.updateMessage(data.weekSelected, 'info');
+        }
+      }
+      
+      onGenerationStarted() {
+        const data = this.moduleData[this.currentModule];
+        if (data && data.generating) {
+          this.updateMessage(data.generating, 'working');
+          this.playAnimation('pulse');
+        }
+      }
+      
+      onOperationSuccess() {
+        const data = this.moduleData[this.currentModule];
+        if (data && data.success) {
+          this.updateMessage(data.success, 'success');
+          this.playAnimation('celebration');
+          this.showCelebration();
+        }
+      }
+      
+      onDownloadReady() {
+        this.updateMessage('🎉 ¡Descarga iniciada! Tu archivo se está generando automáticamente.', 'success');
+        this.showCelebration();
+      }
+      
+      onProgressDetected() {
+        this.playAnimation('pulse');
+      }
+      
+      analyzeCurrentModule() {
+        const data = this.moduleData[this.currentModule];
+        if (data) {
+          const randomTip = data.tips[Math.floor(Math.random() * data.tips.length)];
+          this.updateMessage(randomTip, 'info');
+        }
+      }
+      
+      getModuleNameFromCard(card) {
+        const title = card.querySelector('h2')?.textContent;
+        if (title?.includes('Transporte')) return 'transporte.html';
+        if (title?.includes('Calendario')) return 'calendario.html';
+        if (title?.includes('Carta')) return 'cartas.html';
+        if (title?.includes('Turnos Diarios')) return 'turnos.html';
+        if (title?.includes('Cambio')) return 'cambio-turnos.html';
+        return 'home';
+      }
+      
+      showModulePreview(moduleName) {
+        const data = this.moduleData[moduleName];
+        if (data) {
+          this.updateMessage(`🔍 ${data.name}: ${data.tips[0]}`, 'preview');
+        }
+      }
+      
+      showQuickTip(element) {
+        const text = element.textContent;
+        const tips = {
+          'Inicio': '🏠 Centro de comando - Acceso rápido a todos los módulos',
+          'Gestión de Transporte': '🚐 Optimiza rutas y horarios de transporte automáticamente',
+          'Calendario Teletrabajo': '📅 IA que distribuye TT/Presencial de forma inteligente',
+          'Turnos Diarios': '📊 Algoritmos avanzados para turnos equilibrados',
+          'Carta Amonestación': '📝 Genera documentación legal automatizada',
+          'Cambio de Turnos': '🔄 Sistema inteligente de intercambios'
+        };
+        
+        Object.entries(tips).forEach(([key, tip]) => {
+          if (text.includes(key)) {
+            this.updateMessage(tip, 'tip');
+          }
+        });
+      }
+      
+      updateMessage(message, type = 'info') {
+        this.messageElement.textContent = message;
+        
+        // Add visual feedback based on type
+        this.messageElement.className = 'ia-msg';
+        if (type === 'success') this.messageElement.style.background = '#e6f7f0';
+        else if (type === 'working') this.messageElement.style.background = '#fff3cd';
+        else if (type === 'preview') this.messageElement.style.background = '#e7f3ff';
+        else this.messageElement.style.background = '';
+      }
+      
+      playAnimation(type) {
+        this.avatarElement.style.animation = 'none';
+        
+        setTimeout(() => {
+          switch (type) {
+            case 'bounce':
+              this.avatarElement.style.animation = 'bounce 0.6s ease-in-out';
+              break;
+            case 'pulse':
+              this.avatarElement.style.animation = 'pulse 1s ease-in-out infinite';
+              break;
+            case 'celebration':
+              this.avatarElement.style.animation = 'celebration 1s ease-in-out';
+              break;
+            default:
+              this.avatarElement.style.animation = 'float 3s ease-in-out infinite';
+          }
+        }, 10);
+      }
+      
+      showCelebration() {
+        // Create celebration effect
+        const celebration = document.createElement('div');
+        celebration.innerHTML = '🎉✨🎊';
+        celebration.style.cssText = `
+          position: fixed; right: 30px; bottom: 100px; z-index: 200;
+          font-size: 24px; animation: celebration-float 2s ease-out forwards;
+          pointer-events: none;
+        `;
+        
+        document.body.appendChild(celebration);
+        
+        setTimeout(() => {
+          celebration.remove();
+        }, 2000);
+      }
+      
+      setCurrentModule(moduleName) {
+        this.currentModule = moduleName;
+        
+        // Show contextual welcome message
+        setTimeout(() => {
+          const data = this.moduleData[moduleName];
+          if (data) {
+            this.updateMessage(`🚀 ${data.name} activado. ${data.tips[0]}`, 'info');
+          }
+        }, 500);
+      }
+    }
+    
+    // Añadir animaciones CSS adicionales
+    const style = document.createElement('style');
+    style.textContent = `
+      @keyframes bounce {
+        0%, 100% { transform: translateY(0) scale(1); }
+        50% { transform: translateY(-10px) scale(1.1); }
+      }
+      
+      @keyframes pulse {
+        0%, 100% { transform: scale(1); opacity: 1; }
+        50% { transform: scale(1.1); opacity: 0.8; }
+      }
+      
+      @keyframes celebration {
+        0% { transform: scale(1) rotate(0deg); }
+        25% { transform: scale(1.2) rotate(10deg); }
+        50% { transform: scale(1.1) rotate(-10deg); }
+        75% { transform: scale(1.2) rotate(5deg); }
+        100% { transform: scale(1) rotate(0deg); }
+      }
+      
+      @keyframes celebration-float {
+        0% { opacity: 0; transform: translateY(0) scale(0.5); }
+        50% { opacity: 1; transform: translateY(-30px) scale(1); }
+        100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
+      }
+      
+      .ia-msg {
+        transition: all 0.3s ease;
+      }
+    `;
+    document.head.appendChild(style);
+    
+    // Inicializar el asistente inteligente
+    const assistant = new IntelligentAssistant();
+    
+    // ===== FUNCIONES ORIGINALES MEJORADAS =====
+    
+    // Funcionalidad para mostrar/ocultar sidebar
+    document.addEventListener('mousemove', function(e) {
+      if (e.clientX <= 50) {
+        // Mostrar sidebar completo
+        sidebar.classList.add('show');
+        topBanner.style.left = '260px';
+        main.style.marginLeft = '260px';
+      } else if (e.clientX > 280) {
+        // Ocultar sidebar completo, mostrar solo íconos
+        sidebar.classList.remove('show');
+        topBanner.style.left = '60px';
+        main.style.marginLeft = '60px';
+      }
+    });
+    
+    // Mantener sidebar visible cuando el mouse está sobre él
+    sidebar.addEventListener('mouseenter', function() {
+      sidebar.classList.add('show');
+      topBanner.style.left = '260px';
+      main.style.marginLeft = '260px';
+    });
+    
     function loadModule(page) {
       // Ocultar contenido de inicio
       document.querySelector('.home-content').classList.add('hidden');
@@ -310,8 +842,8 @@
       // Actualizar navegación activa
       updateActiveNav(page);
       
-      // Actualizar mensaje del asistente
-      document.getElementById('iaMsg').textContent = '✨ Módulo cargado. Usa la navegación lateral para cambiar.';
+      // Actualizar asistente inteligente
+      assistant.setCurrentModule(page);
     }
     
     function showHome() {
@@ -326,29 +858,35 @@
       // Actualizar navegación activa
       updateActiveNav('home');
       
-      // Actualizar mensaje del asistente
-      document.getElementById('iaMsg').textContent = '💡 Consejo: Haz clic en un módulo para comenzar.';
+      // Actualizar asistente
+      assistant.setCurrentModule('home');
     }
     
     function updateActiveNav(activePage) {
       // Remover clase active de todos los enlaces
-      document.querySelectorAll('.sidebar a').forEach(link => {
+      document.querySelectorAll('.sidebar a, .icon-only').forEach(link => {
         link.classList.remove('active');
       });
       
       // Agregar clase active al enlace correspondiente
       if (activePage === 'home') {
         document.getElementById('home-link').classList.add('active');
+        document.getElementById('home-icon').classList.add('active');
       } else {
         const activeLink = document.querySelector(`[data-page="${activePage.replace('.html', '')}"]`);
         if (activeLink) {
           activeLink.classList.add('active');
+        }
+        const activeIcon = document.querySelector(`.icon-only[data-page="${activePage.replace('.html', '')}"]`);
+        if (activeIcon) {
+          activeIcon.classList.add('active');
         }
       }
     }
     
     // Marcar inicio como activo por defecto
     document.getElementById('home-link').classList.add('active');
+    document.getElementById('home-icon').classList.add('active');
   </script>
 
 </body>
