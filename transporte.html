@@ -172,16 +172,9 @@
         .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
         .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
         
-        /* --- INICIO: ESTILOS MODIFICADOS PARA LA ZONA DE CARGA --- */
-        .upload-area.file-loaded #uploadDefaultContent {
-            display: none;
-        }
-        .upload-area #uploadSuccessContent {
-            display: none; /* Oculto por defecto */
-        }
-        .upload-area.file-loaded #uploadSuccessContent {
-            display: block; /* Visible cuando hay un archivo */
-        }
+        .upload-area.file-loaded #uploadDefaultContent { display: none; }
+        .upload-area #uploadSuccessContent { display: none; }
+        .upload-area.file-loaded #uploadSuccessContent { display: block; }
         #fileNameDisplay {
             font-size: 18px;
             font-weight: 600;
@@ -193,20 +186,14 @@
             color: var(--color-text-secondary);
             margin-top: 8px;
         }
-        /* --- FIN: ESTILOS MODIFICADOS --- */
 
         input[type="file"] { display: none; }
         .button-container { text-align: center; margin-top: 25px; }
         .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
         .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
         .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-
-        .button.is-success {
-            background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%);
-        }
-        .button.is-success:hover {
-            box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3);
-        }
+        .button.is-success { background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%); }
+        .button.is-success:hover { box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3); }
 
         .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
         .progress-bar.active { display: block; }
@@ -231,88 +218,27 @@
         .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
         #weekSelector { display: none; }
         
-        .settings-container {
-            display: none;
-            position: relative;
-            margin-top: 15px;
-            text-align: right;
-        }
-        .settings-button {
-            background: transparent;
-            border: none;
-            cursor: pointer;
-            color: var(--color-text-secondary);
-            padding: 5px;
-            border-radius: 50%;
-            transition: all 0.2s ease;
-        }
-        .settings-button:hover {
-            background-color: #eef2ff;
-            color: var(--color-primary-end);
-        }
-        .settings-button.is-active {
-            color: var(--color-primary-end);
-            animation: blink-active 1.5s infinite;
-        }
-        @keyframes blink-active {
-            50% { opacity: 0.4; }
-        }
+        .settings-container { display: none; position: relative; margin-top: 15px; text-align: right; }
+        .settings-button { background: transparent; border: none; cursor: pointer; color: var(--color-text-secondary); padding: 5px; border-radius: 50%; transition: all 0.2s ease; }
+        .settings-button:hover { background-color: #eef2ff; color: var(--color-primary-end); }
+        .settings-button.is-active { color: var(--color-primary-end); animation: blink-active 1.5s infinite; }
+        @keyframes blink-active { 50% { opacity: 0.4; } }
         .settings-panel {
-            display: none;
-            position: absolute;
-            bottom: 100%;
-            right: 0;
-            margin-bottom: 8px;
-            background: var(--color-surface);
-            border-radius: 12px;
-            box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 20px;
-            z-index: 100;
-            width: 320px;
-            text-align: left;
-            border: 1px solid var(--color-border);
+            display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
+            background: var(--color-surface); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
+            padding: 20px; z-index: 100; width: 320px; text-align: left; border: 1px solid var(--color-border);
         }
-        .settings-panel h3 {
-            font-size: 16px;
-            margin-bottom: 15px;
-            color: var(--color-text);
-        }
-        .holiday-options-container {
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            margin-bottom: 15px;
-        }
-        .holiday-option {
-            display: flex;
-            align-items: center;
-            gap: 10px;
-        }
-        .holiday-option label {
-            font-size: 15px;
-            cursor: pointer;
-            text-transform: capitalize;
-        }
-        .holiday-checkbox {
-            width: 18px;
-            height: 18px;
-            cursor: pointer;
-        }
+        .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--color-text); }
+        .holiday-options-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
+        .holiday-option { display: flex; align-items: center; gap: 10px; }
+        .holiday-option label { font-size: 15px; cursor: pointer; text-transform: capitalize; }
+        .holiday-checkbox { width: 18px; height: 18px; cursor: pointer; }
         .button-small {
             background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
-            color: white;
-            border: none;
-            padding: 8px 16px;
-            border-radius: 8px;
-            font-size: 14px;
-            font-weight: 600;
-            cursor: pointer;
-            transition: transform 0.2s ease;
+            color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;
+            font-weight: 600; cursor: pointer; transition: transform 0.2s ease;
         }
-        .button-small:hover {
-            transform: translateY(-2px);
-        }
-
+        .button-small:hover { transform: translateY(-2px); }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -322,18 +248,9 @@
         <div class="illustration-panel">
             <div class="route-animation">
                 <div class="road"></div>
-                <div class="stop stop1">
-                    <div class="person-icon"></div>
-                    <div class="stop-pin"></div>
-                </div>
-                <div class="stop stop2">
-                    <div class="person-icon"></div>
-                    <div class="stop-pin"></div>
-                </div>
-                <div class="stop stop3">
-                    <div class="person-icon"></div>
-                    <div class="stop-pin"></div>
-                </div>
+                <div class="stop stop1"><div class="person-icon"></div><div class="stop-pin"></div></div>
+                <div class="stop stop2"><div class="person-icon"></div><div class="stop-pin"></div></div>
+                <div class="stop stop3"><div class="person-icon"></div><div class="stop-pin"></div></div>
                 <div class="van"></div>
             </div>
             <h2>Guía Rápida</h2>
@@ -363,12 +280,11 @@
             
             <div class="settings-container" id="settingsContainer">
                 <button id="settingsBtn" class="settings-button" title="Configurar Feriado">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07-1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
                 </button>
                 <div class="settings-panel" id="settingsPanel">
                     <h3>Activar arribo 08:00 en feriados</h3>
-                    <div class="holiday-options-container" id="holidayOptionsContainer">
-                    </div>
+                    <div class="holiday-options-container" id="holidayOptionsContainer"></div>
                     <button id="holidayAcceptBtn" class="button-small">Aceptar</button>
                 </div>
             </div>
@@ -382,12 +298,12 @@
     </div>
     
     <script>
-        let allData = null, turnosData = null, generatedWorkbook = null, fileName = '', addressMap = null;
+        let allData = null, turnosData = null, generatedWorkbook = null, fileName = '', addressMap = null, confirmacionMap = null;
         let selectedHolidays = []; 
         
         const uploadArea = document.getElementById('uploadArea');
         const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay'); // Nuevo elemento
+        const fileNameDisplay = document.getElementById('fileNameDisplay');
         const generateBtn = document.getElementById('generateBtn');
         const progressBar = document.getElementById('progressBar');
         const progressFill = document.getElementById('progressFill');
@@ -397,7 +313,6 @@
         const customSelect = document.getElementById('customSelect');
         const customSelectTrigger = document.getElementById('customSelectTrigger');
         const customOptions = document.getElementById('customOptions');
-
         const settingsContainer = document.getElementById('settingsContainer');
         const settingsBtn = document.getElementById('settingsBtn');
         const settingsPanel = document.getElementById('settingsPanel');
@@ -405,29 +320,17 @@
         const holidayAcceptBtn = document.getElementById('holidayAcceptBtn');
 
         customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-        
-        settingsBtn.addEventListener('click', (e) => {
-            e.stopPropagation();
-            settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
-        });
-
+        settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block'; });
         holidayAcceptBtn.addEventListener('click', () => {
             const checkedBoxes = document.querySelectorAll('.holiday-checkbox:checked');
             selectedHolidays = Array.from(checkedBoxes).map(cb => cb.value);
-            
-            if (selectedHolidays.length > 0) {
-                settingsBtn.classList.add('is-active');
-            } else {
-                settingsBtn.classList.remove('is-active');
-            }
+            settingsBtn.classList.toggle('is-active', selectedHolidays.length > 0);
             settingsPanel.style.display = 'none';
         });
-        
         window.addEventListener('click', (e) => { 
             if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
             if (!settingsContainer.contains(e.target)) settingsPanel.style.display = 'none';
         });
-
         uploadArea.addEventListener('click', () => fileInput.click());
         uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
         uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
@@ -435,14 +338,12 @@
         fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
         
         function handleFile(file) {
-            // --- INICIO: LÓGICA MODIFICADA PARA MOSTRAR NOMBRE DE ARCHIVO DENTRO ---
             fileNameDisplay.textContent = file.name;
             uploadArea.classList.add('file-loaded');
-            // --- FIN: LÓGICA MODIFICADA ---
-
             generateBtn.disabled = true;
             settingsContainer.style.display = 'none';
             addressMap = null;
+            confirmacionMap = null;
 
             const reader = new FileReader();
             reader.onload = (e) => {
@@ -451,21 +352,12 @@
                     const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                     allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
                     
-                    let addressSheetName = null;
-                    for (const name of workbook.SheetNames) {
-                        if (name.toLowerCase().trim() === 'direcciones') {
-                            addressSheetName = name;
-                            break; 
-                        }
-                    }
-
+                    const addressSheetName = workbook.SheetNames.find(name => name.toLowerCase().trim() === 'direcciones');
                     if (!addressSheetName) {
-                        showStatus('Error: No se encontró la hoja "Direcciones" en el archivo.', 'error');
+                        showStatus('Error: No se encontró la hoja "Direcciones".', 'error');
                         return;
                     }
-                    
-                    const addressSheet = workbook.Sheets[addressSheetName];
-                    const addressJson = XLSX.utils.sheet_to_json(addressSheet);
+                    const addressJson = XLSX.utils.sheet_to_json(workbook.Sheets[addressSheetName]);
                     addressMap = new Map();
                     addressJson.forEach(row => {
                         const rut = row['Rut'] || row['rut'] || row['RUT'];
@@ -477,22 +369,77 @@
                         }
                     });
 
+                    const confirmacionSheetName = workbook.SheetNames.find(name => name.toLowerCase().trim() === 'confirmacion_transporte');
+                    confirmacionMap = new Map(); // Inicia como mapa vacío
+                    if (confirmacionSheetName) {
+                        const confirmacionJson = XLSX.utils.sheet_to_json(workbook.Sheets[confirmacionSheetName], { header: 1 });
+                        if (confirmacionJson && confirmacionJson.length > 1) {
+                            for (let i = 1; i < confirmacionJson.length; i++) {
+                                const row = confirmacionJson[i];
+                                if (!row || row.length < 3) continue; // Saltar filas vacías o incompletas
+
+                                const rawRut = row[1];
+                                const weekString = row[2];
+
+                                if (rawRut && weekString && typeof weekString === 'string') {
+                                    const rutStr = String(rawRut).replace(/[\.\-]/g, '');
+                                    if (rutStr.length > 1) {
+                                        const formattedRut = rutStr.slice(0, -1) + '-' + rutStr.slice(-1);
+                                        const mondayISO = parseWeekString(weekString);
+                                        if (mondayISO) {
+                                            const key = ${formattedRut}|${mondayISO};
+                                            confirmacionMap.set(key, true);
+                                        }
+                                    }
+                                }
+                            }
+                        }
+                    } else {
+                        console.warn('Hoja "Confirmacion_Transporte" no encontrada.');
+                    }
+
                     populateWeekSelector(allData);
                     weekSelectorContainer.style.display = 'block';
                     showStatus('Archivo cargado. Por favor, selecciona una semana.', 'success');
                 } catch(error) {
-                    showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
-                    console.error(error);
+                    showStatus('Error al leer el archivo. Revisa la consola (F12) para detalles.', 'error');
+                    console.error("Error en handleFile:", error);
                 }
             };
             reader.readAsArrayBuffer(file);
+        }
+
+        function parseWeekString(weekText) {
+            try {
+                const monthMap = {
+                    'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
+                    'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
+                };
+                const regex = /semana del\s+(\d{1,2})\s+al\s+(\d{1,2})\s+de\s+([\w]+)\s+del\s+(\d{4})/i;
+                const match = weekText.match(regex);
+
+                if (match) {
+                    const day = parseInt(match[1], 10);
+                    const monthName = match[3].toLowerCase();
+                    const year = parseInt(match[4], 10);
+                    const month = monthMap[monthName];
+
+                    if (month !== undefined) {
+                        const date = new Date(year, month, day);
+                        if (!isNaN(date)) return getMonday(date).toISOString();
+                    }
+                }
+            } catch (error) {
+                console.error(Error al parsear la semana: "${weekText}", error);
+            }
+            return null;
         }
 
         weekSelector.addEventListener('change', handleWeekSelection);
 
         function getMonday(d) {
             d = new Date(d);
-            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+            const day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
             const monday = new Date(d.setDate(diff));
             monday.setHours(0, 0, 0, 0);
             return monday;
@@ -501,7 +448,9 @@
         function populateWeekSelector(data) {
             const weekSet = new Set();
             data.forEach(row => {
-                if (row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString());
+                if (row.Fecha && !isNaN(new Date(row.Fecha))) {
+                     weekSet.add(getMonday(new Date(row.Fecha)).toISOString());
+                }
             });
 
             const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
@@ -515,9 +464,7 @@
                 const monday = new Date(mondayISO);
                 const sunday = new Date(monday);
                 sunday.setDate(monday.getDate() + 6);
-                
-                const monthName = sunday.toLocaleString('es-ES', { month: 'long' });
-                const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${monthName}`;
+                const optionText = Semana del ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES', { month: 'long' })} del ${sunday.getFullYear()};
                 
                 const option = document.createElement('option');
                 option.value = mondayISO;
@@ -553,6 +500,7 @@
             const nextMonday = new Date(selectedMonday);
             nextMonday.setDate(selectedMonday.getDate() + 7);
             turnosData = allData.filter(row => {
+                if (!row.Fecha || isNaN(new Date(row.Fecha))) return false;
                 const rowDate = new Date(row.Fecha);
                 return rowDate >= selectedMonday && rowDate < nextMonday;
             });
@@ -567,24 +515,10 @@
                 currentDay.setDate(selectedMonday.getDate() + i);
                 
                 const valueFormat = currentDay.toISOString().split('T')[0];
-                const displayFormat = { weekday: 'long', day: 'numeric', month: 'long' };
-                const dayName = currentDay.toLocaleDateString('es-ES', displayFormat);
-
+                const dayName = currentDay.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'holiday-option';
-
-                const checkbox = document.createElement('input');
-                checkbox.type = 'checkbox';
-                checkbox.className = 'holiday-checkbox';
-                checkbox.id = `holiday-${valueFormat}`;
-                checkbox.value = valueFormat;
-                
-                const label = document.createElement('label');
-                label.htmlFor = `holiday-${valueFormat}`;
-                label.textContent = dayName;
-
-                optionDiv.appendChild(checkbox);
-                optionDiv.appendChild(label);
+                optionDiv.innerHTML = <input type="checkbox" class="holiday-checkbox" id="holiday-${valueFormat}" value="${valueFormat}"><label for="holiday-${valueFormat}">${dayName}</label>;
                 holidayOptionsContainer.appendChild(optionDiv);
             }
             settingsContainer.style.display = 'block';
@@ -603,7 +537,7 @@
             if (typeof excelValue === 'string') {
                 const parts = excelValue.match(/(\d+):(\d+)(:(\d+))?/);
                 if (parts) {
-                    const hours = parseInt(parts[1], 10), minutes = parseInt(parts[2], 10), seconds = parts[4] ? parseInt(parts[4], 10) : 0;
+                    const [ , hours, minutes, , seconds] = parts.map(p => parseInt(p, 10) || 0);
                     if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
                         const date = new Date();
                         date.setHours(hours, minutes, seconds, 0);
@@ -612,8 +546,7 @@
                 }
             }
             const parsedDate = new Date(excelValue);
-            if (!isNaN(parsedDate)) return parsedDate;
-            return null;
+            return !isNaN(parsedDate) ? parsedDate : null;
         }
         
         generateBtn.addEventListener('click', generateTransportExcel);
@@ -626,7 +559,9 @@
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = fileName;
+                document.body.appendChild(a);
                 a.click();
+                document.body.removeChild(a);
                 URL.revokeObjectURL(url);
             }
         }
@@ -643,41 +578,44 @@
 
             generateBtn.disabled = true;
             progressBar.classList.add('active');
-            let progress = 0;
-            const progressInterval = setInterval(() => {
-                progress += 10;
-                progressFill.style.width = progress + '%';
-                if (progress >= 100) clearInterval(progressInterval);
-            }, 100);
+            progressFill.style.width = '0%';
             
-            setTimeout(async () => {
-                try {
-                    await createTransportWorkbook(); 
-                    progressBar.classList.remove('active');
-                    progressFill.style.width = '0%';
+            let progress = 0;
+            const interval = setInterval(() => {
+                progress = Math.min(progress + Math.random() * 10, 90);
+                progressFill.style.width = progress + '%';
+            }, 200);
 
-                    if (fileName) { 
-                        generateBtn.classList.add('is-success');
-                        generateBtn.textContent = 'Descargando...';
-                        showStatus('¡Listo! Iniciando descarga...', 'success');
-                        
-                        await triggerDownload();
-
-                        setTimeout(() => {
-                            generateBtn.classList.remove('is-success');
-                            generateBtn.textContent = 'Generar Excel';
-                            generateBtn.disabled = false;
-                        }, 2000);
-
-                    } else {
+            try {
+                await createTransportWorkbook(); 
+                
+                clearInterval(interval);
+                progressFill.style.width = '100%';
+                
+                if (fileName) { 
+                    generateBtn.classList.add('is-success');
+                    generateBtn.textContent = 'Descargando...';
+                    showStatus('¡Listo! Iniciando descarga...', 'success');
+                    await triggerDownload();
+                    setTimeout(() => {
+                        generateBtn.classList.remove('is-success');
+                        generateBtn.textContent = 'Generar Excel';
                         generateBtn.disabled = false;
-                    }
-                } catch (error) {
-                    showStatus('Ocurrió un error al generar el archivo.', 'error');
-                    console.error(error);
+                    }, 2000);
+                } else {
                     generateBtn.disabled = false;
                 }
-            }, 1500);
+            } catch (error) {
+                clearInterval(interval);
+                showStatus('Ocurrió un error. Revisa la consola (F12) para detalles.', 'error');
+                console.error("Error en generateTransportExcel:", error);
+                generateBtn.disabled = false;
+            } finally {
+                 setTimeout(() => {
+                     progressBar.classList.remove('active');
+                     progressFill.style.width = '0%';
+                 }, 1000);
+            }
         }
         
         async function createTransportWorkbook() {
@@ -687,55 +625,40 @@
 
             turnosData.forEach(row => {
                 const estado = row['Estado'] || row['estado'] || row['ESTADO'];
-                if ((estado || '').toLowerCase() !== 'activo') { return; }
+                if ((estado || '').toLowerCase() !== 'activo' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
 
-                const fecha = row['Fecha'] ? new Date(row['Fecha']) : null;
-                if (!fecha) { return; }
-                
-                const iniValue = row['Ini'] || row['ini'] || row['INI'];
-                const finValue = row['FIN'] || row['Fin'] || row['fin'] || row['FIN '];
-                const ini = parseExcelTime(iniValue);
-                const fin = parseExcelTime(finValue);
+                const fecha = new Date(row.Fecha);
+                const ini = parseExcelTime(row['Ini'] || row['ini'] || row['INI']);
+                const fin = parseExcelTime(row['FIN'] || row['Fin'] || row['fin'] || row['FIN ']);
                 const nombre = row['Nombre'] || row['nombre'];
-                const rutValue = row['Rut'] || row['RUT'] || row['rut'] || '';
+                const rutValue = row['Rut'] || row['RUT'] || row['rut'];
+
+                if (!nombre || !rutValue) return;
                 
-                let direccion = '';
-                let fono = '';
-                if (addressMap && rutValue) {
-                    const contactInfo = addressMap.get(String(rutValue).trim());
-                    if (contactInfo) {
-                        direccion = contactInfo.direccion;
-                        fono = contactInfo.fono;
-                    }
-                }
+                const contactInfo = addressMap.get(String(rutValue).trim()) || { direccion: '', fono: '' };
+                const mondayOfRow = getMonday(fecha).toISOString();
+                const confirmationKey = ${String(rutValue).trim()}|${mondayOfRow};
+                const isConfirmed = confirmacionMap && confirmacionMap.has(confirmationKey);
                 
-                if (!nombre) { return; }
-                
-                const formattedDate = fecha.toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' });
-                const dayOfWeek = fecha.getDay();
+                // --- CAMBIO SOLICITADO: Ajuste del texto a "Confirmado" ---
+                const confirmacionStatus = isConfirmed ? 'Confirmado' : 'No Confirmado';
 
                 const itemData = {
                     rawDate: fecha,
-                    fecha: formattedDate,
-                    rut: rutValue,
-                    nombre: nombre,
-                    direccion: direccion,
-                    fono: fono,
-                    servicio: 'Saesa',
-                    confirmacion: 'No Confirmado'
+                    fecha: fecha.toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }),
+                    rut: rutValue, nombre, ...contactInfo, servicio: 'Saesa',
+                    confirmacion: confirmacionStatus
                 };
 
                 if (ini) {
                     const iniHour = ini.getHours(), iniMinutes = ini.getMinutes();
+                    const dayOfWeek = fecha.getDay();
                     const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                    const rowDateStr = fecha.toISOString().split('T')[0];
-                    const isHoliday = selectedHolidays.includes(rowDateStr);
+                    const isHoliday = selectedHolidays.includes(fecha.toISOString().split('T')[0]);
 
                     if (iniHour === 0 && iniMinutes === 0) transportList.push({ ...itemData, hora: '00:00', sentido: 'Arribo' });
                     else if (iniHour === 7 && iniMinutes === 0 && dayOfWeek >= 1 && dayOfWeek <= 5) transportList.push({ ...itemData, hora: '07:00', sentido: 'Arribo' });
-                    else if (iniHour === 8 && iniMinutes === 0 && (isWeekend || isHoliday)) {
-                        transportList.push({ ...itemData, hora: '08:00', sentido: 'Arribo' });
-                    }
+                    else if (iniHour === 8 && iniMinutes === 0 && (isWeekend || isHoliday)) transportList.push({ ...itemData, hora: '08:00', sentido: 'Arribo' });
                 }
 
                 if (fin) {
@@ -746,50 +669,37 @@
             });
 
             if (transportList.length === 0) {
-                showStatus('No se encontraron agentes "Activos" que requieran transporte.', 'error');
+                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada.', 'error');
                 fileName = '';
                 return;
             }
 
-            const getSortOrder = (sentido, hora) => {
-                if (sentido === 'Arribo') {
-                    if (hora === '00:00') return 1; if (hora === '07:00') return 2; if (hora === '08:00') return 3;
-                }
-                if (sentido === 'Zarpe') {
-                    if (hora === '22:00') return 4; if (hora === '00:00') return 5;
-                }
-                return 99;
-            };
-
             transportList.sort((a, b) => {
                 const dateDiff = a.rawDate - b.rawDate;
                 if (dateDiff !== 0) return dateDiff;
-                const orderA = getSortOrder(a.sentido, a.hora);
-                const orderB = getSortOrder(b.sentido, b.hora);
-                if (orderA !== orderB) return orderA - orderB;
+                const getSortOrder = (sentido, hora) => {
+                    const order = { 'Arribo-00:00': 1, 'Arribo-07:00': 2, 'Arribo-08:00': 3, 'Zarpe-22:00': 4, 'Zarpe-00:00': 5 };
+                    return order[${sentido}-${hora}] || 99;
+                };
+                const orderDiff = getSortOrder(a.sentido, a.hora) - getSortOrder(b.sentido, b.hora);
+                if (orderDiff !== 0) return orderDiff;
                 return a.nombre.localeCompare(b.nombre);
             });
 
-            const firstDay = transportList[0].rawDate;
-            const lastDayInList = transportList[transportList.length - 1].rawDate;
-            const d1 = String(firstDay.getDate()).padStart(2, '0');
-            const d2 = String(lastDayInList.getDate()).padStart(2, '0');
-            const monthName = firstDay.toLocaleString('es-ES', { month: 'long' });
-            const sheetName = `semana del ${d1} al ${d2} de ${monthName} ${firstDay.getFullYear()}`;
+            const sheetNameDate = new Date(weekSelector.value);
+            const d1 = String(sheetNameDate.getDate()).padStart(2, '0');
+            sheetNameDate.setDate(sheetNameDate.getDate() + 6);
+            const d2 = String(sheetNameDate.getDate()).padStart(2, '0');
+            const monthName = sheetNameDate.toLocaleString('es-ES', { month: 'long' });
+            const sheetName = semana del ${d1} al ${d2} de ${monthName} ${sheetNameDate.getFullYear()};
             
             const worksheet = workbook.addWorksheet(sheetName);
-
             worksheet.columns = [
-                { header: 'Transporte', key: 'transporteId', width: 12 },
-                { header: 'Sentido del viaje', key: 'sentido', width: 20 },
-                { header: 'Fecha', key: 'fecha', width: 15 },
-                { header: 'Hora', key: 'hora', width: 15 },
-                { header: 'Servicio', key: 'servicio', width: 15 },
-                { header: 'RUT', key: 'rut', width: 15 },
-                { header: 'Nombre', key: 'nombre', width: 40 },
-                { header: 'Direcciones', key: 'direccion', width: 50 },
-                { header: 'Fono', key: 'fono', width: 15 },
-                { header: 'Confirmacion', key: 'confirmacion', width: 20 }
+                { header: 'Transporte', key: 'transporteId', width: 12 }, { header: 'Sentido del viaje', key: 'sentido', width: 20 },
+                { header: 'Fecha', key: 'fecha', width: 15 }, { header: 'Hora', key: 'hora', width: 15 },
+                { header: 'Servicio', key: 'servicio', width: 15 }, { header: 'RUT', key: 'rut', width: 15 },
+                { header: 'Nombre', key: 'nombre', width: 40 }, { header: 'Direcciones', key: 'direccion', width: 50 },
+                { header: 'Fono', key: 'fono', width: 15 }, { header: 'Confirmacion', key: 'confirmacion', width: 25 }
             ];
             
             const styleHeaderRow = (row) => {
@@ -799,79 +709,55 @@
                     cell.alignment = { vertical: 'middle', horizontal: 'center' };
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                 });
-                row.commit();
             };
 
             styleHeaderRow(worksheet.getRow(1));
 
-            let transportCounter = 1;
-            let currentDay = null;
-
+            let transportCounter = 1, currentDay = null;
             transportList.forEach(item => {
-                if (currentDay !== null && currentDay !== item.rawDate.toDateString()) {
-                    const newHeaderRow = worksheet.addRow(worksheet.columns.map(c => c.header));
-                    styleHeaderRow(newHeaderRow);
+                if (currentDay && currentDay !== item.rawDate.toDateString()) {
+                    styleHeaderRow(worksheet.addRow(worksheet.columns.map(c => c.header)));
                     transportCounter = 1;
                 }
-                
                 currentDay = item.rawDate.toDateString();
-                
-                const rowData = { transporteId: transportCounter, ...item };
-                const row = worksheet.addRow(rowData);
-
-                let rowColor = '';
-                if (item.sentido === 'Arribo' && item.hora === '00:00') rowColor = 'FFFBE2D5';
-                else if (item.sentido === 'Arribo' && (item.hora === '07:00' || item.hora === '08:00')) rowColor = 'FFF2CEEF';
-                else if (item.sentido === 'Zarpe' && item.hora === '22:00') rowColor = 'FFDAE9F8';
-                else if (item.sentido === 'Zarpe' && item.hora === '00:00') rowColor = 'FFDAF2D0';
-                
-                if (rowColor) {
-                    row.eachCell({ includeEmpty: true }, (cell) => {
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } };
-                    });
-                }
+                const row = worksheet.addRow({ transporteId: transportCounter++, ...item });
+                const colors = { 'Arribo-00:00': 'FFFBE2D5', 'Arribo-07:00': 'FFF2CEEF', 'Arribo-08:00': 'FFF2CEEF', 'Zarpe-22:00': 'FFDAE9F8', 'Zarpe-00:00': 'FFDAF2D0' };
+                const rowColor = colors[${item.sentido}-${item.hora}];
+                if (rowColor) row.eachCell({ includeEmpty: true }, c => c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } });
 
                 row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    const key = worksheet.columns[colNumber - 1].key;
-                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(key)) {
+                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(worksheet.columns[colNumber - 1].key)) {
                         cell.alignment = { horizontal: 'center' };
                     }
                 });
-                transportCounter++;
             });
             
-            const confirmacionColRef = `J2:J${worksheet.rowCount}`;
+            // --- CAMBIO SOLICITADO: Ajuste de la regla de formato ---
             worksheet.addConditionalFormatting({
-                ref: confirmacionColRef,
+                ref: J2:J${worksheet.rowCount},
                 rules: [
-                    {
-                        type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'],
-                        style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } },
-                    },
-                    {
-                        type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'],
-                        style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } },
-                    }
+                    { type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } } },
+                    { type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } } }
                 ]
             });
 
-            const confirmacionColNumber = 10;
             worksheet.eachRow((row, rowNumber) => {
-                if (rowNumber > 1 && row.getCell(confirmacionColNumber).value !== 'Confirmacion') {
-                    row.getCell(confirmacionColNumber).dataValidation = {
+                // Evita agregar validación en filas de encabezado repetidas
+                if (rowNumber > 1 && row.getCell(1).value) { 
+                    // --- CAMBIO SOLICITADO: Ajuste de la regla de validación ---
+                     row.getCell(10).dataValidation = {
                         type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'],
-                        showErrorMessage: true, errorStyle: 'stop', errorTitle: 'Valor no válido',
-                        error: 'Por favor, selecciona "Confirmado" o "No Confirmado".'
+                        showErrorMessage: true, errorStyle: 'stop', errorTitle: 'Valor no válido', error: 'Por favor, selecciona un valor de la lista.'
                     };
                 }
             });
 
-            fileName = `Transporte ${sheetName}.xlsx`;
+            fileName = Transporte ${sheetName}.xlsx;
             generatedWorkbook = workbook;
         }
 
-        function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
+        function showStatus(message, type) { statusMessage.className = status-message ${type}; statusMessage.textContent = message; }
     </script>
 </body>
 </html>
