@@ -1,933 +1,321 @@
 <!DOCTYPE html>
-
 <html lang="es">
-
 <head>
-
   <meta charset="UTF-8" />
-
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
-
   <title>Gestor Operativo — Plataforma de Automatización</title>
-
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
-
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
   <style>
-
+    /* ===== TEMA MINIMALISTA PROFESIONAL (VERSIÓN CORREGIDA Y COMPLETA) ===== */
     :root {
-
-      --color-bg: #f4f7fe;
-
+      --color-background: #f8f9fa;
       --color-surface: #ffffff;
-
-      --color-primary-start: #6a11cb;
-
-      --color-primary-end: #2575fc;
-
-      --color-disabled: #cbd5e1;
-
-      --color-text: #0f172a;
-
-      --color-text-secondary: #64748b;
-
-      --shadow-lg: 0 20px 40px -12px rgba(0,0,0,0.15);
-
+      --color-border: #eaecf0;
+      --accent-gradient-start: #7F56D9;
+      --accent-gradient-end: #2970FF;
+      --color-text-primary: #101828;
+      --color-text-secondary: #667085;
       --font: 'Manrope', sans-serif;
-
     }
 
     * { box-sizing: border-box; }
 
-    body { margin: 0; font-family: var(--font); background: var(--color-bg); color: var(--color-text); display: flex; min-height: 100vh; overflow-y: auto; }
-
-    .background { position: fixed; inset: 0; overflow: hidden; z-index: -1; }
-
-    .blob { position: absolute; border-radius: 50%; filter: blur(100px); opacity: 0.35; }
-
-    .blob1 { width: 400px; height: 400px; background: #6a11cb; top: -100px; left: -100px; animation: move1 30s infinite alternate ease-in-out; }
-
-    .blob2 { width: 350px; height: 350px; background: #2575fc; bottom: -150px; right: -120px; animation: move2 40s infinite alternate ease-in-out; }
-
-    .blob3 { width: 300px; height: 300px; background: #16a34a; top: 40%; left: 60%; animation: move3 35s infinite alternate ease-in-out; }
-
-    @keyframes move1 { 0% { transform: translate(0,0);} 100% { transform: translate(150px,200px);} }
-
-    @keyframes move2 { 0% { transform: translate(0,0);} 100% { transform: translate(-200px,-100px);} }
-
-    @keyframes move3 { 0% { transform: translate(0,0);} 100% { transform: translate(100px,-150px);} }
-
-    /* Sidebar completo (oculto por defecto) */
-    .sidebar { 
-      width: 260px; 
-      background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end)); 
-      color: #fff; 
-      padding: 28px 18px 22px; 
-      display: flex; 
-      flex-direction: column; 
-      align-items: center; 
-      box-shadow: var(--shadow-lg); 
-      z-index: 10; 
-      position: fixed;
-      left: -200px;
-      top: 0;
-      height: 100vh;
-      transition: left 0.3s ease;
+    body {
+      margin: 0;
+      font-family: var(--font);
+      background-color: var(--color-background);
+      color: var(--color-text-primary);
+      display: flex;
+      min-height: 100vh;
       overflow: hidden;
     }
-    
-    .sidebar:hover,
-    .sidebar.show {
-      left: 0;
-    }
 
-    .sidebar h1 { margin: 0; font-size: 22px; font-weight: 700; text-align: center; }
-
-    .sidebar h2 { margin: 6px 0 20px; font-size: 12px; font-weight: 400; opacity: .9; text-align: center; }
-
-    .sidebar ul { list-style: none; padding: 0; margin: 0; width: 100%; display: flex; flex-direction: column; gap: 12px; }
-
-    .sidebar a {
-
-      background: rgba(255,255,255,.16); padding: 12px 14px; border-radius: 10px;
-
-      font-size: 14px; cursor: pointer; display: flex; justify-content: space-between;
-
-      align-items: center; transition: background .25s; color: #fff; text-decoration: none;
-
-    }
-
-    .sidebar a:hover { background: rgba(255,255,255,.28); }
-
-    .sidebar a.active { background: rgba(255,255,255,.35); }
-
-    .sidebar a.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
-
-    /* Sidebar colapsado con íconos (siempre visible) */
-    .sidebar-collapsed {
-      position: fixed;
-      left: 0;
-      top: 0;
-      width: 60px;
-      height: 100vh;
-      background: linear-gradient(180deg, var(--color-primary-start), var(--color-primary-end));
-      z-index: 9;
+    /* ===== BARRA LATERAL COLAPSABLE Y ALINEADA ===== */
+    .sidebar {
+      width: 80px; /* Ancho colapsado */
+      background: var(--color-surface);
+      border-right: 1px solid var(--color-border);
+      padding: 24px 0;
       display: flex;
       flex-direction: column;
       align-items: center;
-      padding: 28px 8px;
-      gap: 15px;
-      transition: opacity 0.3s ease;
+      z-index: 10;
+      position: fixed;
+      top: 0; left: 0; height: 100vh;
+      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
+      overflow-x: hidden;
+    }
+    .sidebar:hover {
+      width: 280px; /* Ancho expandido */
     }
 
-    .sidebar.show + .sidebar-collapsed {
+    .sidebar-header {
+      width: 240px;
+      padding: 0 16px;
+      margin-bottom: 32px;
       opacity: 0;
-      pointer-events: none;
+      transition: opacity 0.2s ease;
+    }
+    .sidebar:hover .sidebar-header {
+      opacity: 1;
     }
 
-    .icon-only {
-      width: 44px;
-      height: 44px;
-      border-radius: 12px;
-      background: rgba(255,255,255,.16);
+    .sidebar h1 { margin: 0; font-size: 20px; font-weight: 700; color: var(--color-text-primary); }
+    .sidebar h2 { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); }
+
+    .sidebar ul { list-style: none; padding: 0 16px; margin: 0; display: flex; flex-direction: column; gap: 8px; width: 100%; }
+
+    .sidebar a {
       display: flex;
       align-items: center;
-      justify-content: center;
-      font-size: 20px;
-      cursor: pointer;
-      transition: background 0.25s;
-      color: #fff;
-      text-decoration: none;
-    }
-
-    .icon-only:hover {
-      background: rgba(255,255,255,.28);
-    }
-
-    .icon-only.active {
-      background: rgba(255,255,255,.35);
-    }
-
-    .status-dot { width: 8px; height: 8px; border-radius: 50%; background: #16a34a; animation: blink 1.2s infinite; }
-
-    @keyframes blink { 0%,50%,100%{opacity:1} 25%,75%{opacity:0} }
-
-    .top-banner { 
-      position: fixed; 
-      top: 0; 
-      left: 60px; 
-      right: 0; 
-      background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); 
-      color: #fff; 
-      padding: 18px 36px; 
-      box-shadow: var(--shadow-lg); 
-      display: flex; 
-      align-items: baseline; 
-      gap: 14px; 
-      z-index: 5; 
-      transition: left 0.3s ease; 
-    }
-
-    .top-banner h1 { margin: 0; font-size: 26px; font-weight: 700; }
-
-    .top-banner p { margin: 0; font-size: 14px; opacity: .95; }
-
-    .main { 
-      flex: 1; 
-      margin-left: 60px;
-      padding: 110px 36px 28px 36px; 
-      overflow-y: auto; 
-      position: relative; 
-      max-height: 100vh;
-      transition: margin-left 0.3s ease;
-    }
-
-    .inicio { max-width: 1100px; margin: 0 auto; text-align: center; }
-
-    .card-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(250px, 1fr)); gap: 22px; margin-top: 26px; }
-
-    a.card {
-
-      background: var(--color-surface); border-radius: 18px; padding: 26px; box-shadow: var(--shadow-lg);
-
-      cursor: pointer; transition: transform .22s, box-shadow .22s; position: relative;
-
-      text-decoration: none; color: inherit;
-
-    }
-
-    a.card:hover { transform: translateY(-6px); box-shadow: 0 25px 50px -15px rgba(106,17,203,.22); }
-
-    a.card h2 { margin: 12px 0 4px; font-size: 20px; }
-
-    a.card p { margin: 0; color: var(--color-text-secondary); font-size: 14px; }
-
-    .card-icon { width: 58px; height: 58px; margin: 0 auto; border-radius: 50%; display: grid; place-items: center; color: #fff; background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); font-size: 26px; }
-
-    .status-pill { position: absolute; top: 12px; right: 12px; background: #e6f7f0; color: #16a34a; font-size: 12px; font-weight: 700; padding: 4px 10px; border-radius: 999px; display: inline-flex; align-items: center; gap: 6px; }
-
-    a.card.disabled { opacity: .55; cursor: not-allowed; pointer-events: none; }
-
-    .ia-helper { position: fixed; right: 18px; bottom: 18px; display: flex; align-items: flex-end; gap: 10px; z-index: 100;}
-
-    .ia-msg { background: var(--color-surface); padding: 11px 14px; border-radius: 12px; box-shadow: var(--shadow-lg); font-size: 13px; max-width: 280px; color: var(--color-text-secondary); }
-
-    .ia-avatar { width: 56px; height: 56px; border-radius: 50%; background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end)); color: #fff; display: grid; place-items: center; font-size: 24px; animation: float 3s ease-in-out infinite; }
-
-    @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
-
-    /* Estilos para el iframe */
-    .content-frame {
-      position: absolute;
-      top: 20px;
-      left: 0;
+      gap: 16px;
       width: 100%;
-      height: calc(100vh - 130px);
-      border: none;
-      border-radius: 18px;
-      background: white;
-      box-shadow: var(--shadow-lg);
-      display: none;
-      overflow: auto;
+      padding: 10px 16px;
+      border-radius: 8px;
+      font-size: 15px;
+      font-weight: 500;
+      cursor: pointer;
+      color: var(--color-text-secondary);
+      text-decoration: none;
+      transition: all 0.2s ease;
+      white-space: nowrap;
+    }
+    .sidebar:not(:hover) a {
+        justify-content: center;
+        padding: 10px 0;
+    }
+    
+    .nav-icon {
+      width: 22px; height: 22px; flex-shrink: 0;
+    }
+    .nav-icon svg { width: 100%; height: 100%; stroke-width: 1.5; }
+
+    .nav-text {
+        opacity: 0;
+        visibility: hidden;
+        transition: opacity 0.2s ease, visibility 0.2s ease;
+    }
+    .sidebar:hover .nav-text {
+        opacity: 1;
+        visibility: visible;
     }
 
-    .content-frame.active {
-      display: block;
+    .sidebar a:hover {
+      color: var(--color-text-primary);
+      background-color: var(--color-background);
     }
-
-    .home-content {
-      display: block;
+    .sidebar a.active {
+      color: #fff;
+      background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
+      box-shadow: 0 4px 10px -2px rgba(127, 86, 217, 0.3);
     }
+    .sidebar a.active .nav-icon { color: #fff; }
 
-    .home-content.hidden {
-      display: none;
+    /* ===== CONTENIDO PRINCIPAL ===== */
+    .main {
+      flex: 1;
+      margin-left: 80px; /* Coincide con sidebar colapsado */
+      padding: 32px;
+      overflow-y: auto;
+      height: 100vh;
+      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
+    .sidebar:hover ~ .main {
+        margin-left: 280px; /* Coincide con sidebar expandido */
+    }
+    
+    .main-header h1 { font-size: 28px; }
+    .main-header p { font-size: 16px; color: var(--color-text-secondary); margin-top: -10px; }
 
+    /* ===== TARJETAS DE MÓDULOS RESTAURADAS ===== */
+    .card-grid {
+        display: grid;
+        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        gap: 24px;
+        margin-top: 26px;
+    }
+    .card {
+        background: var(--color-surface);
+        border: 1px solid var(--color-border);
+        border-radius: 12px;
+        padding: 24px;
+        cursor: pointer;
+        text-decoration: none;
+        color: inherit;
+        transition: transform 0.2s ease, box-shadow 0.2s ease;
+    }
+    .card:hover {
+        transform: translateY(-5px);
+        box-shadow: 0 10px 20px rgba(0,0,0,0.07);
+    }
+    .card-icon {
+        width: 48px;
+        height: 48px;
+        border-radius: 10px;
+        display: grid;
+        place-items: center;
+        background-color: var(--accent-gradient-start);
+        background-image: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+        color: #fff;
+    }
+    .card-icon svg { width: 28px; height: 28px; stroke-width: 1.5; }
+    .card h2 { margin: 16px 0 6px; font-size: 18px; font-weight: 700; }
+    .card p { margin: 0; color: var(--color-text-secondary); font-size: 14px; line-height: 1.6; }
+
+    /* IFRAME Y CONTENIDO */
+    .content-frame { width: 100%; height: calc(100vh - 64px); border: none; display: none; background-color: var(--color-surface); border-radius: 12px; border: 1px solid var(--color-border);}
+    .content-frame.active { display: block; }
+    .home-content.hidden { display: none; }
+
+    /* Asistente IA */
+    .ia-helper { position: fixed; right: 24px; bottom: 24px; display: flex; align-items: flex-end; gap: 12px; z-index: 100;}
+    .ia-msg { background: var(--color-surface); border: 1px solid var(--color-border); padding: 12px 16px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); font-size: 13px; color: var(--color-text-secondary); }
+    .ia-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end)); color: #fff; display: grid; place-items: center; font-size: 20px; animation: float 3s ease-in-out infinite; cursor: pointer; }
+    @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
   </style>
-
 </head>
-
 <body>
 
-  <div class="background">
-
-    <div class="blob blob1"></div>
-
-    <div class="blob blob2"></div>
-
-    <div class="blob blob3"></div>
-
-  </div>
-
-  <!-- Sidebar completo (se desliza) -->
   <aside class="sidebar">
-
-    <h1>Gestor Operativo</h1>
-
-    <h2>Plataforma de automatización</h2>
-
+    <div class="sidebar-header">
+        <h1>Gestor Operativo</h1>
+        <h2>Plataforma IA</h2>
+    </div>
     <ul>
-
-      <li><a href="#" onclick="showHome()" id="home-link">🏠 Inicio</a></li>
-
-      <li><a href="#" onclick="loadModule('transporte.html')" data-page="transporte">🚐 Gestión de Transporte <span class='status-dot'></span></a></li>
-
-      <li><a href="#" onclick="loadModule('calendario.html')" data-page="calendario">📅 Calendario Teletrabajo <span class='status-dot'></span></a></li>
-
-      <li><a href="#" onclick="loadModule('turnos.html')" data-page="turnos">📊 Turnos Diarios <span class='status-dot'></span></a></li>
-
-      <li><a href="#" onclick="loadModule('cartas.html')" data-page="cartas">📄 Carta Amonestación <span class='status-dot'></span></a></li>
-
-      <li><a href="#" onclick="loadModule('cambio-turnos.html')" data-page="cambio-turnos">🔄 Cambio de Turnos <span class='status-dot'></span></a></li>
-
+        <li><a href="#" onclick="showHome(this)" id="home-link" class="active">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
+            <span class="nav-text">Inicio</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('transporte.html', this)" data-page="transporte">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
+            <span class="nav-text">Gestión de Transporte</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('calendario.html', this)" data-page="calendario">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
+            <span class="nav-text">Calendario Teletrabajo</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('turnos.html', this)" data-page="turnos">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></span>
+            <span class="nav-text">Turnos Diarios</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('cartas.html', this)" data-page="cartas">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+            <span class="nav-text">Carta Amonestación</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('cambio-turnos.html', this)" data-page="cambio-turnos">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></span>
+            <span class="nav-text">Cambio de Turnos</span>
+        </a></li>
+        <li><a href="#" onclick="loadModule('erlang.html', this)" data-page="erlang">
+            <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></span>
+            <span class="nav-text">Erlang</span>
+        </a></li>
     </ul>
-
   </aside>
 
-  <!-- Sidebar colapsado con íconos (siempre visible) -->
-  <div class="sidebar-collapsed">
-    <a href="#" onclick="showHome()" class="icon-only" id="home-icon">🏠</a>
-    <a href="#" onclick="loadModule('transporte.html')" class="icon-only" data-page="transporte">🚐</a>
-    <a href="#" onclick="loadModule('calendario.html')" class="icon-only" data-page="calendario">📅</a>
-    <a href="#" onclick="loadModule('turnos.html')" class="icon-only" data-page="turnos">📊</a>
-    <a href="#" onclick="loadModule('cartas.html')" class="icon-only" data-page="cartas">📄</a>
-    <a href="#" onclick="loadModule('cambio-turnos.html')" class="icon-only" data-page="cambio-turnos">🔄</a>
-  </div>
-
-  <header class="top-banner" id="topBanner">
-
-    <h1>⚡ Gestor Operativo</h1>
-
-    <p>Plataforma de automatización inteligente</p>
-
-  </header>
-
-  <main class="main" id="mainContent">
-
-    <!-- Contenido de inicio -->
-    <section id="inicio" class="inicio home-content">
-
-      <h1>🚀 Bienvenido</h1>
-
-      <p>Selecciona el módulo que deseas utilizar</p>
-
-      <div class="card-grid">
-
-        <a href="#" onclick="loadModule('transporte.html')" class="card">
-
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-
-          <div class="card-icon">🚐</div>
-
-          <h2>Gestión de Transporte</h2>
-
-          <p>Genera reportes de arribo y zarpe de personal.</p>
-
-        </a>
-
-        <a href="#" onclick="loadModule('calendario.html')" class="card">
-
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-
-          <div class="card-icon">📅</div>
-
-          <h2>Calendario Teletrabajo</h2>
-
-          <p>Gestiona la presencialidad y el trabajo remoto.</p>
-
-        </a>
-
-        <a href="#" onclick="loadModule('turnos.html')" class="card">
-
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-
-          <div class="card-icon">📊</div>
-
-          <h2>Turnos Diarios</h2>
-
-          <p>Genera turnos de forma automática y optimizada.</p>
-
-        </a>
-
-        <a href="#" onclick="loadModule('cartas.html')" class="card">
-
-            <div class="status-pill"><span class="status-dot"></span>Activo</div>
-
-          <div class="card-icon">📄</div>
-
-          <h2>Carta de Amonestación</h2>
-
-          <p>Crea documentos formales en segundos.</p>
-
-        </a>
-
-        <a href="#" onclick="loadModule('cambio-turnos.html')" class="card">
-
-          <div class="status-pill"><span class="status-dot"></span>Activo</div>
-
-          <div class="card-icon">🔄</div>
-
-          <h2>Cambio de Turnos</h2>
-
-          <p>Gestiona solicitudes de cambio de turno entre agentes.</p>
-
-        </a>
-
-      </div>
-
+  <main class="main">
+    <section id="homeContent" class="home-content">
+        <div class="main-header">
+            <h1>Bienvenido a su Gestor Operativo</h1>
+            <p>Seleccione un módulo en el menú de la izquierda para comenzar a trabajar.</p>
+        </div>
+        <div class="card-grid">
+            <a href="#" onclick="loadModule('transporte.html', document.querySelector('[data-page=transporte]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
+                <h2>Gestión de Transporte</h2>
+                <p>Genera reportes de arribo y zarpe de personal.</p>
+            </a>
+            <a href="#" onclick="loadModule('calendario.html', document.querySelector('[data-page=calendario]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
+                <h2>Calendario Teletrabajo</h2>
+                <p>Gestiona la presencialidad y el trabajo remoto.</p>
+            </a>
+            <a href="#" onclick="loadModule('turnos.html', document.querySelector('[data-page=turnos]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></div>
+                <h2>Turnos Diarios</h2>
+                <p>Genera turnos de forma automática y optimizada.</p>
+            </a>
+            <a href="#" onclick="loadModule('cartas.html', document.querySelector('[data-page=cartas]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                <h2>Carta Amonestación</h2>
+                <p>Crea documentos formales en segundos.</p>
+            </a>
+            <a href="#" onclick="loadModule('cambio-turnos.html', document.querySelector('[data-page=cambio-turnos]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></div>
+                <h2>Cambio de Turnos</h2>
+                <p>Gestiona solicitudes de cambio entre agentes.</p>
+            </a>
+            <a href="#" onclick="loadModule('erlang.html', document.querySelector('[data-page=erlang]'))" class="card">
+                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></div>
+                <h2>Erlang</h2>
+                <p>Calcula la carga de trabajo y personal necesario.</p>
+            </a>
+        </div>
     </section>
-
-    <!-- Iframe para cargar módulos -->
     <iframe id="moduleFrame" class="content-frame" src=""></iframe>
-
   </main>
 
   <div class="ia-helper">
-
-    <div class="ia-msg" id="iaMsg">💡 Consejo: Haz clic en un módulo para comenzar.</div>
-
+    <div class="ia-msg" id="iaMsg">💡 Seleccione un módulo para comenzar.</div>
     <div class="ia-avatar">🤖</div>
-
   </div>
 
   <script>
-    // Variables para elementos principales
-    const sidebar = document.querySelector('.sidebar');
-    const topBanner = document.querySelector('.top-banner');
-    const main = document.querySelector('.main');
-    
-    // ===== SISTEMA DE IA INTELIGENTE =====
+    const allLinks = document.querySelectorAll('.sidebar a');
+
+    function updateActiveNav(activeLink) {
+        allLinks.forEach(link => link.classList.remove('active'));
+        if (activeLink) {
+            activeLink.classList.add('active');
+        }
+    }
+
+    function loadModule(page, linkElement) {
+      document.getElementById('homeContent').classList.add('hidden');
+      const iframe = document.getElementById('moduleFrame');
+      iframe.src = page;
+      iframe.classList.add('active');
+      updateActiveNav(linkElement);
+      assistant.setCurrentModule(page);
+    }
+
+    function showHome(linkElement) {
+      document.getElementById('homeContent').classList.remove('hidden');
+      const iframe = document.getElementById('moduleFrame');
+      iframe.classList.remove('active');
+      iframe.src = '';
+      updateActiveNav(linkElement);
+      assistant.setCurrentModule('home');
+    }
+
     class IntelligentAssistant {
       constructor() {
         this.currentModule = 'home';
         this.moduleData = {
-          home: {
-            name: 'Panel Principal',
-            tips: [
-              '🎯 Desde aquí puedes acceder a todos los módulos de automatización',
-              '⚡ Cada módulo está optimizado para tareas específicas',
-              '📊 Los indicadores verdes muestran que todos los sistemas están operativos'
-            ],
-            welcome: '¡Hola! Soy tu asistente inteligente. Te ayudo a optimizar tu flujo de trabajo.'
-          },
-          'transporte.html': {
-            name: 'Gestión de Transporte',
-            tips: [
-              '🚐 Gestiona quién necesita transporte y sus direcciones de recogida',
-              '✅ Sistema de confirmación: "Confirmado" vs "No Confirmado"',
-              '📍 Requiere hoja "Direcciones" con RUT, direcciones y teléfonos',
-              '⏰ Detecta horarios: 00:00, 07:00, 08:00 (arribo) y 22:00, 00:00 (zarpe)'
-            ],
-            fileUploaded: '🚐 Archivo cargado. Verificando hoja "Direcciones" y datos de contacto...',
-            weekSelected: '✅ Semana seleccionada. Identificando agentes que requieren transporte.',
-            generating: '📍 Mapeando direcciones y generando rutas de transporte...',
-            success: '🎉 ¡Reporte de transporte listo! Incluye direcciones, teléfonos y estado de confirmación.',
-            errors: {
-              noDirections: '❌ Falta la hoja "Direcciones". Sin ella no puedo mapear las ubicaciones.',
-              noActiveAgents: '⚠️ No encontré agentes activos que necesiten transporte en esta semana.'
-            }
-          },
-          'calendario.html': {
-            name: 'Calendario Teletrabajo',
-            tips: [
-              '🏠 Distribuye automáticamente días de Teletrabajo vs Presencial',
-              '👥 16 agentes preconfigurados con patrones 3x2, 4x1 y especiales',
-              '⚙️ Configuraciones especiales para AM, PM, Noche y Fines de semana',
-              '🎯 Modalidad "Especial" para horarios específicos por agente'
-            ],
-            fileUploaded: '📊 Archivo procesado. Cargando configuraciones de agentes preestablecidas...',
-            weekSelected: '📅 Semana lista. Aplicaré los patrones de TT/Presencial configurados.',
-            generating: '🧠 Aplicando inteligencia artificial para distribuir TT y presencialidad...',
-            success: '📋 ¡Calendario generado! Distribución TT/Presencial aplicada según patrones.',
-            configuring: '⚙️ Personaliza los patrones de cada agente según sus necesidades.'
-          },
-          'cartas.html': {
-            name: 'Generador de Cartas',
-            tips: [
-              '📄 Genera cartas de amonestación y compromiso automáticamente',
-              '🔍 Detecta: atrasos, ausencias y abandonos de trabajo',
-              '📅 Filtra por rangos de fecha para procesar incidencias específicas',
-              '📝 Agrupa múltiples incidencias del mismo agente en una carta'
-            ],
-            fileUploaded: '📋 Analizando incidencias: atrasos, ausencias y abandonos de trabajo...',
-            filtering: '🔍 Filtro de fechas configurado. Procesando incidencias del período seleccionado.',
-            generating: '✍️ Redactando cartas con formato legal y agrupando por agente...',
-            success: '📜 ¡Cartas generadas! Documentos legales listos con formato corporativo.'
-          },
-          'turnos.html': {
-            name: 'Turnos Diarios',
-            tips: [
-              '📅 Organiza turnos en 7 hojas Excel (Lunes a Domingo)',
-              '👥 Separa: Supervisores → Agentes Site → Teletrabajo → Inactivos',
-              '🌙 Turnos de madrugada (00:00) se muestran en sección especial',
-              '⚙️ Configura texto de "Permanencia" personalizado'
-            ],
-            fileUploaded: '📊 Turnos cargados. Organizando por días de la semana...',
-            weekSelected: '📅 Semana seleccionada. Preparando 7 hojas de turnos diarios.',
-            generating: '📋 Creando hojas por día y separando por tipos de servicio...',
-            success: '📈 ¡Turnos listos! Excel con 7 hojas organizadas por día.',
-            permanenciaConfigured: '⚙️ Texto de permanencia configurado correctamente.'
-          },
-          'cambio-turnos.html': {
-            name: 'Cambio de Turnos',
-            tips: [
-              '🔄 Gestiona solicitudes de intercambio entre agentes',
-              '✅ Validación automática de compatibilidad de horarios',
-              '📋 Seguimiento de solicitudes y aprobaciones'
-            ],
-            generating: '🔄 Procesando solicitudes de cambio y validando compatibilidades...'
-          }
+          home: { name: 'Panel Principal', welcome: '¡Hola! Soy tu asistente inteligente. Te ayudo a optimizar tu flujo de trabajo.' },
+          'transporte.html': { name: 'Gestión de Transporte', tips: ['Genera reportes de arribo y zarpe de personal.'] },
+          'calendario.html': { name: 'Calendario Teletrabajo', tips: ['Gestiona la presencialidad y el trabajo remoto.'] },
+          'turnos.html': { name: 'Turnos Diarios', tips: ['Genera turnos de forma automática y optimizada.'] },
+          'cartas.html': { name: 'Carta Amonestación', tips: ['Crea documentos formales en segundos.'] },
+          'cambio-turnos.html': { name: 'Cambio de Turnos', tips: ['Gestiona solicitudes de cambio entre agentes.'] },
+          'erlang.html': { name: 'Módulo Erlang', tips: ['Calcula la carga de trabajo y el personal necesario.'] }
         };
-        
         this.messageElement = document.getElementById('iaMsg');
-        this.avatarElement = document.querySelector('.ia-avatar');
         this.initializeIntelligence();
       }
-      
-      initializeIntelligence() {
-        // Mostrar mensaje de bienvenida inteligente
-        this.showWelcomeMessage();
-        
-        // Configurar observadores para iframe
-        this.setupIframeMonitoring();
-        
-        // Configurar detección de interacciones
-        this.setupInteractionDetection();
-      }
-      
-      showWelcomeMessage() {
-        const data = this.moduleData[this.currentModule];
-        this.updateMessage(data.welcome || data.tips[0]);
-      }
-      
-      setupIframeMonitoring() {
-        const iframe = document.getElementById('moduleFrame');
-        
-        iframe.addEventListener('load', () => {
-          if (iframe.src && this.currentModule !== 'home') {
-            this.analyzeCurrentModule();
-            this.monitorIframeActivity();
-          }
-        });
-      }
-      
-      setupInteractionDetection() {
-        // Detección de hover en cards
-        document.querySelectorAll('.card').forEach(card => {
-          card.addEventListener('mouseenter', () => {
-            const moduleName = this.getModuleNameFromCard(card);
-            this.showModulePreview(moduleName);
-          });
-          
-          card.addEventListener('mouseleave', () => {
-            if (this.currentModule === 'home') {
-              this.showWelcomeMessage();
-            }
-          });
-        });
-        
-        // Detección de actividad en sidebar
-        document.querySelectorAll('.sidebar a, .icon-only').forEach(link => {
-          link.addEventListener('mouseenter', () => {
-            this.showQuickTip(link);
-          });
-        });
-      }
-      
-      monitorIframeActivity() {
-        const iframe = document.getElementById('moduleFrame');
-        
-        try {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          
-          // Monitor file uploads
-          const fileInputs = iframeDoc.querySelectorAll('input[type="file"]');
-          fileInputs.forEach(input => {
-            input.addEventListener('change', () => {
-              this.onFileUploaded();
-            });
-          });
-          
-          // Monitor drag and drop
-          const uploadAreas = iframeDoc.querySelectorAll('.upload-area');
-          uploadAreas.forEach(area => {
-            area.addEventListener('drop', () => {
-              setTimeout(() => this.onFileUploaded(), 100);
-            });
-          });
-          
-          // Monitor selects and form interactions
-          const selects = iframeDoc.querySelectorAll('select');
-          selects.forEach(select => {
-            select.addEventListener('change', () => {
-              this.onSelectionMade();
-            });
-          });
-          
-          // Monitor for settings configuration (specific to modules with settings)
-          const settingsButtons = iframeDoc.querySelectorAll('#settingsBtn, #toggleAgentConfigBtn, #permanenciaAcceptBtn');
-          settingsButtons.forEach(button => {
-            button.addEventListener('click', () => {
-              this.onSettingsConfigured();
-            });
-          });
-          
-          // Monitor for permanencia configuration in turnos module
-          const permanenciaInput = iframeDoc.querySelector('#permanenciaInput');
-          if (permanenciaInput) {
-            permanenciaInput.addEventListener('input', () => {
-              this.onPermanenciaConfigured();
-            });
-          }
-          
-          // Monitor for success states
-          const observer = new MutationObserver((mutations) => {
-            mutations.forEach((mutation) => {
-              if (mutation.type === 'childList' || mutation.type === 'attributes') {
-                this.checkForSuccessIndicators(iframeDoc);
-              }
-            });
-          });
-          
-          observer.observe(iframeDoc.body, {
-            childList: true,
-            subtree: true,
-            attributes: true,
-            attributeFilter: ['class', 'style']
-          });
-          
-        } catch (error) {
-          // Cross-origin restrictions - use polling as fallback
-          this.setupPollingMonitor();
-        }
-      }
-      
-      setupPollingMonitor() {
-        setInterval(() => {
-          this.checkModuleState();
-        }, 2000);
-      }
-      
-      checkModuleState() {
-        const iframe = document.getElementById('moduleFrame');
-        try {
-          const iframeDoc = iframe.contentDocument || iframe.contentWindow.document;
-          this.checkForSuccessIndicators(iframeDoc);
-        } catch (error) {
-          // Silently handle cross-origin restrictions
-        }
-      }
-      
-      checkForSuccessIndicators(doc) {
-        // Check for download indicators
-        const downloadButtons = doc.querySelectorAll('.button.is-success, .button[disabled]');
-        const successMessages = doc.querySelectorAll('.status-message.success, .status.success');
-        const progressBars = doc.querySelectorAll('.progress-bar.active');
-        
-        if (downloadButtons.length > 0) {
-          this.onDownloadReady();
-        }
-        
-        if (successMessages.length > 0) {
-          this.onOperationSuccess();
-        }
-        
-        if (progressBars.length > 0) {
-          this.onProgressDetected();
-        }
-      }
-      
-      onFileUploaded() {
-        const data = this.moduleData[this.currentModule];
-        if (data && data.fileUploaded) {
-          this.updateMessage(data.fileUploaded, 'success');
-          this.playAnimation('bounce');
-        }
-      }
-      
-      onSelectionMade() {
-        const data = this.moduleData[this.currentModule];
-        if (data && data.weekSelected) {
-          this.updateMessage(data.weekSelected, 'info');
-        }
-      }
-      
-      onGenerationStarted() {
-        const data = this.moduleData[this.currentModule];
-        if (data && data.generating) {
-          this.updateMessage(data.generating, 'working');
-          this.playAnimation('pulse');
-        }
-      }
-      
-      onOperationSuccess() {
-        const data = this.moduleData[this.currentModule];
-        if (data && data.success) {
-          this.updateMessage(data.success, 'success');
-          this.playAnimation('celebration');
-          this.showCelebration();
-          
-          // Mostrar tip contextual después del éxito (sin saturar)
-          setTimeout(() => {
-            this.showContextualTip();
-          }, 4000);
-        }
-      }
-      
-      onDownloadReady() {
-        this.updateMessage('🎉 ¡Descarga iniciada! Tu archivo se está generando automáticamente.', 'success');
-        this.showCelebration();
-      }
-      
-      onSettingsConfigured() {
-        const data = this.moduleData[this.currentModule];
-        if (this.currentModule === 'calendario.html') {
-          this.updateMessage('⚙️ Configuraciones de agentes actualizadas. Patrones personalizados aplicados.', 'info');
-        } else if (this.currentModule === 'transporte.html') {
-          this.updateMessage('🗓️ Feriados configurados. Arribos especiales activados para las fechas seleccionadas.', 'info');
-        }
-      }
-      
-      onPermanenciaConfigured() {
-        if (this.currentModule === 'turnos.html') {
-          const data = this.moduleData[this.currentModule];
-          if (data && data.permanenciaConfigured) {
-            this.updateMessage(data.permanenciaConfigured, 'success');
-            this.playAnimation('bounce');
-          }
-        }
-      }
-      
-      analyzeCurrentModule() {
-        const data = this.moduleData[this.currentModule];
-        if (data && this.currentModule !== 'home') {
-          // Solo mostrar un tip específico, no todos
-          const welcomeTip = data.tips[0]; // Solo el primer tip como bienvenida
-          this.updateMessage(`🚀 ${data.name}: ${welcomeTip}`, 'info');
-        }
-      }
-      
-      getModuleNameFromCard(card) {
-        const title = card.querySelector('h2')?.textContent;
-        if (title?.includes('Transporte')) return 'transporte.html';
-        if (title?.includes('Calendario')) return 'calendario.html';
-        if (title?.includes('Carta')) return 'cartas.html';
-        if (title?.includes('Turnos Diarios')) return 'turnos.html';
-        if (title?.includes('Cambio')) return 'cambio-turnos.html';
-        return 'home';
-      }
-      
-      showModulePreview(moduleName) {
-        const data = this.moduleData[moduleName];
-        if (data && this.currentModule === 'home') {
-          // Solo mostrar preview cuando estés en home
-          this.updateMessage(`🔍 ${data.name}: ${data.tips[0]}`, 'preview');
-        }
-      }
-      
-      showQuickTip(element) {
-        const text = element.textContent;
-        const tips = {
-          'Inicio': '🏠 Centro de comando - Acceso rápido a todos los módulos automatizados',
-          'Gestión de Transporte': '🚐 IA que optimiza rutas y detecta horarios de transporte automáticamente',
-          'Calendario Teletrabajo': '📅 Sistema inteligente que distribuye TT/Presencial con 16 patrones preconfigurados',
-          'Turnos Diarios': '📊 Generador que organiza turnos por días con separación automática por servicios',
-          'Carta Amonestación': '📝 Redacción automática de cartas legales con agrupación inteligente',
-          'Cambio de Turnos': '🔄 Sistema de intercambios con validación automática de compatibilidad'
-        };
-        
-        Object.entries(tips).forEach(([key, tip]) => {
-          if (text.includes(key)) {
-            this.updateMessage(tip, 'tip');
-          }
-        });
-      }
-      
-      updateMessage(message, type = 'info') {
-        this.messageElement.textContent = message;
-        
-        // Add visual feedback based on type
-        this.messageElement.className = 'ia-msg';
-        if (type === 'success') this.messageElement.style.background = '#e6f7f0';
-        else if (type === 'working') this.messageElement.style.background = '#fff3cd';
-        else if (type === 'preview') this.messageElement.style.background = '#e7f3ff';
-        else this.messageElement.style.background = '';
-      }
-      
-      playAnimation(type) {
-        this.avatarElement.style.animation = 'none';
-        
-        setTimeout(() => {
-          switch (type) {
-            case 'bounce':
-              this.avatarElement.style.animation = 'bounce 0.6s ease-in-out';
-              break;
-            case 'pulse':
-              this.avatarElement.style.animation = 'pulse 1s ease-in-out infinite';
-              break;
-            case 'celebration':
-              this.avatarElement.style.animation = 'celebration 1s ease-in-out';
-              break;
-            default:
-              this.avatarElement.style.animation = 'float 3s ease-in-out infinite';
-          }
-        }, 10);
-      }
-      
-      showCelebration() {
-        // Create celebration effect
-        const celebration = document.createElement('div');
-        celebration.innerHTML = '🎉✨🎊';
-        celebration.style.cssText = `
-          position: fixed; right: 30px; bottom: 100px; z-index: 200;
-          font-size: 24px; animation: celebration-float 2s ease-out forwards;
-          pointer-events: none;
-        `;
-        
-        document.body.appendChild(celebration);
-        
-        setTimeout(() => {
-          celebration.remove();
-        }, 2000);
-      }
-      
+      initializeIntelligence() { this.showWelcomeMessage(); }
+      showWelcomeMessage() { this.updateMessage(this.moduleData.home.welcome); }
+      updateMessage(message) { this.messageElement.textContent = message; }
       setCurrentModule(moduleName) {
         this.currentModule = moduleName;
-        
-        // Solo mostrar mensaje de bienvenida específico del módulo una vez
-        if (moduleName !== 'home') {
-          setTimeout(() => {
-            const data = this.moduleData[moduleName];
-            if (data) {
-              this.updateMessage(`✨ ${data.name} activado. ${data.tips[0]}`, 'info');
-            }
-          }, 800);
-        } else {
-          setTimeout(() => {
-            this.showWelcomeMessage();
-          }, 300);
-        }
+        setTimeout(() => {
+          const data = this.moduleData[moduleName] || this.moduleData.home;
+          const message = data.tips ? `💡 Consejo: ${data.tips[0]}` : data.welcome;
+          this.updateMessage(message);
+        }, 700);
       }
     }
-    
-    // Añadir animaciones CSS adicionales
-    const style = document.createElement('style');
-    style.textContent = `
-      @keyframes bounce {
-        0%, 100% { transform: translateY(0) scale(1); }
-        50% { transform: translateY(-10px) scale(1.1); }
-      }
-      
-      @keyframes pulse {
-        0%, 100% { transform: scale(1); opacity: 1; }
-        50% { transform: scale(1.1); opacity: 0.8; }
-      }
-      
-      @keyframes celebration {
-        0% { transform: scale(1) rotate(0deg); }
-        25% { transform: scale(1.2) rotate(10deg); }
-        50% { transform: scale(1.1) rotate(-10deg); }
-        75% { transform: scale(1.2) rotate(5deg); }
-        100% { transform: scale(1) rotate(0deg); }
-      }
-      
-      @keyframes celebration-float {
-        0% { opacity: 0; transform: translateY(0) scale(0.5); }
-        50% { opacity: 1; transform: translateY(-30px) scale(1); }
-        100% { opacity: 0; transform: translateY(-60px) scale(0.8); }
-      }
-      
-      .ia-msg {
-        transition: all 0.3s ease;
-      }
-    `;
-    document.head.appendChild(style);
-    
-    // Inicializar el asistente inteligente
     const assistant = new IntelligentAssistant();
-    
-    // ===== FUNCIONES ORIGINALES MEJORADAS =====
-    
-    // Funcionalidad para mostrar/ocultar sidebar
-    document.addEventListener('mousemove', function(e) {
-      if (e.clientX <= 50) {
-        // Mostrar sidebar completo
-        sidebar.classList.add('show');
-        topBanner.style.left = '260px';
-        main.style.marginLeft = '260px';
-      } else if (e.clientX > 280) {
-        // Ocultar sidebar completo, mostrar solo íconos
-        sidebar.classList.remove('show');
-        topBanner.style.left = '60px';
-        main.style.marginLeft = '60px';
-      }
-    });
-    
-    // Mantener sidebar visible cuando el mouse está sobre él
-    sidebar.addEventListener('mouseenter', function() {
-      sidebar.classList.add('show');
-      topBanner.style.left = '260px';
-      main.style.marginLeft = '260px';
-    });
-    
-    function loadModule(page) {
-      // Ocultar contenido de inicio
-      document.querySelector('.home-content').classList.add('hidden');
-      
-      // Mostrar iframe y cargar página
-      const iframe = document.getElementById('moduleFrame');
-      iframe.src = page;
-      iframe.classList.add('active');
-      
-      // Actualizar navegación activa
-      updateActiveNav(page);
-      
-      // Actualizar asistente inteligente
-      assistant.setCurrentModule(page);
-    }
-    
-    function showHome() {
-      // Mostrar contenido de inicio
-      document.querySelector('.home-content').classList.remove('hidden');
-      
-      // Ocultar iframe
-      const iframe = document.getElementById('moduleFrame');
-      iframe.classList.remove('active');
-      iframe.src = '';
-      
-      // Actualizar navegación activa
-      updateActiveNav('home');
-      
-      // Actualizar asistente
-      assistant.setCurrentModule('home');
-    }
-    
-    function updateActiveNav(activePage) {
-      // Remover clase active de todos los enlaces
-      document.querySelectorAll('.sidebar a, .icon-only').forEach(link => {
-        link.classList.remove('active');
-      });
-      
-      // Agregar clase active al enlace correspondiente
-      if (activePage === 'home') {
-        document.getElementById('home-link').classList.add('active');
-        document.getElementById('home-icon').classList.add('active');
-      } else {
-        const activeLink = document.querySelector(`[data-page="${activePage.replace('.html', '')}"]`);
-        if (activeLink) {
-          activeLink.classList.add('active');
-        }
-        const activeIcon = document.querySelector(`.icon-only[data-page="${activePage.replace('.html', '')}"]`);
-        if (activeIcon) {
-          activeIcon.classList.add('active');
-        }
-      }
-    }
-    
-    // Marcar inicio como activo por defecto
-    document.getElementById('home-link').classList.add('active');
-    document.getElementById('home-icon').classList.add('active');
   </script>
-
 </body>
-
 </html>
