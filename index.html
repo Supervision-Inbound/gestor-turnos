@@ -90,7 +90,7 @@
 
     .top-banner p { margin: 0; font-size: 14px; opacity: .95; }
 
-    .main { flex: 1; padding: 110px 36px 28px; overflow-y: auto; position: relative; }
+    .main { flex: 1; padding: 110px 36px 28px; overflow-y: auto; position: relative; max-height: calc(100vh - 0px); }
 
     .inicio { max-width: 1100px; margin: 0 auto; text-align: center; }
 
@@ -129,10 +129,10 @@
     /* Nuevos estilos para el iframe */
     .content-frame {
       position: absolute;
-      top: 0;
-      left: 0;
-      width: 100%;
-      height: calc(100vh - 110px);
+      top: 15px;
+      left: 36px;
+      right: 36px;
+      height: calc(100vh - 125px - 15px);
       border: none;
       border-radius: 18px;
       background: white;
