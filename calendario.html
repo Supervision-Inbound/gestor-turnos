@@ -16,6 +16,8 @@
             --color-primary-end: #2575fc;
             --color-success-start: #16a34a;
             --color-success-end: #15803d;
+            --color-apply-start: #1976d2;
+            --color-apply-end: #1565c0;
             --color-text: #1e293b;
             --color-text-secondary: #64748b;
             --color-border: #e2e8f0;
@@ -66,7 +68,6 @@
         .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
         .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
         .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
-
         .upload-area.file-loaded #uploadDefaultContent { display: none; }
         .upload-area #uploadSuccessContent { display: none; }
         .upload-area.file-loaded #uploadSuccessContent { display: block; }
@@ -77,10 +78,9 @@
         #changeFileText {
             font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;
         }
-
         input[type="file"] { display: none; }
-        .button-container { text-align: center; margin-top: 25px; }
-        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
+        .button-container { display: flex; justify-content: center; gap: 15px; text-align: center; margin-top: 25px; }
+        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
         .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
         .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
         .button.is-success {
@@ -89,15 +89,17 @@
         .button.is-success:hover {
             box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3);
         }
-        .button.secondary { background: #f8fafc; color: var(--color-text); border: 1px solid var(--color-border); }
-        .button.secondary:hover { background: #e2e8f0; transform: translateY(-2px); box-shadow: 0 5px 15px rgba(0,0,0,0.1); }
+        .button.apply {
+            background-image: linear-gradient(135deg, var(--color-apply-start), var(--color-apply-end));
+        }
+        .button.apply:hover {
+            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
+        }
         .button-icon { width: 20px; height: 20px; }
-
         .button.icon-button {
             padding: 8px; width: 40px; height: 40px;
             border-radius: 50%; justify-content: center;
         }
-
         .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
         .progress-bar.active { display: block; }
         .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
@@ -106,7 +108,6 @@
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
         .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
         .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-
         #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
         #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
         .custom-select-wrapper { position: relative; }
@@ -121,10 +122,8 @@
         .custom-option:hover { background-color: #f4f7fe; }
         .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
         #weekSelector { display: none; }
-
         #agentConfigContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
-        .config-header { display: flex; justify-content: flex-end; margin-bottom: 15px; }
-
+        .config-header { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
         #toggleAgentConfigBtn {
             background: var(--color-primary-end);
             color: white;
@@ -143,7 +142,6 @@
                 box-shadow: 0 0 12px rgba(37, 117, 252, 0.7);
             }
         }
-
         .agents-list { max-height: 60vh; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
         .agent-item { padding: 15px; border-bottom: 1px solid var(--color-border); display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 15px; align-items: start; }
         .agent-item:last-child { border-bottom: none; }
@@ -154,7 +152,6 @@
         .day-checkboxes { display: flex; gap: 5px; flex-wrap: wrap; }
         .day-checkbox-label { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--color-text-secondary); }
         .day-checkbox { width: 16px; height: 16px; cursor: pointer; }
-
         .view-special-btn {
             padding: 6px 10px;
             font-size: 12px;
@@ -163,7 +160,6 @@
         }
         .special-config { display: none; margin-top: 10px; padding: 15px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; max-height: 50vh; overflow-y: auto; }
         .special-config.active { display: block; }
-
         .special-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
         .special-column h5 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; text-align: center; padding: 6px; border-radius: 4px; }
         .special-column.tt h5 { background: #dcfce7; color: #166534; }
@@ -179,7 +175,42 @@
         .add-agent-select { flex: 1; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; background: white; }
         .add-btn { padding: 8px 15px; background: var(--color-primary-end); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .add-btn:hover { background: var(--color-primary-start); }
-
+        
+        #serviceConfigContainer { margin-top: 15px; animation: fadeIn 0.5s; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
+        #serviceConfigContainer h4 {
+            padding: 12px 15px;
+            margin: 0;
+            font-size: 16px;
+            font-weight: 600;
+            color: var(--color-text);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .service-list {
+            padding: 15px;
+            display: grid;
+            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
+            gap: 10px;
+            max-height: 200px;
+            overflow-y: auto;
+        }
+        .service-item label {
+            display: flex;
+            align-items: center;
+            gap: 8px;
+            font-size: 14px;
+            cursor: pointer;
+            padding: 5px;
+            border-radius: 4px;
+            transition: background-color 0.2s ease;
+        }
+        .service-item label:hover {
+             background-color: #f4f7fe;
+        }
+        .service-item input[type="checkbox"] {
+            width: 16px;
+            height: 16px;
+            cursor: pointer;
+        }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -247,10 +278,11 @@
                     <button class="button icon-button" id="toggleAgentConfigBtn" title="Configurar Agentes">
                         <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
                     </button>
+                    <button class="button icon-button" id="toggleServiceConfigBtn" title="Filtrar Servicios">
+                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18v2H3V4Zm2 7h14v2H5v-2Zm4 7h6v2H9v-2Z"/></svg>
+                    </button>
                 </div>
-
                 <div class="agents-list" id="agentsList" style="display: none;"></div>
-
                 <div class="add-agent-section" id="addAgentSection" style="display: none;">
                     <div class="add-agent-controls">
                         <select class="add-agent-select" id="addAgentSelect">
@@ -259,18 +291,20 @@
                         <button class="add-btn" id="addAgentBtn">+ Agregar</button>
                     </div>
                 </div>
+                <div id="serviceConfigContainer" style="display: none;">
+                    <h4>Servicios a Incluir</h4>
+                    <div class="service-list" id="serviceList">
+                    </div>
+                </div>
             </div>
-
+            
             <div class="progress-bar" id="progressBar">
                 <div class="progress-fill" id="progressFill"></div>
             </div>
 
-            <div class="button-container">
+            <div class="button-container" id="actionsContainer" style="display: none;">
                 <button class="button" id="generateBtn" disabled>Generar Calendario</button>
-            </div>
-
-            <div class="button-container" id="secondaryButtonContainer" style="display: none; margin-top: 15px;">
-                <button class="button secondary" id="downloadShiftsBtn">Descargar Malla de Turnos</button>
+                <button class="button apply" id="applyDownloadBtn" disabled>Aplicar y Descargar</button>
             </div>
 
             <div class="status-message" id="statusMessage"></div>
@@ -280,641 +314,752 @@
     <script>
         document.addEventListener('DOMContentLoaded', function() {
 
-        let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
-        let availableAgents = [], configuredAgents = new Map();
-        let calendarResults = new Map();
+            let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
+            let availableAgents = [], configuredAgents = new Map();
+            let uniqueServices = new Set();
+            let calendarResults = new Map();
 
-        let defaultAgentsConfig = [
-            { nombre: "Aros Medina Carla Yessenia", modalidad: "3x2", condicion: ["segundo", "cuarto"] },
-            { nombre: "Alvarado Catalán Yocelyn Susana", modalidad: "4x1", condicion: ["segundo"] },
-            { nombre: "Alvarez Valderas Eliana Del Carmen", modalidad: "especial", condicion: ["pm_tt", "noche_tt", "weekend_festivos_tt"] },
-            { nombre: "Cardenas Huenuqueo Valeria Constanza", modalidad: "especial", condicion: ["pm_tt"] },
-            { nombre: "Cortés Carmona Jessica Marcela", modalidad: "3x2", condicion: ["segundo"] },
-            { nombre: "Garces Nuñez Nicole Andrea", modalidad: "3x2", condicion: ["primer", "tercer"] },
-            { nombre: "Neipán Lemuy Jessica Andrea", modalidad: "4x1", condicion: ["primer"] },
-            { nombre: "Planzer Huanquil Catalina Fernanda", modalidad: "4x1", condicion: ["primer"] },
-            { nombre: "Solís Yáñez Cristian Andrés", modalidad: "4x1", condicion: ["cuarto"] },
-            { nombre: "Tobar Barrientos Nayareth Soledad", modalidad: "especial", condicion: ["pm_tt"] },
-            { nombre: "Vargas Huirimilla Alisson Danitza", modalidad: "4x1", condicion: ["tercer"] },
-            { nombre: "Vidal Gatica Yanira Belen", modalidad: "3x2", condicion: ["segundo", "tercer"] },
-            { nombre: "Ovando Mancilla Cristóbal Alexis", modalidad: "3x2", condicion: ["tercer", "quinto"] },
-            { nombre: "Alvarado Rios Barbara Ivonne", modalidad: "3x2", condicion: ["primer", "segundo"] },
-            { nombre: "Ricouz Ricouz Valentina Anhelore", modalidad: "3x2", condicion: ["tercer", "quinto"] },
-            { nombre: "Cheuquian Coyan Nataly Soledad", modalidad: "3x2", condicion: ["primer", "segundo"] }
-        ];
+            let defaultAgentsConfig = [
+                { nombre: "Aros Medina Carla Yessenia", modalidad: "3x2", condicion: ["segundo", "cuarto"] },
+                { nombre: "Alvarado Catalán Yocelyn Susana", modalidad: "4x1", condicion: ["segundo"] },
+                { nombre: "Alvarez Valderas Eliana Del Carmen", modalidad: "especial", condicion: ["pm_tt", "noche_tt", "weekend_festivos_tt"] },
+                { nombre: "Cardenas Huenuqueo Valeria Constanza", modalidad: "especial", condicion: ["pm_tt"] },
+                { nombre: "Cortés Carmona Jessica Marcela", modalidad: "3x2", condicion: ["primer", "cuarto"] },
+                { nombre: "Garces Nuñez Nicole Andrea", modalidad: "3x2", condicion: ["primer", "tercer"] },
+                { nombre: "Neipán Lemuy Jessica Andrea", modalidad: "4x1", condicion: ["primer"] },
+                { nombre: "Planzer Huanquil Catalina Fernanda", modalidad: "4x1", condicion: ["primer"] },
+                { nombre: "Solís Yáñez Cristian Andrés", modalidad: "4x1", condicion: ["cuarto"] },
+                { nombre: "Tobar Barrientos Nayareth Soledad", modalidad: "especial", condicion: ["pm_tt"] },
+                { nombre: "Vargas Huirimilla Alisson Danitza", modalidad: "4x1", condicion: ["tercer"] },
+                { nombre: "Vidal Gatica Yanira Belen", modalidad: "3x2", condicion: ["segundo", "tercer"] },
+                { nombre: "Ovando Mancilla Cristóbal Alexis", modalidad: "3x2", condicion: ["tercer", "quinto"] },
+                { nombre: "Alvarado Rios Barbara Ivonne", modalidad: "3x2", condicion: ["tercer", "quinto"] },
+                { nombre: "Ricouz Ricouz Valentina Anhelore", modalidad: "3x2", condicion: ["tercer", "quinto"] },
+                { nombre: "Cheuquian Coyan Nataly Soledad", modalidad: "3x2", condicion: ["primer", "segundo"] }
+            ];
 
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
-        const generateBtn = document.getElementById('generateBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const statusMessage = document.getElementById('statusMessage');
-        const weekSelectorContainer = document.getElementById('weekSelectorContainer');
-        const weekSelector = document.getElementById('weekSelector');
-        const customSelect = document.getElementById('customSelect');
-        const customSelectTrigger = document.getElementById('customSelectTrigger');
-        const customOptions = document.getElementById('customOptions');
-        const agentConfigContainer = document.getElementById('agentConfigContainer');
-        const toggleAgentConfigBtn = document.getElementById('toggleAgentConfigBtn');
-        const agentsList = document.getElementById('agentsList');
-        const addAgentSection = document.getElementById('addAgentSection');
-        const addAgentSelect = document.getElementById('addAgentSelect');
-        const addAgentBtn = document.getElementById('addAgentBtn');
-        const downloadShiftsBtn = document.getElementById('downloadShiftsBtn');
+            const uploadArea = document.getElementById('uploadArea');
+            const fileInput = document.getElementById('fileInput');
+            const fileNameDisplay = document.getElementById('fileNameDisplay');
+            const generateBtn = document.getElementById('generateBtn');
+            const progressBar = document.getElementById('progressBar');
+            const progressFill = document.getElementById('progressFill');
+            const statusMessage = document.getElementById('statusMessage');
+            const weekSelectorContainer = document.getElementById('weekSelectorContainer');
+            const weekSelector = document.getElementById('weekSelector');
+            const customSelect = document.getElementById('customSelect');
+            const customSelectTrigger = document.getElementById('customSelectTrigger');
+            const customOptions = document.getElementById('customOptions');
+            const agentConfigContainer = document.getElementById('agentConfigContainer');
+            const toggleAgentConfigBtn = document.getElementById('toggleAgentConfigBtn');
+            const agentsList = document.getElementById('agentsList');
+            const addAgentSection = document.getElementById('addAgentSection');
+            const addAgentSelect = document.getElementById('addAgentSelect');
+            const addAgentBtn = document.getElementById('addAgentBtn');
+            const applyDownloadBtn = document.getElementById('applyDownloadBtn');
+            const actionsContainer = document.getElementById('actionsContainer');
+            const serviceConfigContainer = document.getElementById('serviceConfigContainer');
+            const serviceList = document.getElementById('serviceList');
+            const toggleServiceConfigBtn = document.getElementById('toggleServiceConfigBtn');
 
-        customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-        window.addEventListener('click', (e) => {
-            if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
-        });
-
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
-        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-
-        toggleAgentConfigBtn.addEventListener('click', () => {
-            const isVisible = agentsList.style.display !== 'none';
-            agentsList.style.display = isVisible ? 'none' : 'block';
-            addAgentSection.style.display = isVisible ? 'none' : 'block';
-        });
-
-        addAgentBtn.addEventListener('click', addAgent);
-        weekSelector.addEventListener('change', handleWeekSelection);
-        generateBtn.addEventListener('click', generateCalendar);
-        downloadShiftsBtn.addEventListener('click', downloadShiftRoster);
-
-        function handleFile(file) {
-            fileNameDisplay.textContent = file.name;
-            uploadArea.classList.add('file-loaded');
-            generateBtn.disabled = true;
-            document.getElementById('secondaryButtonContainer').style.display = 'none';
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                    let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                    const timeColumns = ['Ini', 'INI', 'FIN', 'Fin', 'Desc_1', 'Ini_ Colac', 'Fin_ Colac', 'Desc_2', 'INICIO TURNO', 'FIN DEL TURNO'];
-                    jsonData.forEach(row => {
-                        for (const key in row) {
-                            const keyTrimmedLower = key.trim().toLowerCase();
-                            const isTimeColumn = timeColumns.some(col => col.toLowerCase() === keyTrimmedLower);
-                            
-                            if (isTimeColumn && row[key] instanceof Date) {
-                                const date = row[key];
-                                date.setTime(date.getTime() - date.getTimezoneOffset() * 60 * 1000);
-                            }
-                        }
-                    });
-
-                    allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
-
-                    extractAvailableAgents(allData);
-                    populateWeekSelector(allData);
-                    initializeDefaultConfigurations();
-                    updateAgentsList();
-                    updateAddAgentSelect();
-                    weekSelectorContainer.style.display = 'block';
-                    agentConfigContainer.style.display = 'block';
-                    showStatus('Archivo cargado correctamente.', 'success');
-                } catch(error) {
-                    showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
-                    console.error(error);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function extractAvailableAgents(data) {
-            const agentsSet = new Set();
-            data.forEach(row => {
-                if (!row || typeof row.Nombre === 'undefined' || !row.Rut) return;
-
-                const normalizedRowName = String(row.Nombre).replace(/\s/g, '').toLowerCase();
-                const isConfigured = defaultAgentsConfig.some(config =>
-                    String(config.nombre).replace(/\s/g, '').toLowerCase() === normalizedRowName
-                );
-                if (!isConfigured) {
-                    agentsSet.add(JSON.stringify({ nombre: row.Nombre, rut: row.Rut }));
-                }
-            });
-            availableAgents = Array.from(agentsSet).map(agentStr => JSON.parse(agentStr));
-        }
-
-        function initializeDefaultConfigurations() {
-            configuredAgents.clear();
-            defaultAgentsConfig.forEach(defaultConfig => {
-                const normalizedConfigName = String(defaultConfig.nombre).replace(/\s/g, '').toLowerCase();
-
-                const agentInFile = allData.find(row => {
-                    if (!row || typeof row.Nombre === 'undefined') return false;
-                    return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
-                });
-
-                if (agentInFile) {
-                    const key = `${defaultConfig.nombre}_${agentInFile.Rut || 'SIN_RUT'}`;
-                    configuredAgents.set(key, { ...defaultConfig, rut: agentInFile.Rut || 'SIN_RUT' });
-                }
-            });
-            configuredAgents.forEach((config) => {
-                if (config.modalidad === 'especial' && config.condicion) {
-                    config.condicion = fixIncoherentConfiguration(config.condicion);
-                }
-            });
-        }
-
-        function fixIncoherentConfiguration(condicion) {
-            const fixed = [];
-            const types = ['am', 'pm', 'noche', 'weekend_festivos'];
-            types.forEach(type => {
-                const ttOption = `${type}_tt`; const siteOption = `${type}_site`;
-                if (condicion.includes(ttOption)) fixed.push(ttOption);
-                else if (condicion.includes(siteOption)) fixed.push(siteOption);
-            });
-            return fixed;
-        }
-
-        function updateAgentsList() {
-            agentsList.innerHTML = '';
-            configuredAgents.forEach((config) => {
-                agentsList.appendChild(createAgentItem(config));
-            });
-        }
-
-        function createAgentItem(config) {
-            const div = document.createElement('div');
-            div.className = 'agent-item';
-            const isSpecial = config.modalidad === 'especial';
-            div.innerHTML = `
-                <div class="agent-info"><div class="agent-name">${config.nombre}</div></div>
-                <div class="agent-config">
-                    <select class="config-select modalidad-select">
-                        <option value="4x1" ${config.modalidad === '4x1' ? 'selected' : ''}>4x1</option>
-                        <option value="3x2" ${config.modalidad === '3x2' ? 'selected' : ''}>3x2</option>
-                        <option value="especial" ${config.modalidad === 'especial' ? 'selected' : ''}>Especiales</option>
-                    </select>
-                </div>
-                <div class="agent-config">
-                    <button class="button secondary view-special-btn" style="display: ${isSpecial ? 'block' : 'none'};">[+] Ver detalles</button>
-                    <div class="day-checkboxes" style="display: ${isSpecial ? 'none' : 'flex'};">
-                        ${['primer', 'segundo', 'tercer', 'cuarto', 'quinto'].map(day => `<label class="day-checkbox-label"><input type="checkbox" class="day-checkbox" value="${day}" ${config.condicion?.includes(day) ? 'checked' : ''}>${day.charAt(0).toUpperCase() + day.slice(1, 3)}</label>`).join('')}
-                    </div>
-                    <div class="special-config">
-                        <div class="special-columns">
-                            <div class="special-column tt"><h5>🏠 TT</h5></div><div class="special-column site"><h5>🏢 SITE</h5></div>
-                        </div>
-                        ${['am', 'pm', 'noche', 'weekend_festivos'].map(type => `
-                        <div class="special-row">
-                            <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_tt" ${config.condicion?.includes(`${type}_tt`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
-                            <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_site" ${config.condicion?.includes(`${type}_site`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
-                        </div>`).join('')}
-                    </div>
-                </div>
-                <button class="remove-btn" onclick="removeAgent('${config.nombre}_${config.rut}')">×</button>`;
-
-            const key = `${config.nombre}_${config.rut}`;
-            const modalidadSelect = div.querySelector('.modalidad-select');
-            const dayCheckboxContainer = div.querySelector('.day-checkboxes');
-            const specialConfigContainer = div.querySelector('.special-config');
-            const viewSpecialBtn = div.querySelector('.view-special-btn');
-
-            modalidadSelect.addEventListener('change', (e) => {
-                const isNowSpecial = e.target.value === 'especial';
-                dayCheckboxContainer.style.display = isNowSpecial ? 'none' : 'flex';
-                viewSpecialBtn.style.display = isNowSpecial ? 'block' : 'none';
-                specialConfigContainer.classList.remove('active');
-                viewSpecialBtn.textContent = '[+] Ver detalles';
-                updateAgentConfig(key);
+            customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
+            window.addEventListener('click', (e) => {
+                if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
             });
 
-            viewSpecialBtn.addEventListener('click', () => {
-                const isActive = specialConfigContainer.classList.toggle('active');
-                viewSpecialBtn.textContent = isActive ? '[-] Ocultar' : '[+] Ver detalles';
+            uploadArea.addEventListener('click', () => fileInput.click());
+            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
+            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
+            uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
+            fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+
+            toggleAgentConfigBtn.addEventListener('click', () => {
+                const isVisible = agentsList.style.display !== 'none';
+                agentsList.style.display = isVisible ? 'none' : 'block';
+                addAgentSection.style.display = isVisible ? 'none' : 'block';
+            });
+            
+            toggleServiceConfigBtn.addEventListener('click', () => {
+                const isVisible = serviceConfigContainer.style.display !== 'none';
+                serviceConfigContainer.style.display = isVisible ? 'none' : 'block';
             });
 
-            div.querySelectorAll('.day-checkbox, .special-checkbox').forEach(cb => cb.addEventListener('change', (e) => {
-                if (e.target.checked && e.target.classList.contains('special-checkbox')) {
-                    let conflictingValue = e.target.value.includes('_tt') ? e.target.value.replace('_tt', '_site') : e.target.value.replace('_site', '_tt');
-                    const conflictingCheckbox = div.querySelector(`input[value="${conflictingValue}"]`);
-                    if (conflictingCheckbox) conflictingCheckbox.checked = false;
-                }
-                updateAgentConfig(key);
-            }));
-            return div;
-        }
+            addAgentBtn.addEventListener('click', addAgent);
+            weekSelector.addEventListener('change', filterTurnosData);
+            generateBtn.addEventListener('click', generateCalendar);
+            applyDownloadBtn.addEventListener('click', applyAndDownloadShifts);
 
-        function updateAgentConfig(key) {
-            const config = configuredAgents.get(key);
-            if (!config) return;
-            const agentItem = Array.from(agentsList.children).find(item => item.querySelector('.agent-name').textContent.trim() === config.nombre.trim());
-            if (agentItem) {
-                config.modalidad = agentItem.querySelector('.modalidad-select').value;
-                config.condicion = config.modalidad === 'especial'
-                    ? Array.from(agentItem.querySelectorAll('.special-checkbox:checked')).map(cb => cb.value)
-                    : Array.from(agentItem.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
-            }
-        }
-
-        function updateAddAgentSelect() {
-            addAgentSelect.innerHTML = '<option value="">Seleccionar agente para agregar...</option>';
-            availableAgents.forEach(agent => {
-                const key = agent.nombre + '_' + agent.rut;
-                if (!configuredAgents.has(key)) {
-                    const option = document.createElement('option');
-                    option.value = key;
-                    option.textContent = `${agent.nombre} (${agent.rut})`;
-                    addAgentSelect.appendChild(option);
-                }
-            });
-        }
-
-        function addAgent() {
-            const selectedKey = addAgentSelect.value;
-            if (!selectedKey) return;
-            const [nombre, rut] = selectedKey.split('_');
-            configuredAgents.set(selectedKey, { nombre, rut, modalidad: '4x1', condicion: ['primer'] });
-            updateAgentsList();
-            updateAddAgentSelect();
-        }
-
-        function removeAgent(key) {
-            configuredAgents.delete(key);
-            updateAgentsList();
-            updateAddAgentSelect();
-        }
-
-        function getMonday(d) {
-            d = new Date(d);
-            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-            return new Date(new Date(d.setDate(diff)).setHours(0, 0, 0, 0));
-        }
-
-        function populateWeekSelector(data) {
-            const weekSet = new Set();
-            data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
-            const last4Weeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)).slice(0, 4);
-            weekSelector.innerHTML = ''; customOptions.innerHTML = '';
-            customSelectTrigger.textContent = '-- Selecciona una semana --';
-            last4Weeks.forEach(mondayISO => {
-                const monday = new Date(mondayISO);
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
-                const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES', { month: 'long' })}`;
-                const option = document.createElement('option');
-                option.value = mondayISO; option.textContent = optionText;
-                weekSelector.appendChild(option);
-                const customOption = document.createElement('div');
-                customOption.className = 'custom-option'; customOption.textContent = optionText;
-                customOption.dataset.value = mondayISO;
-                customOption.addEventListener('click', () => {
-                    customSelectTrigger.textContent = customOption.textContent;
-                    weekSelector.value = customOption.dataset.value;
-                    weekSelector.dispatchEvent(new Event('change'));
-                    document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-                    customOption.classList.add('selected');
-                    customSelect.classList.remove('open');
-                });
-                customOptions.appendChild(customOption);
-            });
-        }
-
-        function handleWeekSelection(event) {
-            const selectedMondayISO = event.target.value;
-            if (!selectedMondayISO) {
-                turnosData = null; generateBtn.disabled = true; return;
-            }
-            document.getElementById('secondaryButtonContainer').style.display = 'none';
-            const selectedMonday = new Date(selectedMondayISO);
-            const nextMonday = new Date(selectedMonday);
-            nextMonday.setDate(selectedMonday.getDate() + 7);
-            turnosData = allData.filter(row => {
-                if (!row || !row.Fecha) return false;
-                const rowDate = new Date(row.Fecha);
-                return rowDate >= selectedMonday && rowDate < nextMonday;
-            });
-            generateBtn.disabled = false;
-        }
-
-        async function triggerDownload() {
-            if (generatedWorkbook && fileName) {
-                const buffer = await generatedWorkbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(url);
-            }
-        }
-
-        async function generateCalendar() {
-            if (!turnosData || turnosData.length === 0) {
-                showStatus('No hay datos válidos para procesar en la semana seleccionada.', 'error'); return;
-            }
-            if (configuredAgents.size === 0) {
-                showStatus('Debes configurar al menos un agente.', 'error'); return;
-            }
-            calendarResults.clear();
-            generateBtn.disabled = true;
-            progressBar.classList.add('active');
-            let progress = 0;
-            const progressInterval = setInterval(() => { progress += 10; progressFill.style.width = progress + '%'; if (progress >= 100) clearInterval(progressInterval); }, 100);
-
-            setTimeout(async () => {
-                try {
-                    await createCalendarWorkbook();
-                    progressBar.classList.remove('active');
-                    progressFill.style.width = '0%';
-                    if (fileName) {
-                        generateBtn.classList.add('is-success');
-                        generateBtn.textContent = 'Descargando...';
-                        showStatus('Calendario generado. Iniciando descarga...', 'success');
-                        await triggerDownload();
-                        setTimeout(() => {
-                            generateBtn.classList.remove('is-success');
-                            generateBtn.textContent = 'Generar Calendario';
-                            generateBtn.disabled = false;
-                            document.getElementById('secondaryButtonContainer').style.display = 'block';
-                        }, 2000);
-                    } else {
-                         generateBtn.disabled = false;
-                    }
-                } catch (error) {
-                    showStatus('Ocurrió un error al generar el archivo.', 'error');
-                    console.error("Error en generateCalendar:", error);
-                    generateBtn.disabled = false;
-                }
-            }, 1500);
-        }
-
-        async function createCalendarWorkbook() {
-            fileName = '';
-            const workbook = new ExcelJS.Workbook();
-            const worksheet = workbook.addWorksheet('Calendario TT');
-
-            const monday = getMonday(new Date(weekSelector.value));
-            const monthName = monday.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-            const year = monday.getFullYear();
-
-            const weekDays = Array.from({length: 7}, (_, i) => new Date(new Date(monday).setDate(monday.getDate() + i)));
-
-            fileName = `Calendario TT semana del ${weekDays[0].getDate()} al ${weekDays[6].getDate()} de ${monthName} ${year}.xlsx`;
-            createCalendarSheet(worksheet, weekDays, monthName, year);
-
-            generatedWorkbook = workbook;
-        }
-
-        function createCalendarSheet(worksheet, weekDays, monthName, year) {
-            worksheet.columns = [ { width: 5 }, { width: 35 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 80 } ];
-            let rowIndex = 1;
-
-            const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF366092' } };
-            const headerFont = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri' };
-
-            const titleRow = worksheet.getRow(rowIndex++);
-            const titleCell = titleRow.getCell(1);
-            titleCell.value = `CALENDARIO TT ${monthName} ${year}`;
-            worksheet.mergeCells(1, 1, 1, 10);
-            titleCell.font = { ...headerFont, size: 14 };
-            titleCell.fill = headerFill;
-            titleCell.alignment = { horizontal: 'center' };
-
-            const subtitleRow = worksheet.getRow(rowIndex++);
-            const subtitleCell = subtitleRow.getCell(1);
-            subtitleCell.value = `SEMANA ${weekDays[0].getDate()} AL ${weekDays[6].getDate()} ${monthName}`;
-            worksheet.mergeCells(2, 1, 2, 10);
-            subtitleCell.font = { ...headerFont, size: 12 };
-            subtitleCell.fill = headerFill;
-            subtitleCell.alignment = { horizontal: 'center' };
-
-            const headerRow = worksheet.getRow(rowIndex++);
-            const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-            const headers = ['N°', 'NOMBRE', ...weekDays.map((day, i) => `${dayNames[i]} ${day.getDate()}`), 'condiciones'];
-            headers.forEach((header, index) => {
-                const cell = headerRow.getCell(index + 1);
-                cell.value = header;
-                cell.fill = headerFill;
-                cell.font = { ...headerFont, size: 11 };
-                cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-                cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-            });
-
-            let agentNumber = 1;
-            configuredAgents.forEach((config) => {
-                const normalizedConfigName = String(config.nombre).replace(/\s/g, '').toLowerCase();
-                const agentShifts = turnosData.filter(row => {
-                    if (!row || typeof row.Nombre === 'undefined' || row.Nombre === null) return false;
-                    return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
-                });
-
-                if (agentShifts.length > 0) {
-                    const agentRow = worksheet.getRow(rowIndex++);
-                    agentRow.getCell(1).value = agentNumber++;
-                    agentRow.getCell(2).value = config.nombre;
-
-                    weekDays.forEach((day, dayIndex) => {
-                        const dayShift = agentShifts.find(s => s.Fecha && new Date(s.Fecha).toDateString() === day.toDateString());
-                        let status = 'LIBRE';
-                        if (dayShift && !isLibre(dayShift)) {
-                            if (config.modalidad === 'especial') {
-                                status = applySpecialLogic(dayShift, config.condicion, day);
-                            } else {
-                                const workingShifts = agentShifts.filter(s => !isLibre(s)).sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
-                                const shiftPosition = workingShifts.findIndex(s => new Date(s.Fecha).toDateString() === day.toDateString()) + 1;
-                                status = config.condicion.map(getDayPosition).includes(shiftPosition) ? 'SITE' : 'TT';
-                            }
-                        }
-                        const cell = agentRow.getCell(3 + dayIndex);
-                        cell.value = status;
-                        if (status === 'TT') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-                        else if (status === 'SITE') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
-
-                        calendarResults.set(`${config.nombre}_${day.toDateString()}`, status);
-                    });
-
-                    agentRow.getCell(10).value = generateConditionText(config);
-                    for (let i = 1; i <= 10; i++) {
-                        const cell = agentRow.getCell(i);
-                        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                        cell.font = { name: 'Calibri', size: 11 };
-                        cell.alignment = { vertical: 'middle', horizontal: (i > 2 && i < 10) ? 'center' : (i==1 ? 'center' : 'left') };
-                    }
-                }
-            });
-        }
-
-        async function downloadShiftRoster() {
-            try {
-                if (!turnosData || turnosData.length === 0) {
-                    showStatus('No hay datos de turnos válidos para procesar.', 'error');
-                    return;
-                }
-                const validData = turnosData.filter(row => row && row.Nombre && row.Fecha && typeof row.Nombre === 'string');
-                if (validData.length === 0) {
-                    showStatus('No hay registros válidos con Nombre y Fecha.', 'error');
-                    return;
-                }
-
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Malla de Turnos');
-
-                // --- 1. Definir Estilos ---
-                const borderStyle = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                const centerAlignment = { vertical: 'middle', horizontal: 'center' };
+            function handleFile(file) {
+                turnosData = null; 
+                calendarResults.clear();
+                customSelectTrigger.textContent = '-- Selecciona una semana --';
+                fileInput.value = ''; 
                 
-                const headerStyle = {
-                    font: { bold: true, color: { argb: 'FFFFFFFF' }, name: 'Calibri', size: 11 },
-                    fill: { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF002060' } }, // Azul oscuro
-                    border: borderStyle,
-                    alignment: centerAlignment
-                };
+                fileNameDisplay.textContent = file.name;
+                uploadArea.classList.add('file-loaded');
+                actionsContainer.style.display = 'none';
+                generateBtn.disabled = true;
+                applyDownloadBtn.disabled = true;
 
-                // --- 2. Definir y Configurar Columnas ---
-                const originalHeaders = Object.keys(validData[0]);
-                worksheet.columns = originalHeaders.map(header => {
-                    let width = 15;
-                    const cleanHeader = header.trim().toLowerCase();
-                    if (cleanHeader === 'nombre') width = 30;
-                    else if (cleanHeader === 'fecha') width = 12;
-                    else if (cleanHeader.includes('ini') || cleanHeader.includes('fin')) width = 10;
-                    return { header: header.trim(), key: header, width: width };
+                const reader = new FileReader();
+                reader.onload = (e) => {
+                    try {
+                        const data = new Uint8Array(e.target.result);
+                        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
+                        let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+                        const timeColumns = ['Ini', 'INI', 'FIN', 'Fin', 'Desc_1', 'Ini_ Colac', 'Fin_ Colac', 'Desc_2', 'INICIO TURNO', 'FIN DEL TURNO'];
+                        jsonData.forEach(row => {
+                            for (const key in row) {
+                                if (timeColumns.includes(key)) {
+                                    if (typeof row[key] === 'number' && row[key] < 2) {
+                                        const date = XLSX.SSF.parse_date_code(row[key]);
+                                        const jsDate = new Date(1900, 0, 1, date.H, date.M, date.S);
+                                        jsDate.setDate(jsDate.getDate() + (row[key] > 1 ? -1 : 0));
+                                        row[key] = jsDate;
+                                    }
+                                }
+                            }
+                        });
+
+                        allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
+
+                        extractAvailableAgents(allData);
+                        populateWeekSelector(allData);
+                        populateServiceFilter(allData);
+                        initializeDefaultConfigurations();
+                        updateAgentsList();
+                        updateAddAgentSelect();
+                        weekSelectorContainer.style.display = 'block';
+                        agentConfigContainer.style.display = 'block';
+                        actionsContainer.style.display = 'flex';
+                        showStatus('Archivo cargado correctamente.', 'success');
+                    } catch(error) {
+                        showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
+                        console.error(error);
+                    }
+                };
+                reader.readAsArrayBuffer(file);
+            }
+            
+            function populateServiceFilter(data) {
+                uniqueServices.clear();
+                serviceList.innerHTML = '';
+                const serviceKey = findKey(data[0] || {}, ['Servicio']);
+                if (!serviceKey) return; 
+
+                data.forEach(row => {
+                    if (row[serviceKey]) uniqueServices.add(row[serviceKey]);
                 });
 
-                // --- 3. Aplicar Estilo al Encabezado ---
-                worksheet.getRow(1).eachCell(cell => {
-                    cell.style = headerStyle;
-                });
+                const sortedServices = Array.from(uniqueServices).sort();
+                
+                sortedServices.forEach(service => {
+                    const itemDiv = document.createElement('div');
+                    itemDiv.className = 'service-item';
 
-                // --- 4. Función Auxiliar para Búsqueda Insensible a Mayúsculas ---
-                const findVal = (row, possibleNames) => {
-                    const key = Object.keys(row).find(k => possibleNames.includes(k.trim().toLowerCase()));
-                    return key ? row[key] : null;
-                };
-
-                // --- 5. Procesar y Agregar Filas con Estilos ---
-                validData.forEach(row => {
-                    const turnoIni = findVal(row, ['ini', 'ini']);
-                    const esLibre = typeof turnoIni === 'string' && turnoIni.toUpperCase().includes('LIBRE');
-                    let lugar = 'SITE';
+                    const label = document.createElement('label');
+                    const checkbox = document.createElement('input');
+                    checkbox.type = 'checkbox';
+                    checkbox.value = service;
                     
-                    if (!esLibre) {
-                        const nombreAgente = findVal(row, ['nombre']);
-                        const fechaTurno = findVal(row, ['fecha']);
-                        if (nombreAgente && fechaTurno) {
-                            const dateString = new Date(fechaTurno).toDateString();
-                            const key = `${nombreAgente}_${dateString}`;
-                            const status = calendarResults.get(key);
-                            if (status) lugar = status;
+                    if (service === '01_Masivo' || service === '10_Staff_Inbound') {
+                        checkbox.checked = true;
+                    }
+                    checkbox.addEventListener('change', filterTurnosData);
+                    
+                    label.appendChild(checkbox);
+                    label.appendChild(document.createTextNode(` ${service}`));
+                    itemDiv.appendChild(label);
+                    serviceList.appendChild(itemDiv);
+                });
+            }
+
+            function extractAvailableAgents(data) {
+                const agentsSet = new Set();
+                data.forEach(row => {
+                    const rut = findVal(row, ['Rut', 'id']);
+                    if (!row || typeof row.Nombre === 'undefined' || !rut) return;
+                    const normalizedRowName = String(row.Nombre).replace(/\s/g, '').toLowerCase();
+                    const isConfigured = defaultAgentsConfig.some(config =>
+                        String(config.nombre).replace(/\s/g, '').toLowerCase() === normalizedRowName
+                    );
+                    if (!isConfigured) {
+                        agentsSet.add(JSON.stringify({ nombre: row.Nombre, rut: rut }));
+                    }
+                });
+                availableAgents = Array.from(agentsSet).map(agentStr => JSON.parse(agentStr));
+            }
+
+            function initializeDefaultConfigurations() {
+                configuredAgents.clear();
+                defaultAgentsConfig.forEach(defaultConfig => {
+                    const normalizedConfigName = String(defaultConfig.nombre).replace(/\s/g, '').toLowerCase();
+                    const agentInFile = allData.find(row => {
+                        if (!row || typeof row.Nombre === 'undefined') return false;
+                        return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
+                    });
+                    if (agentInFile) {
+                        const rut = findVal(agentInFile, ['Rut', 'id']) || 'SIN_RUT';
+                        const key = `${defaultConfig.nombre}_${rut}`;
+                        configuredAgents.set(key, { ...defaultConfig, rut: rut });
+                    }
+                });
+                configuredAgents.forEach((config) => {
+                    if (config.modalidad === 'especial' && config.condicion) {
+                        config.condicion = fixIncoherentConfiguration(config.condicion);
+                    }
+                });
+            }
+
+            function fixIncoherentConfiguration(condicion) {
+                const fixed = [];
+                const types = ['am', 'pm', 'noche', 'weekend_festivos'];
+                types.forEach(type => {
+                    const ttOption = `${type}_tt`; const siteOption = `${type}_site`;
+                    if (condicion.includes(ttOption)) fixed.push(ttOption);
+                    else if (condicion.includes(siteOption)) fixed.push(siteOption);
+                });
+                return fixed;
+            }
+
+            function updateAgentsList() {
+                agentsList.innerHTML = '';
+                configuredAgents.forEach((config) => {
+                    agentsList.appendChild(createAgentItem(config));
+                });
+            }
+
+            function createAgentItem(config) {
+                const div = document.createElement('div');
+                div.className = 'agent-item';
+                const isSpecial = config.modalidad === 'especial';
+                const key = `${config.nombre}_${config.rut}`;
+
+                div.innerHTML = `
+                    <div class="agent-info"><div class="agent-name">${config.nombre}</div></div>
+                    <div class="agent-config">
+                        <select class="config-select modalidad-select">
+                            <option value="4x1" ${config.modalidad === '4x1' ? 'selected' : ''}>4x1</option>
+                            <option value="3x2" ${config.modalidad === '3x2' ? 'selected' : ''}>3x2</option>
+                            <option value="especial" ${config.modalidad === 'especial' ? 'selected' : ''}>Especiales</option>
+                        </select>
+                    </div>
+                    <div class="agent-config">
+                        <button class="button secondary view-special-btn" style="display: ${isSpecial ? 'block' : 'none'};">[+] Ver detalles</button>
+                        <div class="day-checkboxes" style="display: ${isSpecial ? 'none' : 'flex'};">
+                            ${['primer', 'segundo', 'tercer', 'cuarto', 'quinto'].map(day => `<label class="day-checkbox-label"><input type="checkbox" class="day-checkbox" value="${day}" ${config.condicion?.includes(day) ? 'checked' : ''}>${day.charAt(0).toUpperCase() + day.slice(1, 3)}</label>`).join('')}
+                        </div>
+                        <div class="special-config">
+                            <div class="special-columns">
+                                <div class="special-column tt"><h5>🏠 TT</h5></div><div class="special-column site"><h5>🏢 SITE</h5></div>
+                            </div>
+                            ${['am', 'pm', 'noche', 'weekend_festivos'].map(type => `
+                            <div class="special-row">
+                                <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_tt" ${config.condicion?.includes(`${type}_tt`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
+                                <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_site" ${config.condicion?.includes(`${type}_site`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
+                            </div>`).join('')}
+                        </div>
+                    </div>
+                    <button class="remove-btn" data-key="${key}">×</button>`;
+
+                const modalidadSelect = div.querySelector('.modalidad-select');
+                const dayCheckboxContainer = div.querySelector('.day-checkboxes');
+                const specialConfigContainer = div.querySelector('.special-config');
+                const viewSpecialBtn = div.querySelector('.view-special-btn');
+
+                modalidadSelect.addEventListener('change', (e) => {
+                    const isNowSpecial = e.target.value === 'especial';
+                    dayCheckboxContainer.style.display = isNowSpecial ? 'none' : 'flex';
+                    viewSpecialBtn.style.display = isNowSpecial ? 'block' : 'none';
+                    specialConfigContainer.classList.remove('active');
+                    viewSpecialBtn.textContent = '[+] Ver detalles';
+                    updateAgentConfig(key);
+                });
+
+                viewSpecialBtn.addEventListener('click', () => {
+                    const isActive = specialConfigContainer.classList.toggle('active');
+                    viewSpecialBtn.textContent = isActive ? '[-] Ocultar' : '[+] Ver detalles';
+                });
+
+                div.querySelectorAll('.day-checkbox, .special-checkbox').forEach(cb => cb.addEventListener('change', (e) => {
+                    if (e.target.checked && e.target.classList.contains('special-checkbox')) {
+                        let conflictingValue = e.target.value.includes('_tt') ? e.target.value.replace('_tt', '_site') : e.target.value.replace('_site', '_tt');
+                        const conflictingCheckbox = div.querySelector(`input[value="${conflictingValue}"]`);
+                        if (conflictingCheckbox) conflictingCheckbox.checked = false;
+                    }
+                    updateAgentConfig(key);
+                }));
+                
+                return div;
+            }
+
+            agentsList.addEventListener('click', function(event) {
+                if (event.target.classList.contains('remove-btn')) {
+                    const key = event.target.dataset.key;
+                    if (key) {
+                        removeAgent(key);
+                    }
+                }
+            });
+
+            function updateAgentConfig(key) {
+                const config = configuredAgents.get(key);
+                if (!config) return;
+                const agentItem = Array.from(agentsList.children).find(item => {
+                    const btn = item.querySelector('.remove-btn');
+                    return btn && btn.dataset.key === key;
+                });
+                if (agentItem) {
+                    config.modalidad = agentItem.querySelector('.modalidad-select').value;
+                    config.condicion = config.modalidad === 'especial'
+                        ? Array.from(agentItem.querySelectorAll('.special-checkbox:checked')).map(cb => cb.value)
+                        : Array.from(agentItem.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
+                }
+            }
+
+            function updateAddAgentSelect() {
+                addAgentSelect.innerHTML = '<option value="">Seleccionar agente para agregar...</option>';
+                availableAgents.forEach(agent => {
+                    const key = agent.nombre + '_' + agent.rut;
+                    if (!configuredAgents.has(key)) {
+                        const option = document.createElement('option');
+                        option.value = key;
+                        option.textContent = `${agent.nombre} (${agent.rut})`;
+                        addAgentSelect.appendChild(option);
+                    }
+                });
+            }
+
+            function addAgent() {
+                const selectedKey = addAgentSelect.value;
+                if (!selectedKey) return;
+                const [nombre, rut] = selectedKey.split('_');
+                configuredAgents.set(selectedKey, { nombre, rut, modalidad: '4x1', condicion: ['primer'] });
+                updateAgentsList();
+                updateAddAgentSelect();
+            }
+
+            function removeAgent(key) {
+                configuredAgents.delete(key);
+                updateAgentsList();
+                updateAddAgentSelect();
+            }
+
+            function getMonday(d) {
+                d = new Date(d);
+                const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
+                return new Date(new Date(d.setDate(diff)).setHours(0, 0, 0, 0));
+            }
+
+            function populateWeekSelector(data) {
+                const weekSet = new Set();
+                data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
+                const last4Weeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)).slice(0, 4);
+                weekSelector.innerHTML = ''; customOptions.innerHTML = '';
+                
+                last4Weeks.forEach(mondayISO => {
+                    const monday = new Date(mondayISO);
+                    const sunday = new Date(monday);
+                    sunday.setDate(monday.getDate() + 6);
+                    const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES', { month: 'long' })}`;
+                    const option = document.createElement('option');
+                    option.value = mondayISO; option.textContent = optionText;
+                    weekSelector.appendChild(option);
+                    const customOption = document.createElement('div');
+                    customOption.className = 'custom-option'; customOption.textContent = optionText;
+                    customOption.dataset.value = mondayISO;
+                    customOption.addEventListener('click', () => {
+                        customSelectTrigger.textContent = customOption.textContent;
+                        weekSelector.value = customOption.dataset.value;
+                        weekSelector.dispatchEvent(new Event('change'));
+                        document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
+                        customOption.classList.add('selected');
+                        customSelect.classList.remove('open');
+                    });
+                    customOptions.appendChild(customOption);
+                });
+            }
+
+            function filterTurnosData() {
+                const selectedMondayISO = weekSelector.value;
+                if (!selectedMondayISO || !allData) {
+                    turnosData = null; 
+                    generateBtn.disabled = true; 
+                    applyDownloadBtn.disabled = true;
+                    return;
+                }
+                
+                applyDownloadBtn.disabled = true;
+
+                const selectedServices = Array.from(serviceList.querySelectorAll('input:checked')).map(cb => cb.value);
+                const serviceKey = findKey(allData[0] || {}, ['Servicio']);
+
+                const selectedMonday = new Date(selectedMondayISO);
+                const nextMonday = new Date(selectedMonday);
+                nextMonday.setDate(selectedMonday.getDate() + 7);
+                
+                let weeklyData = allData.filter(row => {
+                    if (!row || !row.Fecha) return false;
+                    const rowDate = new Date(row.Fecha);
+                    return rowDate >= selectedMonday && rowDate < nextMonday;
+                });
+
+                if (serviceKey && selectedServices.length > 0) {
+                    turnosData = weeklyData.filter(row => selectedServices.includes(row[serviceKey]));
+                } else {
+                    turnosData = weeklyData;
+                }
+
+                generateBtn.disabled = turnosData.length === 0;
+            }
+
+            async function triggerDownload() {
+                if (generatedWorkbook && fileName) {
+                    const buffer = await generatedWorkbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(url);
+                }
+            }
+
+            async function generateCalendar() {
+                if (!turnosData || turnosData.length === 0) {
+                    showStatus('No hay datos válidos para procesar (verifique la semana y servicios seleccionados).', 'error'); return;
+                }
+                if (configuredAgents.size === 0) {
+                    showStatus('Debes configurar al menos un agente.', 'error'); return;
+                }
+                calendarResults.clear();
+                generateBtn.disabled = true;
+                applyDownloadBtn.disabled = true;
+                progressBar.classList.add('active');
+                let progress = 0;
+                const progressInterval = setInterval(() => { progress += 10; progressFill.style.width = progress + '%'; if (progress >= 100) clearInterval(progressInterval); }, 100);
+
+                setTimeout(async () => {
+                    try {
+                        await createCalendarWorkbook();
+                        progressBar.classList.remove('active');
+                        progressFill.style.width = '0%';
+                        if (fileName) {
+                            generateBtn.classList.add('is-success');
+                            generateBtn.textContent = 'Descargando...';
+                            showStatus('Calendario generado. Iniciando descarga...', 'success');
+                            await triggerDownload();
+                            setTimeout(() => {
+                                generateBtn.classList.remove('is-success');
+                                generateBtn.textContent = 'Generar Calendario';
+                                generateBtn.disabled = false;
+                                applyDownloadBtn.disabled = false;
+                            }, 2000);
+                        } else {
+                            generateBtn.disabled = false;
+                        }
+                    } catch (error) {
+                        showStatus('Ocurrió un error al generar el archivo.', 'error');
+                        console.error("Error en generateCalendar:", error);
+                        generateBtn.disabled = false;
+                    }
+                }, 1500);
+            }
+
+            async function createCalendarWorkbook() {
+                fileName = '';
+                const workbook = new ExcelJS.Workbook();
+                const worksheet = workbook.addWorksheet('Calendario TT');
+
+                const monday = getMonday(new Date(weekSelector.value));
+                const monthName = monday.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
+                const year = monday.getFullYear();
+
+                const weekDays = Array.from({length: 7}, (_, i) => new Date(new Date(monday).setDate(monday.getDate() + i)));
+
+                fileName = `Calendario TT semana del ${weekDays[0].getDate()} al ${weekDays[6].getDate()} de ${monthName} ${year}.xlsx`;
+                createCalendarSheet(worksheet, weekDays, monthName, year);
+
+                generatedWorkbook = workbook;
+            }
+
+            function createCalendarSheet(worksheet, weekDays, monthName, year) {
+                worksheet.columns = [ { width: 5 }, { width: 35 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 80 } ];
+                let rowIndex = 1;
+
+                const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF366092' } };
+                const headerFont = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri' };
+
+                const titleRow = worksheet.getRow(rowIndex++);
+                const titleCell = titleRow.getCell(1);
+                titleCell.value = `CALENDARIO TT ${monthName} ${year}`;
+                worksheet.mergeCells(1, 1, 1, 10);
+                titleCell.font = { ...headerFont, size: 14 };
+                titleCell.fill = headerFill;
+                titleCell.alignment = { horizontal: 'center' };
+
+                const subtitleRow = worksheet.getRow(rowIndex++);
+                const subtitleCell = subtitleRow.getCell(1);
+                subtitleCell.value = `SEMANA ${weekDays[0].getDate()} AL ${weekDays[6].getDate()} ${monthName}`;
+                worksheet.mergeCells(2, 1, 2, 10);
+                subtitleCell.font = { ...headerFont, size: 12 };
+                subtitleCell.fill = headerFill;
+                subtitleCell.alignment = { horizontal: 'center' };
+
+                const headerRow = worksheet.getRow(rowIndex++);
+                const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
+                const headers = ['N°', 'NOMBRE', ...weekDays.map((day, i) => `${dayNames[i]} ${day.getDate()}`), 'condiciones'];
+                headers.forEach((header, index) => {
+                    const cell = headerRow.getCell(index + 1);
+                    cell.value = header;
+                    cell.fill = headerFill;
+                    cell.font = { ...headerFont, size: 11 };
+                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                });
+
+                let agentNumber = 1;
+                configuredAgents.forEach((config) => {
+                    const normalizedConfigName = String(config.nombre).replace(/\s/g, '').toLowerCase();
+                    const agentShifts = turnosData.filter(row => {
+                        if (!row || typeof row.Nombre === 'undefined' || row.Nombre === null) return false;
+                        return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
+                    });
+
+                    if (agentShifts.length > 0) {
+                        const agentRow = worksheet.getRow(rowIndex++);
+                        agentRow.getCell(1).value = agentNumber++;
+                        agentRow.getCell(2).value = config.nombre;
+
+                        weekDays.forEach((day, dayIndex) => {
+                            const dayShift = agentShifts.find(s => s.Fecha && new Date(s.Fecha).toDateString() === day.toDateString());
+                            let status = 'LIBRE';
+                            if (dayShift && !isLibre(dayShift)) {
+                                if (config.modalidad === 'especial') {
+                                    status = applySpecialLogic(dayShift, config.condicion, day);
+                                } else {
+                                    const workingShifts = agentShifts.filter(s => !isLibre(s)).sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
+                                    const shiftPosition = workingShifts.findIndex(s => new Date(s.Fecha).toDateString() === day.toDateString()) + 1;
+                                    status = config.condicion.map(getDayPosition).includes(shiftPosition) ? 'SITE' : 'TT';
+                                }
+                            }
+                            const cell = agentRow.getCell(3 + dayIndex);
+                            cell.value = status;
+                            if (status === 'TT') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
+                            else if (status === 'SITE') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
+
+                            calendarResults.set(`${config.nombre}_${day.toDateString()}`, status);
+                        });
+
+                        agentRow.getCell(10).value = generateConditionText(config);
+                        for (let i = 1; i <= 10; i++) {
+                            const cell = agentRow.getCell(i);
+                            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                            cell.font = { name: 'Calibri', size: 11 };
+                            cell.alignment = { vertical: 'middle', horizontal: (i > 2 && i < 10) ? 'center' : (i==1 ? 'center' : 'left') };
                         }
                     }
-
-                    const lugarKey = Object.keys(row).find(k => k.trim().toLowerCase() === 'lugar');
-                    if(lugarKey) row[lugarKey] = lugar;
-                    
-                    const addedRow = worksheet.addRow(row);
-
-                    addedRow.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                        const headerName = originalHeaders[colNumber - 1].trim().toLowerCase();
-                        
-                        cell.border = borderStyle;
-                        cell.alignment = centerAlignment;
-                        cell.font = { name: 'Calibri', size: 11 };
-
-                        if(headerName === 'fecha') cell.numFmt = 'dd/mm/yyyy';
-                        if(headerName.includes('ini') || headerName.includes('fin')) cell.numFmt = 'hh:mm';
-                    });
                 });
-
-                // --- 6. Generar y Descargar Archivo ---
-                const buffer = await workbook.xlsx.writeBuffer();
-                const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                const monday = getMonday(new Date(weekSelector.value));
-                const monthName = monday.toLocaleString('es-ES', { month: 'long' });
-                const downloadFileName = `Malla de Turnos - Semana ${monday.getDate()} ${monthName} ${monday.getFullYear()}.xlsx`;
-                const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = downloadFileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
-                showStatus(`Malla de turnos descargada: ${downloadFileName}`, 'success');
-
-            } catch (error) {
-                console.error('Error detallado al generar la malla de turnos:', error);
-                showStatus(`Error al generar la malla: ${error.message}`, 'error');
             }
-        }
-        
-        function isLibre(row) {
-            if (!row) return true;
-            const key = Object.keys(row).find(k => k.trim().toLowerCase() === 'ini' || k.trim().toLowerCase() === 'ini');
-            const ini = key ? row[key] : '';
-            return typeof ini === 'string' && String(ini).toUpperCase().includes('LIBRE');
-        }
 
-        function applySpecialLogic(shift, specialConditions, day) {
-            const key = Object.keys(shift).find(k => k.trim().toLowerCase() === 'ini' || k.trim().toLowerCase() === 'ini');
-            const iniValue = key ? shift[key] : null;
+            async function applyAndDownloadShifts() {
+                try {
+                    if (!turnosData || turnosData.length === 0) {
+                        return showStatus('No hay datos de turnos válidos para procesar.', 'error');
+                    }
 
-            if (!iniValue || typeof iniValue.getHours !== 'function') return 'SITE';
-            const hour = new Date(iniValue).getHours();
-            const dayOfWeek = day.getDay();
-            const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-            const isFestivo = checkIfFestivo(day);
-            const isWeekendOrFestivo = isWeekend || isFestivo;
-            let shiftType = (hour >= 0 && hour <= 6) ? 'noche' : (hour >= 7 && hour <= 11) ? 'am' : 'pm';
-            if (isWeekendOrFestivo) {
-                if (specialConditions.includes('weekend_festivos_tt')) return 'TT';
-                if (specialConditions.includes('weekend_festivos_site')) return 'SITE';
+                    const workbook = new ExcelJS.Workbook();
+                    const worksheet = workbook.addWorksheet('Turnos Aplicados');
+
+                    worksheet.columns = [
+                        { width: 10.27 }, { width: 10.27 }, { width: 35.55 }, { width: 10.27 },
+                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 10.27 },
+                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 10.27 },
+                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 11.73 },
+                        { width: 20.09 }
+                    ];
+
+                    const headers = ['Rut','Lugar','Nombre','Estado','Fecha','Dia','INI','FIN','Dur_Tur','Desc_1','Ini_ Colac','Fin_ Colac','Desc_2','Dur_ Colac','HC','Encargado','Servicio'];
+                    const headerRow = worksheet.getRow(1);
+                    headerRow.height = 20;
+                    headerRow.customHeight = true;
+
+                    headers.forEach((header, index) => {
+                        const cell = headerRow.getCell(index + 1);
+                        cell.value = header;
+                        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFC00000' } };
+                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD0CECE' } };
+                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
+                        cell.border = { top: { style: 'dotted' }, left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' } };
+                    });
+
+                    const sortedData = [...turnosData].sort((a,b) => (findVal(a, ['Rut', 'id']) || '').localeCompare(findVal(b, ['Rut', 'id']) || ''));
+
+                    sortedData.forEach((data, rowIndex) => {
+                        const row = worksheet.getRow(rowIndex + 2);
+                        row.height = 14.50;
+                        row.customHeight = true;
+                        
+                        const newRow = { ...data };
+                        const nombreAgente = findVal(newRow, ['nombre']);
+                        const fechaTurno = new Date(findVal(newRow, ['fecha']));
+                        const key = `${nombreAgente}_${fechaTurno.toDateString()}`;
+                        const status = calendarResults.get(key);
+                        
+                        const lugarKey = findKey(newRow, ['Lugar']);
+                        if (lugarKey) {
+                            if (isLibre(newRow)) {
+                                newRow[lugarKey] = 'Site';
+                            } else if (status) {
+                                newRow[lugarKey] = status;
+                            }
+                        }
+
+                        const currentRut = findVal(data, ['Rut', 'id']);
+                        const previousRut = rowIndex > 0 ? findVal(sortedData[rowIndex - 1], ['Rut', 'id']) : null;
+                        const isNewAgent = (rowIndex === 0) || (currentRut !== previousRut);
+
+                        headers.forEach((header, colIndex) => {
+                            const cell = row.getCell(colIndex + 1);
+                            const originalHeaderKey = findKey(newRow, [header.trim()]);
+                            let value = originalHeaderKey ? newRow[originalHeaderKey] : '';
+
+                            if (['ini', 'fin', 'desc_1', 'ini_ colac', 'fin_ colac', 'desc_2'].includes(header.toLowerCase().trim()) && typeof value !== 'string') {
+                                value = formatTime(value);
+                            }
+
+                            if (header.toLowerCase().trim() === 'fecha' && value instanceof Date) {
+                                cell.value = value;
+                                cell.numFmt = 'dd-mm-yyyy';
+                            } else {
+                                cell.value = value;
+                            }
+
+                            cell.font = { name: 'Calibri', size: 11, color: { argb: 'FF000000' } };
+                            cell.alignment = { horizontal: 'left', vertical: 'middle' };
+                            cell.border = {
+                                top: { style: isNewAgent ? 'thin' : 'dotted' },
+                                left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' }
+                            };
+                        });
+                    });
+
+                    worksheet.properties.defaultRowHeight = 14.50;
+                    
+                    const buffer = await workbook.xlsx.writeBuffer();
+                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
+                    const monday = getMonday(new Date(weekSelector.value));
+                    const monthName = monday.toLocaleString('es-ES', { month: 'long' });
+                    const downloadFileName = `Malla de Turnos Aplicada - Semana ${monday.getDate()} ${monthName} ${monday.getFullYear()}.xlsx`;
+                    
+                    const url = URL.createObjectURL(blob);
+                    const a = document.createElement('a');
+                    a.href = url;
+                    a.download = downloadFileName;
+                    document.body.appendChild(a);
+                    a.click();
+                    document.body.removeChild(a);
+                    URL.revokeObjectURL(url);
+                    showStatus(`Malla de turnos aplicada y descargada.`, 'success');
+
+                } catch (error) {
+                    console.error('Error al aplicar y descargar la malla:', error);
+                    showStatus(`Error al generar la malla: ${error.message}`, 'error');
+                }
             }
-            if (specialConditions.includes(`${shiftType}_tt`)) return 'TT';
-            if (specialConditions.includes(`${shiftType}_site`)) return 'SITE';
-            return 'SITE';
-        }
 
-        function checkIfFestivo(day) {
-            const festivos = ['2024-01-01', '2024-03-29', '2024-03-30', '2024-05-01', '2024-05-21', '2024-06-29', '2024-07-16', '2024-08-15', '2024-09-18', '2024-09-19', '2024-10-12', '2024-11-01', '2024-12-08', '2024-12-25', '2025-01-01', '2025-04-18', '2025-04-19', '2025-05-01', '2025-05-21', '2025-06-29', '2025-07-16', '2025-08-15', '2025-09-18', '2025-09-19', '2025-10-12', '2025-11-01', '2025-12-08', '2025-12-25'];
-            return festivos.includes(day.toISOString().split('T')[0]);
-        }
-
-        function generateConditionText(config) {
-            if (config.modalidad === 'especial') {
-                const format = (arr, type) => arr.filter(c => c.endsWith(type)).map(c => {
-                    const prefix = c.split('_')[0];
-                    if(prefix === 'weekend') return 'FDS/Fest.';
-                    return prefix.toUpperCase();
-                }).join(', ');
-
-                const ttText = format(config.condicion, '_tt');
-                const siteText = format(config.condicion, '_site');
-
-                let result = 'PERSONALIZADO: ';
-                if(ttText) result += `${ttText} TT`;
-                if(ttText && siteText) result += ' X ';
-                if(siteText) result += `${siteText} PRESENCIAL`;
-                return result;
-            } else {
-                const positions = config.condicion.map(pos => pos.toUpperCase().substring(0,3)).join(' Y ');
-                return `DISTRIBUCIÓN ${config.modalidad.toUpperCase()} (${positions} TURNO)`;
+            const findKey = (o, names) => { if (!o || !names) return null; const keys = Object.keys(o); const lowerCaseNames = names.map(n => n.toLowerCase()); return keys.find(k => lowerCaseNames.includes(k.trim().toLowerCase())); };
+            const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : null; };
+            
+            function isLibre(row) {
+                if (!row) return true;
+                const ini = findVal(row, ['ini', 'inicio', 'inicio turno']);
+                return typeof ini === 'string' && String(ini).toUpperCase().includes('LIBRE');
             }
-        }
 
-        function getDayPosition(dayName) {
-            const positions = { 'primer': 1, 'segundo': 2, 'tercer': 3, 'cuarto': 4, 'quinto': 5 };
-            return positions[dayName] || 1;
-        }
+            function applySpecialLogic(shift, specialConditions, day) {
+                const iniValue = findVal(shift, ['ini', 'inicio', 'inicio turno']);
+                if (!iniValue || typeof iniValue.getHours !== 'function') return 'SITE';
+                const hour = new Date(iniValue).getHours();
+                const dayOfWeek = day.getDay();
+                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                const isFestivo = checkIfFestivo(day);
+                const isWeekendOrFestivo = isWeekend || isFestivo;
+                let shiftType = (hour >= 0 && hour <= 6) ? 'noche' : (hour >= 7 && hour <= 11) ? 'am' : 'pm';
+                if (isWeekendOrFestivo) {
+                    if (specialConditions.includes('weekend_festivos_tt')) return 'TT';
+                    if (specialConditions.includes('weekend_festivos_site')) return 'SITE';
+                }
+                if (specialConditions.includes(`${shiftType}_tt`)) return 'TT';
+                if (specialConditions.includes(`${shiftType}_site`)) return 'SITE';
+                return 'SITE';
+            }
 
-        function showStatus(message, type) {
-            statusMessage.className = `status-message ${type}`;
-            statusMessage.textContent = message;
-            setTimeout(() => {
-                statusMessage.className = 'status-message';
-            }, 4000);
-        }
+            function checkIfFestivo(day) {
+                const festivos = ['2024-01-01', '2024-03-29', '2024-03-30', '2024-05-01', '2024-05-21', '2024-06-29', '2024-07-16', '2024-08-15', '2024-09-18', '2024-09-19', '2024-10-12', '2024-11-01', '2024-12-08', '2024-12-25', '2025-01-01', '2025-04-18', '2025-04-19', '2025-05-01', '2025-05-21', '2025-06-29', '2025-07-16', '2025-08-15', '2025-09-18', '2025-09-19', '2025-10-12', '2025-11-01', '2025-12-08', '2025-12-25'];
+                return festivos.includes(day.toISOString().split('T')[0]);
+            }
+
+            function generateConditionText(config) {
+                if (config.modalidad === 'especial') {
+                    const format = (arr, type) => arr.filter(c => c.endsWith(type)).map(c => {
+                        const prefix = c.split('_')[0].replace('weekendfestivos', 'FDS/Fest.');
+                        return prefix.toUpperCase();
+                    }).join(', ');
+                    const ttText = format(config.condicion, '_tt');
+                    const siteText = format(config.condicion, '_site');
+                    let result = 'PERSONALIZADO: ';
+                    if(ttText) result += `${ttText} TT`;
+                    if(ttText && siteText) result += ' X ';
+                    if(siteText) result += `${siteText} PRESENCIAL`;
+                    return result;
+                } else {
+                    const positions = config.condicion.map(pos => pos.toUpperCase().substring(0,3)).join(' Y ');
+                    return `DISTRIBUCIÓN ${config.modalidad.toUpperCase()} (${positions} TURNO)`;
+                }
+            }
+
+            function getDayPosition(dayName) {
+                const positions = { 'primer': 1, 'segundo': 2, 'tercer': 3, 'cuarto': 4, 'quinto': 5 };
+                return positions[dayName] || 1;
+            }
+
+            // --- FUNCIÓN CORREGIDA ---
+            function formatTime(t) {
+                if (t === null || t === undefined || t === '') return '';
+                
+                if (t instanceof Date) {
+                    // Arreglo para celdas de tiempo vacías que se leen como la fecha de la época (ej. 1899-12-31)
+                    if (t.getFullYear() < 1970) {
+                        return ''; 
+                    }
+                    return t.toTimeString().substring(0, 5);
+                }
+
+                if (typeof t === 'number' && t >= 0 && t < 1) { // Procesa el número de serie de Excel
+                    // Si el número de serie es 0, es medianoche, lo que tratamos como vacío.
+                    if (t === 0) return '';
+                    const totalSeconds = Math.round(t * 86400);
+                    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
+                    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
+                    return `${hours}:${minutes}`;
+                }
+
+                let timeStr = String(t).trim();
+                if (timeStr.match(/^\d{1,2}:\d{2}/)) {
+                    const [h, m] = timeStr.split(':');
+                    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
+                }
+                return '';
+            }
+
+            function showStatus(message, type) {
+                statusMessage.className = `status-message ${type}`;
+                statusMessage.textContent = message;
+                setTimeout(() => {
+                    statusMessage.className = 'status-message';
+                    statusMessage.textContent = '';
+                }, 4000);
+            }
 
         });
     </script>
