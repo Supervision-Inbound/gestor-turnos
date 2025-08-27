@@ -424,6 +424,17 @@
 
                         allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
 
+                        // --- CÓDIGO CORREGIDO ---
+                        // Corrección de fechas por zona horaria
+                        allData.forEach(row => {
+                            const fechaKey = findKey(row, ['Fecha']);
+                            if (fechaKey && row[fechaKey] instanceof Date) {
+                                const tzOffset = row[fechaKey].getTimezoneOffset() * 60000; // offset en milisegundos
+                                row[fechaKey] = new Date(row[fechaKey].getTime() + tzOffset);
+                            }
+                        });
+                        // --- FIN DE LA CORRECCIÓN ---
+
                         extractAvailableAgents(allData);
                         populateWeekSelector(allData);
                         populateServiceFilter(allData);
