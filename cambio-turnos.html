@@ -165,7 +165,73 @@
 
         .custom-select-wrapper > select { display: none; }
 
-        .agent-name { font-size: 18px; font-weight: 700; color: var(--color-primary-end); margin-bottom: 12px; }
+        /* --- NUEVOS ESTILOS PARA INTERCAMBIO --- */
+        .agent-header {
+            display: flex;
+            justify-content: space-between;
+            align-items: center;
+            margin-bottom: 12px;
+            position: relative;
+        }
+        .agent-name {
+            font-size: 18px;
+            font-weight: 700;
+            color: var(--color-primary-end);
+        }
+        .swap-agent-btn {
+            width: 32px;
+            height: 32px;
+            background: #f1f5f9;
+            border: 1px solid var(--color-border);
+            border-radius: 8px;
+            cursor: pointer;
+            display: flex;
+            align-items: center;
+            justify-content: center;
+            color: var(--color-text-secondary);
+            transition: all 0.3s ease;
+        }
+        .swap-agent-btn:hover {
+            background: var(--color-primary-end);
+            color: white;
+            transform: translateY(-1px);
+        }
+        .swap-agent-btn svg {
+            width: 18px;
+            height: 18px;
+        }
+        .swap-agent-popup {
+            position: absolute;
+            top: 100%;
+            right: 0;
+            background: var(--color-surface);
+            border-radius: 8px;
+            box-shadow: var(--shadow-lg);
+            border: 1px solid var(--color-border);
+            z-index: 300;
+            width: 250px;
+            max-height: 300px;
+            overflow-y: auto;
+            margin-top: 5px;
+        }
+        .swap-agent-popup-header {
+            padding: 10px 15px;
+            font-size: 13px;
+            font-weight: 600;
+            color: var(--color-text-secondary);
+            border-bottom: 1px solid var(--color-border);
+        }
+        .swap-agent-item {
+            padding: 10px 15px;
+            cursor: pointer;
+            font-size: 14px;
+            transition: background-color 0.2s ease;
+        }
+        .swap-agent-item:hover {
+            background-color: #f4f7fe;
+        }
+        /* --- FIN NUEVOS ESTILOS --- */
+        
         .simulation-container { display: flex; flex-direction: column; gap: 20px; margin-top: 20px; }
         
         .agent-section { 
@@ -179,7 +245,7 @@
             position: relative; 
         }
 
-        .remove-agent-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: #f1f5f9; border: 1px solid var(--color-border); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); transition: all 0.3s ease; }
+        .remove-agent-btn { position: absolute; top: 8px; right: 8px; width: 28px; height: 28px; background: #f1f5f9; border: 1px solid var(--color-border); border-radius: 50%; cursor: pointer; display: flex; align-items: center; justify-content: center; color: var(--color-text-secondary); transition: all 0.3s ease; z-index: 5; }
         .remove-agent-btn:hover { background: var(--color-error); color: white; border-color: var(--color-error); transform: scale(1.1); }
         @media (max-width: 1100px) { .agent-section { grid-template-columns: 1fr; } }
         .shifts-section { min-width: 0; }
@@ -294,22 +360,22 @@
         </div>
         <header class="app-header app-header-simulator"><div class="app-header-content"><h1 id="appTitleSimulator">Gestor de Cambios de Turnos</h1><div class="file-info-header" id="fileInfoHeader"></div></div></header>
         <main class="simulator-view"><div class="config-group"><label>Selecciona la semana a simular</label><div class="week-selector-group"><div class="custom-select-wrapper" id="simCustomSelectWeek" style="flex: 1;"><select id="simWeekSelector"></select><div class="custom-select-trigger" id="simWeekTrigger">-- Selecciona una semana --</div><div class="custom-options" id="simWeekOptions"></div></div>
-        <div class="actions-menu-wrapper">
-            <button class="actions-menu-btn" id="actionsMenuBtn" title="Opciones">
-                <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413-1.4-2.397 0-2.81l.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
-            </button>
-            <div class="actions-menu-dropdown" id="actionsMenuDropdown">
-                <div id="mainMenuView">
-                    <div class="actions-menu-item" id="simulateAllBtnMenu">Simular Todo</div>
-                    <div class="actions-menu-item" id="serviceFilterBtn">Servicio ▸</div>
-                </div>
-                <div id="serviceMenuView" style="display: none;">
-                    <div class="actions-menu-header" id="backToMainMenuBtn">◂ Volver</div>
-                    <div class="service-list" id="serviceList"></div>
-                </div>
+    <div class="actions-menu-wrapper">
+        <button class="actions-menu-btn" id="actionsMenuBtn" title="Opciones">
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413-1.4-2.397 0-2.81l.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
+        </button>
+        <div class="actions-menu-dropdown" id="actionsMenuDropdown">
+            <div id="mainMenuView">
+                <div class="actions-menu-item" id="simulateAllBtnMenu">Simular Todo</div>
+                <div class="actions-menu-item" id="serviceFilterBtn">Servicio ▸</div>
+            </div>
+            <div id="serviceMenuView" style="display: none;">
+                <div class="actions-menu-header" id="backToMainMenuBtn">◂ Volver</div>
+                <div class="service-list" id="serviceList"></div>
             </div>
         </div>
     </div>
+</div>
 </div>
 <div id="simulationArea" style="display: none;"><div class="simulation-container" id="simulationContainer"></div><div class="add-agent-section"><p style="margin-bottom: 10px; color: var(--color-text-secondary);">Agregar ejecutivo a la simulación</p><div class="custom-select-wrapper" id="addAgentCustomSelect" style="max-width: 500px; margin-bottom: 15px;"><select id="addAgentSelector"></select><div class="custom-select-trigger" id="addAgentTrigger">-- Selecciona un ejecutivo --</div><div class="custom-options" id="addAgentOptions"><input type="text" class="search-input" id="agentSearchInput" placeholder="Buscar ejecutivo..."/><div id="agentOptionsList"></div></div></div><button class="add-agent-btn" id="addAgentBtn">Agregar Ejecutivo</button></div><div class="global-actions">
             <button id="downloadBtn" class="download-btn" disabled>
@@ -366,7 +432,16 @@
         addAgentBtn.addEventListener('click', handleAddAgent);
         
         simulationContainer.addEventListener('input', handleTableChange);
-        simulationContainer.addEventListener('click', handleRemoveAgent);
+        
+        // --- MODIFICADO: Un solo manejador de clics para la simulación ---
+        simulationContainer.addEventListener('click', (e) => {
+            if (e.target.closest('.remove-agent-btn')) {
+                handleRemoveAgent(e);
+            } else if (e.target.closest('.swap-agent-btn')) {
+                handleSwapButtonClick(e);
+            }
+        });
+        
         agentSearchInput.addEventListener('input', handleAgentSearch);
         setupCustomSelect(simCustomSelectWeek, simWeekTrigger, simWeekOptions, simWeekSelector);
         setupCustomSelectWithSearch(addAgentCustomSelect, addAgentTrigger, addAgentOptions, addAgentSelector);
@@ -374,7 +449,8 @@
         downloadBtn.addEventListener('click', handleDownloadWithTemplate);
         applyDownloadBtn.addEventListener('click', handleMasterDownload);
 
-        actionsMenuBtn.addEventListener('click', () => {
+        actionsMenuBtn.addEventListener('click', (e) => {
+            e.stopPropagation();
             mainMenuView.style.display = 'block';
             serviceMenuView.style.display = 'none';
             actionsMenuDropdown.classList.toggle('show');
@@ -382,6 +458,10 @@
         document.addEventListener('click', (e) => {
             if (!actionsMenuBtn.contains(e.target) && !actionsMenuDropdown.contains(e.target)) {
                 actionsMenuDropdown.classList.remove('show');
+            }
+            // --- NUEVO: Cerrar popups de intercambio ---
+            if (!e.target.closest('.swap-agent-btn') && !e.target.closest('.swap-agent-popup')) {
+                closeAllSwapPopups();
             }
         });
 
@@ -521,7 +601,6 @@
                 return fecha ? getMonday(fecha).toISOString() : null;
             }).filter(Boolean));
             
-            // --- AJUSTE DE ORDEN DE SEMANAS ---
             const allWeeks = [...weekSet].sort((a, b) => new Date(b) - new Date(a));
             
             simWeekSelector.innerHTML = ''; 
@@ -698,9 +777,23 @@
                     </tr>`;
                 }
 
+                // --- MODIFICADO: Se agrega el botón de intercambio ---
                 section.innerHTML = `
                     <button class="remove-agent-btn" title="Quitar Ejecutivo"><svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16"><path d="M5.5 5.5A.5.5 0 0 1 6 6v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m2.5 0a.5.5 0 0 1 .5.5v6a.5.5 0 0 1-1 0V6a.5.5 0 0 1 .5-.5m3 .5a.5.5 0 0 0-1 0v6a.5.5 0 0 0 1 0V6z"/><path fill-rule="evenodd" d="M14.5 3a1 1 0 0 1-1 1H13v9a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2V4h-.5a1 1 0 0 1-1-1V2a1 1 0 0 1 1-1H6a1 1 0 0 1 1-1h2a1 1 0 0 1 1 1h3.5a1 1 0 0 1 1 1v1zM4.118 4L4 4.059V13a1 1 0 0 0 1 1h6a1 1 0 0 0 1-1V4.059L11.882 4H4.118zM2.5 3V2h11v1h-11z"/></svg></button>
-                    <div class="shifts-section"><div class="agent-name">${agent.nombre}</div><div class="tables-wrapper"><div class="table-container"><div class="table-title">Turno Original</div><table class="schedule-table original-schedule"><thead>${tableHeaders}</thead><tbody>${originalTableRowsHTML}</tbody></table></div><div class="table-container"><div class="table-title">Turno Modificado</div><table class="schedule-table modifiable-schedule"><thead>${tableHeaders}</thead><tbody>${modifiableTableRowsHTML}</tbody></table></div></div></div>
+                    <div class="shifts-section">
+                        <div class="agent-header">
+                            <div class="agent-name">${agent.nombre}</div>
+                            <button class="swap-agent-btn" title="Intercambiar Turnos">
+                                <svg xmlns="http://www.w3.org/2000/svg" width="16" height="16" fill="currentColor" viewBox="0 0 16 16">
+                                    <path fill-rule="evenodd" d="M1 11.5a.5.5 0 0 0 .5.5h11.793l-3.147 3.146a.5.5 0 0 0 .708.708l4-4a.5.5 0 0 0 0-.708l-4-4a.5.5 0 0 0-.708.708L13.293 11H1.5a.5.5 0 0 0-.5.5m14-7a.5.5 0 0 1-.5.5H2.707l3.147 3.146a.5.5 0 1 1-.708.708l-4-4a.5.5 0 0 1 0-.708l4-4a.5.5 0 1 1 .708.708L2.707 4H14.5a.5.5 0 0 1 .5.5"/>
+                                </svg>
+                            </button>
+                        </div>
+                        <div class="tables-wrapper">
+                            <div class="table-container"><div class="table-title">Turno Original</div><table class="schedule-table original-schedule"><thead>${tableHeaders}</thead><tbody>${originalTableRowsHTML}</tbody></table></div>
+                            <div class="table-container"><div class="table-title">Turno Modificado</div><table class="schedule-table modifiable-schedule"><thead>${tableHeaders}</thead><tbody>${modifiableTableRowsHTML}</tbody></table></div>
+                        </div>
+                    </div>
                     <div class="validation-sidebar"><div class="validation-status original">Análisis Semanal</div><div class="validation-details"></div></div>`;
                 
                 setTimeout(() => updateAndValidateAgent(section), 100);
@@ -1018,6 +1111,117 @@
                 return `<li>${m}</li>`;
             }).join('')}</ul>`;
         }
+
+        // --- INICIO: NUEVAS FUNCIONES PARA INTERCAMBIO DE TURNOS ---
+
+        function handleSwapButtonClick(e) {
+            const swapBtn = e.target.closest('.swap-agent-btn');
+            if (!swapBtn) return;
+        
+            closeAllSwapPopups(); // Cerrar otros popups abiertos
+        
+            const sourceSection = swapBtn.closest('.agent-section');
+            const sourceAgentRut = sourceSection.dataset.agentRut;
+        
+            // Agentes disponibles para intercambio son todos los de la semana, excepto el actual.
+            const agentsForSwapping = availableAgents.filter(a => a.rut !== sourceAgentRut);
+        
+            if (agentsForSwapping.length === 0) {
+                alert("No hay otros ejecutivos disponibles para intercambiar.");
+                return;
+            }
+        
+            const popup = document.createElement('div');
+            popup.className = 'swap-agent-popup';
+            let popupHTML = '<div class="swap-agent-popup-header">Intercambiar con:</div>';
+            agentsForSwapping.forEach(agent => {
+                popupHTML += `<div class="swap-agent-item" data-rut="${agent.rut}">${agent.nombre}</div>`;
+            });
+            popup.innerHTML = popupHTML;
+        
+            sourceSection.querySelector('.agent-header').appendChild(popup);
+        
+            popup.addEventListener('click', (event) => {
+                const selectedItem = event.target.closest('.swap-agent-item');
+                if (selectedItem) {
+                    const destinationAgentRut = selectedItem.dataset.rut;
+                    performAgentSwap(sourceSection, destinationAgentRut);
+                    closeAllSwapPopups();
+                }
+            });
+        
+            e.stopPropagation(); // Evitar que el clic se propague al 'document' y cierre el popup
+        }
+        
+        function closeAllSwapPopups() {
+            document.querySelectorAll('.swap-agent-popup').forEach(p => p.remove());
+        }
+        
+        function getModifiableScheduleData(agentSection) {
+            const schedule = [];
+            agentSection.querySelectorAll('.modifiable-schedule tbody tr').forEach(row => {
+                schedule.push({
+                    startTime: row.querySelector('.start-time').value,
+                    endTime: row.querySelector('.end-time').value,
+                    colacion: row.querySelector('.colacion-select').value
+                });
+            });
+            return schedule;
+        }
+        
+        function setModifiableScheduleData(agentSection, scheduleData) {
+            agentSection.querySelectorAll('.modifiable-schedule tbody tr').forEach((row, index) => {
+                const dayData = scheduleData[index];
+                if (dayData) {
+                    row.querySelector('.start-time').value = dayData.startTime;
+                    row.querySelector('.end-time').value = dayData.endTime;
+                    row.querySelector('.colacion-select').value = dayData.colacion;
+                }
+            });
+        }
+
+        function performAgentSwap(sourceSection, destinationAgentRut) {
+            const weekStartISO = simWeekSelector.value;
+            const sourceScheduleData = getModifiableScheduleData(sourceSection);
+            let destinationSection = document.querySelector(`.agent-section[data-agent-rut="${destinationAgentRut}"]`);
+            
+            if (destinationSection) {
+                // Caso A: El ejecutivo de destino ya está en la simulación
+                const destinationScheduleData = getModifiableScheduleData(destinationSection);
+                
+                setModifiableScheduleData(sourceSection, destinationScheduleData);
+                setModifiableScheduleData(destinationSection, sourceScheduleData);
+                
+                updateAndValidateAgent(sourceSection);
+                updateAndValidateAgent(destinationSection);
+        
+            } else {
+                // Caso B: El ejecutivo de destino NO está en la simulación
+                const newDestinationSection = createAgentSection(destinationAgentRut, weekStartISO);
+                if (!newDestinationSection) {
+                    alert("Error al agregar el nuevo ejecutivo para el intercambio.");
+                    return;
+                }
+        
+                // El nuevo agente se crea con su turno original en la tabla modificable.
+                const destinationOriginalScheduleData = getModifiableScheduleData(newDestinationSection);
+        
+                // Realizar el intercambio
+                setModifiableScheduleData(sourceSection, destinationOriginalScheduleData);
+                setModifiableScheduleData(newDestinationSection, sourceScheduleData);
+        
+                // Agregar la nueva sección al DOM y actualizar el estado
+                simulationContainer.appendChild(newDestinationSection);
+                addedAgents.add(destinationAgentRut);
+                updateAddAgentSelector();
+                
+                // Validar ambas secciones afectadas
+                updateAndValidateAgent(sourceSection);
+                updateAndValidateAgent(newDestinationSection);
+            }
+        }
+        
+        // --- FIN: NUEVAS FUNCIONES PARA INTERCAMBIO DE TURNOS ---
         
         function parseDate(d) {
             if (!d) return null;
