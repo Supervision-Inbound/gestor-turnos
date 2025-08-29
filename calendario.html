@@ -248,6 +248,13 @@
     </div>
 
     <script>
+
+    function normalizeDate(date) {
+        if (!date) return null;
+        const d = new Date(date);
+        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
+    }
+    
         document.addEventListener('DOMContentLoaded', function() {
 
             let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
@@ -587,7 +594,7 @@
 
             function populateWeekSelector(data) {
                 const weekSet = new Set();
-                data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
+                data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(normalizeDate(row.Fecha)).toISOString()); });
                 const last4Weeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)).slice(0, 4);
                 weekSelector.innerHTML = ''; customOptions.innerHTML = '';
                 
@@ -703,11 +710,11 @@
                 const workbook = new ExcelJS.Workbook();
                 const worksheet = workbook.addWorksheet('Calendario TT');
 
-                const monday = getMonday(new Date(weekSelector.value));
+                const mondayISO = weekSelector.value; const mondayUTC = new Date(mondayISO); const monday = getMonday(new Date(mondayUTC.getTime() + mondayUTC.getTimezoneOffset()*60000));
                 const monthName = monday.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
                 const year = monday.getFullYear();
 
-                const weekDays = Array.from({length: 7}, (_, i) => new Date(new Date(monday).setDate(monday.getDate() + i)));
+                const weekDays = Array.from({length: 7}, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i));
 
                 fileName = `Calendario TT semana del ${weekDays[0].getDate()} al ${weekDays[6].getDate()} de ${monthName} ${year}.xlsx`;
                 createCalendarSheet(worksheet, weekDays, monthName, year);
@@ -764,7 +771,7 @@
                         agentRow.getCell(2).value = config.nombre;
 
                         weekDays.forEach((day, dayIndex) => {
-                            const dayShift = agentShifts.find(s => s.Fecha && new Date(s.Fecha).toDateString() === day.toDateString());
+                            const dayShift = agentShifts.find(s => s.Fecha && normalizeDate(s.Fecha).toDateString() === day.toDateString());
                             let status = 'LIBRE';
                             if (dayShift && !isLibre(dayShift)) {
                                 if (config.modalidad === 'especial') {
@@ -862,7 +869,7 @@
                         const status = calendarResults.get(key);
                         const lugarKey = findKey(record, headerMap['Lugar']);
                         if (lugarKey) {
-                            if (isLibre(record)) record[lugarKey] = 'LIBRE';
+                            if (isLibre(record)) record[lugarKey] = 'Site';
                             else if (status) record[lugarKey] = status;
                         }
 
@@ -911,7 +918,7 @@
                     
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    const monday = getMonday(new Date(weekSelector.value));
+                    const mondayISO = weekSelector.value; const mondayUTC = new Date(mondayISO); const monday = getMonday(new Date(mondayUTC.getTime() + mondayUTC.getTimezoneOffset()*60000));
                     const monthName = monday.toLocaleString('es-ES', { month: 'long' });
                     const downloadFileName = `Malla de Turnos Aplicada - Semana ${monday.getDate()} ${monthName} ${monday.getFullYear()}.xlsx`;
                     
@@ -1039,3 +1046,4 @@
     </script>
 </body>
 </html>
+
