@@ -636,7 +636,15 @@
 
             turnosData.forEach(row => {
                 const estado = row['Estado'] || row['estado'] || row['ESTADO'];
-                if ((estado || '').toLowerCase() !== 'activo' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
+                const lugar = row['Lugar'] || row['lugar'] || row['LUGAR'] || '';
+                
+                // Excluir agentes que contengan "TT" en la columna Lugar
+                if ((estado || '').toLowerCase() !== 'activo' || 
+                    !row.Fecha || 
+                    isNaN(new Date(row.Fecha)) || 
+                    lugar.toString().toUpperCase().includes('TT')) {
+                    return;
+                }
 
                 const fecha = new Date(row.Fecha);
                 const ini = parseExcelTime(row['Ini'] || row['ini'] || row['INI']);
@@ -681,7 +689,7 @@
             });
 
             if (transportList.length === 0) {
-                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada.', 'error');
+                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada (excluyendo TT).', 'error');
                 fileName = '';
                 return;
             }
