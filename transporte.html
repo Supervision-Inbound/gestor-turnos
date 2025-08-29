@@ -499,6 +499,14 @@
             });
         }
 
+        
+        function normalizeDate(d) {
+            const date = new Date(d);
+            date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // corrige desfase
+            date.setHours(0, 0, 0, 0); // elimina horas
+            return date;
+        }
+    
         function handleWeekSelection(event) {
             const selectedMondayISO = event.target.value;
             if (!selectedMondayISO) {
@@ -508,12 +516,12 @@
                 return;
             }
             const selectedMonday = new Date(selectedMondayISO);
-            const nextMonday = new Date(selectedMonday);
-            nextMonday.setDate(selectedMonday.getDate() + 7);
+            const sunday = new Date(selectedMonday);
+            sunday.setDate(selectedMonday.getDate() + 6);
             turnosData = allData.filter(row => {
                 if (!row.Fecha || isNaN(new Date(row.Fecha))) return false;
-                const rowDate = new Date(row.Fecha);
-                return rowDate >= selectedMonday && rowDate < nextMonday;
+                const rowDate = normalizeDate(row.Fecha);
+                return rowDate >= selectedMonday && rowDate <= sunday;
             });
             generateBtn.disabled = false;
 
@@ -636,17 +644,11 @@
 
             turnosData.forEach(row => {
                 const estado = row['Estado'] || row['estado'] || row['ESTADO'];
-                const lugar = row['Lugar'] || row['lugar'] || row['LUGAR'] || '';
-                
-                // Excluir agentes que contengan "TT" en la columna Lugar
-                if ((estado || '').toLowerCase() !== 'activo' || 
-                    !row.Fecha || 
-                    isNaN(new Date(row.Fecha)) || 
-                    lugar.toString().toUpperCase().includes('TT')) {
-                    return;
-                }
+                if ((estado || '').toLowerCase() !== 'activo' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
 
-                const fecha = new Date(row.Fecha);
+                let fecha = new Date(row.Fecha);
+                // Corregir desfase de zona horaria
+                fecha.setMinutes(fecha.getMinutes() + fecha.getTimezoneOffset());
                 const ini = parseExcelTime(row['Ini'] || row['ini'] || row['INI']);
                 const fin = parseExcelTime(row['FIN'] || row['Fin'] || row['fin'] || row['FIN ']);
                 const nombre = row['Nombre'] || row['nombre'];
@@ -689,7 +691,7 @@
             });
 
             if (transportList.length === 0) {
-                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada (excluyendo TT).', 'error');
+                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada.', 'error');
                 fileName = '';
                 return;
             }
