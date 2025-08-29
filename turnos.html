@@ -280,7 +280,7 @@
         function populateWeekSelector(data) {
             const weekSet = new Set();
             data.forEach(row => {
-                if (row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString());
+                if (row.Fecha) weekSet.add(getMonday(normalizeDate(row.Fecha)).toISOString());
             });
 
             const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
@@ -320,6 +320,14 @@
             });
         }
 
+        
+        function normalizeDate(d) {
+            const date = new Date(d);
+            date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // corrige desfase
+            date.setHours(0, 0, 0, 0); // elimina horas
+            return date;
+        }
+    
         function handleWeekSelection(event) {
             const selectedMondayISO = event.target.value;
             if (!selectedMondayISO) {
@@ -329,11 +337,11 @@
                 return;
             }
             const selectedMonday = new Date(selectedMondayISO);
-            const nextMonday = new Date(selectedMonday);
-            nextMonday.setDate(selectedMonday.getDate() + 7);
+            const sunday = new Date(selectedMonday);
+            sunday.setDate(selectedMonday.getDate() + 6);
             turnosData = allData.filter(row => {
-                const rowDate = new Date(row.Fecha);
-                return rowDate >= selectedMonday && rowDate < nextMonday;
+                const rowDate = normalizeDate(row.Fecha);
+                return rowDate >= selectedMonday && rowDate <= sunday;
             });
             generateBtn.disabled = false;
             settingsContainer.style.display = 'block';
@@ -402,7 +410,7 @@
                 const dayOfWeekToFind = jsDayToSheetIndex.indexOf(index);
                 const dayData = turnosData.filter(row => {
                     if (isLibre(row) || !row.Fecha) return false;
-                    const rowDate = new Date(row.Fecha);
+                    const rowDate = normalizeDate(row.Fecha);
                     return rowDate.getDay() === dayOfWeekToFind;
                 });
                 
@@ -416,11 +424,13 @@
                 }
             });
 
-            if (minDate && maxDate) {
-                const d1 = new Date(minDate), d2 = new Date(maxDate);
+            if (weekSelector && weekSelector.value) {
+                const monday = new Date(weekSelector.value);
+                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
+                const d1 = normalizeDate(monday), d2 = normalizeDate(sunday);
                 const day1 = String(d1.getDate()).padStart(2, '0'), day2 = String(d2.getDate()).padStart(2, '0');
-                const monthName = d1.toLocaleString('es-ES', { month: 'long' });
-                fileName = `Turno diario semana del ${day1} al ${day2} de ${monthName} ${d1.getFullYear()}.xlsx`;
+                const monthName = d2.toLocaleString('es-ES', { month: 'long' });
+                fileName = `Turno diario semana del ${day1} al ${day2} de ${monthName} ${d2.getFullYear()}.xlsx`;
             } else {
                 showStatus('No se encontraron turnos válidos con fechas para la semana seleccionada.', 'error');
             }
@@ -591,7 +601,7 @@
                 const mainHeaderCell = headerRow1.getCell(nightShiftStartCol);
                 const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
                 const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-                const d = new Date(fechaDia);
+                const d = normalizeDate(fechaDia);
                 const formattedDateHeader = `Turno de madrugada ${days[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`;
                 mainHeaderCell.value = formattedDateHeader;
 
@@ -630,8 +640,19 @@
         }
 
         function formatTime(date) { if (!date || typeof date.getHours !== 'function') return ''; const d = new Date(date); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
-        function formatDate(date) { if (!date) return ''; const d = new Date(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
-        function isLibre(row) { const ini = row['Ini']; return typeof ini === 'string' && ini.toUpperCase().includes('LIBRE'); }
+        function formatDate(date) { if (!date) return ''; const d = normalizeDate(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
+        
+        function isLibre(row) {
+            const ini = row['Ini'] ?? row['ini'] ?? row['INI'];
+            const fin = row['FIN'] ?? row['Fin'] ?? row['fin'] ?? row['FIN '];
+            const iniStr = typeof ini === 'string' ? ini.trim().toUpperCase() : '';
+            const finStr = typeof fin === 'string' ? fin.trim().toUpperCase() : '';
+            const iniEmpty = ini === null || ini === undefined || ini === '' || Number.isNaN(new Date(ini).getTime());
+            const finEmpty = fin === null || fin === undefined || fin === '' || Number.isNaN(new Date(fin).getTime());
+            // Es LIBRE si dice LIBRE o si no hay horas válidas en INI y FIN
+            return iniStr.includes('LIBRE') || finStr.includes('LIBRE') || (iniEmpty && finEmpty);
+        }
+
         function areSameDay(date1, date2) { const d1 = new Date(date1); const d2 = new Date(date2); return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
         
         function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
