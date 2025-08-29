@@ -2,61 +2,17 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
-  <title>Gestiones Inbound - Generador de Turnos</title>
-
-  <!-- MSAL y librerías Excel -->
+  <title>Test Descarga Excel desde SharePoint</title>
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
   <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-
-  <style>
-    body {
-      font-family: Arial, sans-serif;
-      background: #f4f7fe;
-      margin: 0;
-      padding: 20px;
-    }
-    .button {
-      background: linear-gradient(45deg,#6a11cb,#2575fc);
-      color: white;
-      padding: 12px 24px;
-      margin: 10px;
-      border: none;
-      border-radius: 8px;
-      cursor: pointer;
-      font-weight: bold;
-    }
-    .button:disabled {
-      opacity: 0.5;
-      cursor: not-allowed;
-    }
-    .status-message {
-      margin-top: 10px;
-      padding: 10px;
-      border-radius: 6px;
-      display: none;
-    }
-    .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
-    .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-  </style>
 </head>
 <body>
-  <h1>Generador de Turnos Diarios Inbound</h1>
-
-  <!-- Botones de sesión -->
-  <button class="button" id="btnLogin">🔑 Iniciar Sesión</button>
-  <button class="button" id="btnLoad" disabled>📂 Cargar Excel desde SharePoint</button>
-  <button class="button" id="generateBtn" disabled>⚡ Generar Excel</button>
-
-  <div class="status-message" id="statusMessage"></div>
-  <div style="margin-top:20px;">
-    <label for="weekSelector">Selecciona semana:</label>
-    <select id="weekSelector"></select>
-  </div>
+  <h1>📂 Test: Leer Excel en SharePoint</h1>
+  <button id="btnLogin">Iniciar Sesión</button>
+  <button id="btnLoad" disabled>Cargar Excel</button>
+  <pre id="output"></pre>
 
   <script>
-    // ===== MSAL CONFIG (con redirectUri fijo a GitHub Pages) =====
     const msalConfig = {
       auth: {
         clientId: "7d5a8e5f-4d3e-45fa-b3de-f634b9c6b0f8",
@@ -67,117 +23,58 @@
     };
 
     const msalInstance = new msal.PublicClientApplication(msalConfig);
-    let account = null, allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
+    let account = null;
 
     const btnLogin = document.getElementById("btnLogin");
     const btnLoad = document.getElementById("btnLoad");
-    const btnGenerate = document.getElementById("generateBtn");
-    const statusMessage = document.getElementById("statusMessage");
-    const weekSelector = document.getElementById("weekSelector");
+    const output = document.getElementById("output");
 
-    function showStatus(msg, type) {
-      statusMessage.textContent = msg;
-      statusMessage.className = `status-message ${type}`;
+    function log(msg) {
+      output.textContent += msg + "\n";
     }
 
-    // ===== LOGIN =====
     btnLogin.addEventListener("click", async () => {
       try {
         const loginResponse = await msalInstance.loginPopup({
-          scopes: ["Files.ReadWrite", "Sites.Read.All", "offline_access"]
+          scopes: ["Files.Read", "Files.ReadWrite", "Sites.Read.All"]
         });
         account = loginResponse.account;
-        showStatus("✅ Sesión iniciada: " + account.username, "success");
+        log("✅ Sesión iniciada como: " + account.username);
         btnLoad.disabled = false;
       } catch (e) {
         console.error(e);
-        showStatus("Error al iniciar sesión", "error");
+        log("❌ Error login: " + e.message);
       }
     });
 
     async function getToken() {
-      const resp = await msalInstance.acquireTokenSilent({
-        scopes: ["Files.ReadWrite", "Sites.Read.All"],
+      const result = await msalInstance.acquireTokenSilent({
+        scopes: ["Files.Read", "Sites.Read.All"],
         account
       });
-      return resp.accessToken;
+      return result.accessToken;
     }
 
-    // ===== CARGAR EXCEL DE SHAREPOINT =====
     btnLoad.addEventListener("click", async () => {
       try {
         const token = await getToken();
         const filePath = "/sites/INBOUND/Documentos Compartidos/INBOUND/Dimensionamientos/Turnos_dimensionamiento.xlsx";
         const url = "https://graph.microsoft.com/v1.0/sites/root:" + encodeURI(filePath) + ":/content";
 
+        log("📡 Descargando archivo desde: " + url);
+
         const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
-        if (!resp.ok) throw new Error("No se pudo descargar el Excel");
+        if (!resp.ok) throw new Error("Error HTTP " + resp.status);
 
         const buffer = await resp.arrayBuffer();
-        const workbook = XLSX.read(new Uint8Array(buffer), { type: "array", cellDates: true });
-        allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+        const wb = XLSX.read(new Uint8Array(buffer), { type: "array", cellDates: true });
 
-        populateWeeks(allData);
-        showStatus("📂 Excel cargado, filas: " + allData.length, "success");
+        const sheetName = wb.SheetNames[0];
+        const data = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
+        log("✅ Archivo cargado, hoja: " + sheetName + ", filas leídas: " + data.length);
       } catch (e) {
         console.error(e);
-        showStatus("Error al cargar Excel: " + e.message, "error");
-      }
-    });
-
-    function getMonday(d) {
-      d = new Date(d);
-      const day = d.getDay(), diff = d.getDate() - day + (day==0?-6:1);
-      const monday = new Date(d.setDate(diff));
-      monday.setHours(0,0,0,0);
-      return monday;
-    }
-
-    function populateWeeks(data) {
-      const weekSet = new Set();
-      data.forEach(r => { if (r.Fecha) weekSet.add(getMonday(r.Fecha).toISOString()); });
-      const sorted = Array.from(weekSet).sort((a,b)=>new Date(b)-new Date(a)).slice(0,4);
-
-      weekSelector.innerHTML = "";
-      sorted.forEach(mISO => {
-        const m = new Date(mISO), s = new Date(m); s.setDate(m.getDate()+6);
-        const opt = document.createElement("option");
-        opt.value = mISO;
-        opt.textContent = `Semana ${m.getDate()} al ${s.getDate()} de ${s.toLocaleString('es-ES',{month:'long'})}`;
-        weekSelector.appendChild(opt);
-      });
-
-      weekSelector.addEventListener("change", e => {
-        const monday = new Date(e.target.value);
-        const nextMon = new Date(monday); nextMon.setDate(monday.getDate()+7);
-        turnosData = allData.filter(r=>{
-          const d = new Date(r.Fecha);
-          return d>=monday && d<nextMon;
-        });
-        btnGenerate.disabled = false;
-        showStatus("📅 Semana seleccionada con "+turnosData.length+" registros", "success");
-      });
-    }
-
-    // ===== GENERAR NUEVO EXCEL =====
-    btnGenerate.addEventListener("click", async () => {
-      if (!turnosData) return;
-      try {
-        const wb = new ExcelJS.Workbook();
-        const ws = wb.addWorksheet("Turnos");
-        ws.columns = Object.keys(turnosData[0]).map(k=>({header:k, key:k}));
-        turnosData.forEach(r=>ws.addRow(r));
-
-        const buffer = await wb.xlsx.writeBuffer();
-        const blob = new Blob([buffer], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
-        const url = URL.createObjectURL(blob);
-        const a = document.createElement("a"); a.href=url; a.download="Turnos_Generados.xlsx"; a.click();
-        URL.revokeObjectURL(url);
-
-        showStatus("✅ Excel generado y descargado", "success");
-      } catch(e) {
-        console.error(e);
-        showStatus("Error al generar Excel: " + e.message, "error");
+        log("❌ Error al cargar Excel: " + e.message);
       }
     });
   </script>
