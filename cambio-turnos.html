@@ -390,6 +390,18 @@
     </div>
     
     <script>
+
+    // === Fecha helpers (local, sin desfase) ===
+    function normalizeDate(d) {
+        if (!d) return null;
+        const x = new Date(d);
+        return new Date(x.getFullYear(), x.getMonth(), x.getDate());
+    }
+    function isoDateLocal(d) {
+        d = normalizeDate(d);
+        return `${d.getFullYear()}-${String(d.getMonth()+1).padStart(2,'0')}-${String(d.getDate()).padStart(2,'0')}`;
+    }
+
     document.addEventListener('DOMContentLoaded', function() {
         let allData = [], availableAgents = [], addedAgents = new Set(), fullAgentList = [];
         let selectedServices = ['01_Masivo', '10_Staff_Inbound'];
@@ -897,8 +909,8 @@
                 
                 if (start && end) {
                     const dayDate = new Date(new Date(weekStartISO).setDate(new Date(weekStartISO).getDate() + idx));
-                    let startDt = new Date(`${dayDate.toISOString().split('T')[0]}T${start}`);
-                    let endDt = new Date(`${dayDate.toISOString().split('T')[0]}T${end}`);
+                    let startDt = new Date(`${isoDateLocal(dayDate)}T${start}`);
+                    let endDt = new Date(`${isoDateLocal(dayDate)}T${end}`);
                     
                     if (endDt <= startDt) endDt.setDate(endDt.getDate() + 1);
                     
@@ -1013,7 +1025,7 @@
                 if (prevFinVal && !String(prevFinVal).toUpperCase().includes('LIBRE')) {
                     const prevFinTime = formatTime(prevFinVal);
                     if (prevFinTime) {
-                        let prevEndDt = new Date(`${prevSunday.toISOString().split('T')[0]}T${prevFinTime}`);
+                        let prevEndDt = new Date(`${isoDateLocal(prevSunday)}T${prevFinTime}`);
                         const prevIniVal = findVal(prevSundayShiftData, ['ini', 'inicio', 'inicio turno']);
                         if (prevIniVal && formatTime(prevIniVal) > prevFinTime) {
                              prevEndDt.setDate(prevEndDt.getDate() + 1);
