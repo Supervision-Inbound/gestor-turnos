@@ -644,7 +644,8 @@
 
             turnosData.forEach(row => {
                 const estado = row['Estado'] || row['estado'] || row['ESTADO'];
-                if ((estado || '').toLowerCase() !== 'activo' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
+                const lugar = (row['Lugar'] || row['lugar'] || '').toLowerCase();
+                if ((estado || '').toLowerCase() !== 'activo' || lugar === 'tt' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
 
                 let fecha = new Date(row.Fecha);
                 // Corregir desfase de zona horaria
