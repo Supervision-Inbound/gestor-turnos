@@ -1,154 +1,185 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-    <meta charset="UTF-8">
-    <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestiones Inbound - Generador de Turnos</title>
-    <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
-    <style>
-        body { font-family: Arial, sans-serif; background: #f4f7fe; margin: 0; padding: 20px; }
-        .button { padding: 12px 24px; margin: 10px; border: none; border-radius: 8px; cursor: pointer; font-weight: bold; }
-        .login-btn { background: linear-gradient(45deg,#6a11cb,#2575fc); color: white; }
-        .load-btn { background: linear-gradient(45deg,#16a34a,#15803d); color: white; }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; }
-        pre { background: white; padding: 15px; border-radius: 10px; max-height: 300px; overflow-y: auto; }
-    </style>
+  <meta charset="UTF-8" />
+  <meta name="viewport" content="width=device-width, initial-scale=1.0"/>
+  <title>Gestiones Inbound - Generador de Turnos</title>
+
+  <!-- MSAL y librerías Excel -->
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+  <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
+
+  <style>
+    body {
+      font-family: Arial, sans-serif;
+      background: #f4f7fe;
+      margin: 0;
+      padding: 20px;
+    }
+    .button {
+      background: linear-gradient(45deg,#6a11cb,#2575fc);
+      color: white;
+      padding: 12px 24px;
+      margin: 10px;
+      border: none;
+      border-radius: 8px;
+      cursor: pointer;
+      font-weight: bold;
+    }
+    .button:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+    .status-message {
+      margin-top: 10px;
+      padding: 10px;
+      border-radius: 6px;
+      display: none;
+    }
+    .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
+    .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
+  </style>
 </head>
 <body>
-    <h1>Generador de Turnos Diarios Inbound</h1>
+  <h1>Generador de Turnos Diarios Inbound</h1>
 
-    <button class="button login-btn" onclick="signIn()">🔑 Iniciar Sesión</button>
-    <button class="button load-btn" onclick="loadExcel()" disabled id="loadBtn">📂 Cargar Excel Online</button>
-    
-    <div id="weekSelectorContainer" style="display:none; margin-top:20px;">
-        <label for="weekSelector">Selecciona semana:</label>
-        <select id="weekSelector"></select>
-    </div>
-    
-    <button class="button" id="generateBtn" disabled>Generar Excel</button>
+  <!-- Botones de sesión -->
+  <button class="button" id="btnLogin">🔑 Iniciar Sesión</button>
+  <button class="button" id="btnLoad" disabled>📂 Cargar Excel desde SharePoint</button>
+  <button class="button" id="generateBtn" disabled>⚡ Generar Excel</button>
 
-    <pre id="output"></pre>
+  <div class="status-message" id="statusMessage"></div>
+  <div style="margin-top:20px;">
+    <label for="weekSelector">Selecciona semana:</label>
+    <select id="weekSelector"></select>
+  </div>
 
-    <script>
-        // ---------------- MSAL Config ----------------
-        const msalConfig = {
-            auth: {
-                clientId: "7d5a8e5f-4d3e-45fa-b3de-f634b9c6b0f8", 
-                authority: "https://login.microsoftonline.com/13bd05ac-5854-49bf-b70c-842244af1a02",
-                redirectUri: window.location.href
-            }
-        };
-        const msalInstance = new msal.PublicClientApplication(msalConfig);
-        let account = null, allData = null, turnosData = null;
+  <script>
+    // ===== MSAL CONFIG (con redirectUri fijo a GitHub Pages) =====
+    const msalConfig = {
+      auth: {
+        clientId: "7d5a8e5f-4d3e-45fa-b3de-f634b9c6b0f8",
+        authority: "https://login.microsoftonline.com/13bd05ac-5854-49bf-b70c-842244af1a02",
+        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
+      },
+      cache: { cacheLocation: "localStorage", storeAuthStateInCookie: false }
+    };
 
-        async function signIn() {
-            try {
-                const loginResponse = await msalInstance.loginPopup({
-                    scopes: ["Files.ReadWrite", "Sites.Read.All", "offline_access"]
-                });
-                account = loginResponse.account;
-                document.getElementById("output").textContent = "✅ Sesión iniciada con: " + account.username;
-                document.getElementById("loadBtn").disabled = false;
-            } catch (err) {
-                console.error(err);
-            }
-        }
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    let account = null, allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
 
-        async function getToken() {
-            if (!account) throw new Error("Debes iniciar sesión primero.");
-            const response = await msalInstance.acquireTokenSilent({
-                scopes: ["Files.ReadWrite", "Sites.Read.All"],
-                account: account
-            });
-            return response.accessToken;
-        }
+    const btnLogin = document.getElementById("btnLogin");
+    const btnLoad = document.getElementById("btnLoad");
+    const btnGenerate = document.getElementById("generateBtn");
+    const statusMessage = document.getElementById("statusMessage");
+    const weekSelector = document.getElementById("weekSelector");
 
-        // ---------------- Descargar Excel desde SharePoint ----------------
-        async function loadExcel() {
-            try {
-                const token = await getToken();
-                const filePath = "/sites/INBOUND/Documentos Compartidos/INBOUND/Dimensionamientos/Turnos_dimensionamiento.xlsx";
-                const graphUrl = `https://graph.microsoft.com/v1.0/sites/root:${filePath}:/content`;
+    function showStatus(msg, type) {
+      statusMessage.textContent = msg;
+      statusMessage.className = `status-message ${type}`;
+    }
 
-                const response = await fetch(graphUrl, { headers: { Authorization: `Bearer ${token}` } });
-                if (!response.ok) throw new Error("Error al descargar Excel");
-
-                const arrayBuffer = await response.arrayBuffer();
-                const workbook = XLSX.read(new Uint8Array(arrayBuffer), { type: "array" });
-                allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                populateWeekSelector(allData);
-                document.getElementById("weekSelectorContainer").style.display = "block";
-                document.getElementById("output").textContent = "📊 Archivo cargado desde SharePoint con " + allData.length + " filas.";
-            } catch (err) {
-                document.getElementById("output").textContent = "❌ " + err.message;
-            }
-        }
-
-        // ---------------- Selector de Semana ----------------
-        function getMonday(d) {
-            d = new Date(d);
-            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-            const monday = new Date(d.setDate(diff));
-            monday.setHours(0, 0, 0, 0);
-            return monday;
-        }
-
-        function populateWeekSelector(data) {
-            const weekSet = new Set();
-            data.forEach(row => { if (row.Fecha) weekSet.add(getMonday(row.Fecha).toISOString()); });
-            const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
-            const last4Weeks = sortedWeeks.slice(0, 4);
-
-            const weekSelector = document.getElementById("weekSelector");
-            weekSelector.innerHTML = "";
-            last4Weeks.forEach(mondayISO => {
-                const monday = new Date(mondayISO);
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
-                const option = document.createElement("option");
-                option.value = mondayISO;
-                option.textContent = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES',{month:'long'})}`;
-                weekSelector.appendChild(option);
-            });
-            weekSelector.onchange = handleWeekSelection;
-        }
-
-        function handleWeekSelection(event) {
-            const selectedMondayISO = event.target.value;
-            if (!selectedMondayISO) return;
-            const selectedMonday = new Date(selectedMondayISO);
-            const nextMonday = new Date(selectedMonday);
-            nextMonday.setDate(selectedMonday.getDate() + 7);
-            turnosData = allData.filter(row => {
-                const rowDate = new Date(row.Fecha);
-                return rowDate >= selectedMonday && rowDate < nextMonday;
-            });
-            document.getElementById("generateBtn").disabled = false;
-            document.getElementById("output").textContent = "📅 Semana seleccionada con " + turnosData.length + " registros.";
-        }
-
-        // ---------------- Generación Excel (ejemplo simple) ----------------
-        document.getElementById("generateBtn").addEventListener("click", async () => {
-            if (!turnosData) return alert("Primero selecciona una semana");
-
-            const wb = new ExcelJS.Workbook();
-            const ws = wb.addWorksheet("Turnos");
-
-            ws.columns = Object.keys(turnosData[0]).map(key => ({ header: key, key }));
-            turnosData.forEach(r => ws.addRow(r));
-
-            const buffer = await wb.xlsx.writeBuffer();
-            const blob = new Blob([buffer], { type: "application/vnd.openxmlformats-officedocument.spreadsheetml.sheet" });
-            const url = URL.createObjectURL(blob);
-            const a = document.createElement("a");
-            a.href = url;
-            a.download = "Turnos_Generados.xlsx";
-            a.click();
-            URL.revokeObjectURL(url);
+    // ===== LOGIN =====
+    btnLogin.addEventListener("click", async () => {
+      try {
+        const loginResponse = await msalInstance.loginPopup({
+          scopes: ["Files.ReadWrite", "Sites.Read.All", "offline_access"]
         });
-    </script>
+        account = loginResponse.account;
+        showStatus("✅ Sesión iniciada: " + account.username, "success");
+        btnLoad.disabled = false;
+      } catch (e) {
+        console.error(e);
+        showStatus("Error al iniciar sesión", "error");
+      }
+    });
+
+    async function getToken() {
+      const resp = await msalInstance.acquireTokenSilent({
+        scopes: ["Files.ReadWrite", "Sites.Read.All"],
+        account
+      });
+      return resp.accessToken;
+    }
+
+    // ===== CARGAR EXCEL DE SHAREPOINT =====
+    btnLoad.addEventListener("click", async () => {
+      try {
+        const token = await getToken();
+        const filePath = "/sites/INBOUND/Documentos Compartidos/INBOUND/Dimensionamientos/Turnos_dimensionamiento.xlsx";
+        const url = "https://graph.microsoft.com/v1.0/sites/root:" + encodeURI(filePath) + ":/content";
+
+        const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
+        if (!resp.ok) throw new Error("No se pudo descargar el Excel");
+
+        const buffer = await resp.arrayBuffer();
+        const workbook = XLSX.read(new Uint8Array(buffer), { type: "array", cellDates: true });
+        allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
+
+        populateWeeks(allData);
+        showStatus("📂 Excel cargado, filas: " + allData.length, "success");
+      } catch (e) {
+        console.error(e);
+        showStatus("Error al cargar Excel: " + e.message, "error");
+      }
+    });
+
+    function getMonday(d) {
+      d = new Date(d);
+      const day = d.getDay(), diff = d.getDate() - day + (day==0?-6:1);
+      const monday = new Date(d.setDate(diff));
+      monday.setHours(0,0,0,0);
+      return monday;
+    }
+
+    function populateWeeks(data) {
+      const weekSet = new Set();
+      data.forEach(r => { if (r.Fecha) weekSet.add(getMonday(r.Fecha).toISOString()); });
+      const sorted = Array.from(weekSet).sort((a,b)=>new Date(b)-new Date(a)).slice(0,4);
+
+      weekSelector.innerHTML = "";
+      sorted.forEach(mISO => {
+        const m = new Date(mISO), s = new Date(m); s.setDate(m.getDate()+6);
+        const opt = document.createElement("option");
+        opt.value = mISO;
+        opt.textContent = `Semana ${m.getDate()} al ${s.getDate()} de ${s.toLocaleString('es-ES',{month:'long'})}`;
+        weekSelector.appendChild(opt);
+      });
+
+      weekSelector.addEventListener("change", e => {
+        const monday = new Date(e.target.value);
+        const nextMon = new Date(monday); nextMon.setDate(monday.getDate()+7);
+        turnosData = allData.filter(r=>{
+          const d = new Date(r.Fecha);
+          return d>=monday && d<nextMon;
+        });
+        btnGenerate.disabled = false;
+        showStatus("📅 Semana seleccionada con "+turnosData.length+" registros", "success");
+      });
+    }
+
+    // ===== GENERAR NUEVO EXCEL =====
+    btnGenerate.addEventListener("click", async () => {
+      if (!turnosData) return;
+      try {
+        const wb = new ExcelJS.Workbook();
+        const ws = wb.addWorksheet("Turnos");
+        ws.columns = Object.keys(turnosData[0]).map(k=>({header:k, key:k}));
+        turnosData.forEach(r=>ws.addRow(r));
+
+        const buffer = await wb.xlsx.writeBuffer();
+        const blob = new Blob([buffer], {type:"application/vnd.openxmlformats-officedocument.spreadsheetml.sheet"});
+        const url = URL.createObjectURL(blob);
+        const a = document.createElement("a"); a.href=url; a.download="Turnos_Generados.xlsx"; a.click();
+        URL.revokeObjectURL(url);
+
+        showStatus("✅ Excel generado y descargado", "success");
+      } catch(e) {
+        console.error(e);
+        showStatus("Error al generar Excel: " + e.message, "error");
+      }
+    });
+  </script>
 </body>
 </html>
