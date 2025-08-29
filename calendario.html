@@ -71,35 +71,19 @@
         .upload-area.file-loaded #uploadDefaultContent { display: none; }
         .upload-area #uploadSuccessContent { display: none; }
         .upload-area.file-loaded #uploadSuccessContent { display: block; }
-        #fileNameDisplay {
-            font-size: 18px; font-weight: 600; color: var(--color-primary-end);
-            word-break: break-all; padding: 0 15px;
-        }
-        #changeFileText {
-            font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;
-        }
+        #fileNameDisplay { font-size: 18px; font-weight: 600; color: var(--color-primary-end); word-break: break-all; padding: 0 15px; }
+        #changeFileText { font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; }
         input[type="file"] { display: none; }
         .button-container { display: flex; justify-content: center; gap: 15px; text-align: center; margin-top: 25px; }
         .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
         .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
         .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .button.is-success {
-            background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%);
-        }
-        .button.is-success:hover {
-            box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3);
-        }
-        .button.apply {
-            background-image: linear-gradient(135deg, var(--color-apply-start), var(--color-apply-end));
-        }
-        .button.apply:hover {
-            box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4);
-        }
+        .button.is-success { background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%); }
+        .button.is-success:hover { box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3); }
+        .button.apply { background-image: linear-gradient(135deg, var(--color-apply-start), var(--color-apply-end)); }
+        .button.apply:hover { box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4); }
         .button-icon { width: 20px; height: 20px; }
-        .button.icon-button {
-            padding: 8px; width: 40px; height: 40px;
-            border-radius: 50%; justify-content: center;
-        }
+        .button.icon-button { padding: 8px; width: 40px; height: 40px; border-radius: 50%; justify-content: center; }
         .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
         .progress-bar.active { display: block; }
         .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
@@ -124,23 +108,11 @@
         #weekSelector { display: none; }
         #agentConfigContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
         .config-header { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
-        #toggleAgentConfigBtn {
-            background: var(--color-primary-end);
-            color: white;
-            animation: blink-blue 1.5s infinite ease-in-out;
-        }
-        #toggleAgentConfigBtn:hover {
-            background: var(--color-primary-start);
-        }
+        #toggleAgentConfigBtn { background: var(--color-primary-end); color: white; animation: blink-blue 1.5s infinite ease-in-out; }
+        #toggleAgentConfigBtn:hover { background: var(--color-primary-start); }
         @keyframes blink-blue {
-            0%, 100% {
-                transform: scale(1);
-                box-shadow: 0 0 4px rgba(37, 117, 252, 0.4);
-            }
-            50% {
-                transform: scale(1.05);
-                box-shadow: 0 0 12px rgba(37, 117, 252, 0.7);
-            }
+            0%, 100% { transform: scale(1); box-shadow: 0 0 4px rgba(37, 117, 252, 0.4); }
+            50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(37, 117, 252, 0.7); }
         }
         .agents-list { max-height: 60vh; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
         .agent-item { padding: 15px; border-bottom: 1px solid var(--color-border); display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 15px; align-items: start; }
@@ -152,12 +124,7 @@
         .day-checkboxes { display: flex; gap: 5px; flex-wrap: wrap; }
         .day-checkbox-label { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--color-text-secondary); }
         .day-checkbox { width: 16px; height: 16px; cursor: pointer; }
-        .view-special-btn {
-            padding: 6px 10px;
-            font-size: 12px;
-            margin-bottom: 10px;
-            width: fit-content;
-        }
+        .view-special-btn { padding: 6px 10px; font-size: 12px; margin-bottom: 10px; width: fit-content; }
         .special-config { display: none; margin-top: 10px; padding: 15px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; max-height: 50vh; overflow-y: auto; }
         .special-config.active { display: block; }
         .special-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
@@ -175,42 +142,12 @@
         .add-agent-select { flex: 1; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; background: white; }
         .add-btn { padding: 8px 15px; background: var(--color-primary-end); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
         .add-btn:hover { background: var(--color-primary-start); }
-        
         #serviceConfigContainer { margin-top: 15px; animation: fadeIn 0.5s; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
-        #serviceConfigContainer h4 {
-            padding: 12px 15px;
-            margin: 0;
-            font-size: 16px;
-            font-weight: 600;
-            color: var(--color-text);
-            border-bottom: 1px solid var(--color-border);
-        }
-        .service-list {
-            padding: 15px;
-            display: grid;
-            grid-template-columns: repeat(auto-fill, minmax(200px, 1fr));
-            gap: 10px;
-            max-height: 200px;
-            overflow-y: auto;
-        }
-        .service-item label {
-            display: flex;
-            align-items: center;
-            gap: 8px;
-            font-size: 14px;
-            cursor: pointer;
-            padding: 5px;
-            border-radius: 4px;
-            transition: background-color 0.2s ease;
-        }
-        .service-item label:hover {
-             background-color: #f4f7fe;
-        }
-        .service-item input[type="checkbox"] {
-            width: 16px;
-            height: 16px;
-            cursor: pointer;
-        }
+        #serviceConfigContainer h4 { padding: 12px 15px; margin: 0; font-size: 16px; font-weight: 600; color: var(--color-text); border-bottom: 1px solid var(--color-border); }
+        .service-list { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; }
+        .service-item label { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; padding: 5px; border-radius: 4px; transition: background-color 0.2s ease; }
+        .service-item label:hover { background-color: #f4f7fe; }
+        .service-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -293,8 +230,7 @@
                 </div>
                 <div id="serviceConfigContainer" style="display: none;">
                     <h4>Servicios a Incluir</h4>
-                    <div class="service-list" id="serviceList">
-                    </div>
+                    <div class="service-list" id="serviceList"></div>
                 </div>
             </div>
             
@@ -363,9 +299,7 @@
             const toggleServiceConfigBtn = document.getElementById('toggleServiceConfigBtn');
 
             customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-            window.addEventListener('click', (e) => {
-                if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
-            });
+            window.addEventListener('click', (e) => { if (!customSelect.contains(e.target)) customSelect.classList.remove('open'); });
 
             uploadArea.addEventListener('click', () => fileInput.click());
             uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
@@ -378,7 +312,6 @@
                 agentsList.style.display = isVisible ? 'none' : 'block';
                 addAgentSection.style.display = isVisible ? 'none' : 'block';
             });
-            
             toggleServiceConfigBtn.addEventListener('click', () => {
                 const isVisible = serviceConfigContainer.style.display !== 'none';
                 serviceConfigContainer.style.display = isVisible ? 'none' : 'block';
@@ -408,13 +341,14 @@
                         const workbook = XLSX.read(data, { type: 'array', cellDates: true });
                         let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
 
-                        const timeColumns = ['Ini', 'INI', 'FIN', 'Fin', 'Desc_1', 'Ini_ Colac', 'Fin_ Colac', 'Desc_2', 'INICIO TURNO', 'FIN DEL TURNO'];
+                        // columnas de tiempo a convertir (añadí Ini_Colac / Fin_Colac)
+                        const timeColumns = ['Ini','INI','FIN','Fin','Desc_1','Ini_ Colac','Ini_Colac','Fin_ Colac','Fin_Colac','Desc_2','INICIO TURNO','FIN DEL TURNO'];
                         jsonData.forEach(row => {
                             for (const key in row) {
                                 if (timeColumns.includes(key)) {
                                     if (typeof row[key] === 'number' && row[key] < 2) {
                                         const date = XLSX.SSF.parse_date_code(row[key]);
-                                        const jsDate = new Date(1900, 0, 1, date.H, date.M, date.S);
+                                        const jsDate = new Date(1900, 0, 1, date.H || 0, date.M || 0, date.S || 0);
                                         jsDate.setDate(jsDate.getDate() + (row[key] > 1 ? -1 : 0));
                                         row[key] = jsDate;
                                     }
@@ -424,16 +358,14 @@
 
                         allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
 
-                        // --- CÓDIGO CORREGIDO ---
                         // Corrección de fechas por zona horaria
                         allData.forEach(row => {
                             const fechaKey = findKey(row, ['Fecha']);
                             if (fechaKey && row[fechaKey] instanceof Date) {
-                                const tzOffset = row[fechaKey].getTimezoneOffset() * 60000; // offset en milisegundos
+                                const tzOffset = row[fechaKey].getTimezoneOffset() * 60000;
                                 row[fechaKey] = new Date(row[fechaKey].getTime() + tzOffset);
                             }
                         });
-                        // --- FIN DE LA CORRECCIÓN ---
 
                         extractAvailableAgents(allData);
                         populateWeekSelector(allData);
@@ -458,27 +390,17 @@
                 serviceList.innerHTML = '';
                 const serviceKey = findKey(data[0] || {}, ['Servicio']);
                 if (!serviceKey) return; 
-
-                data.forEach(row => {
-                    if (row[serviceKey]) uniqueServices.add(row[serviceKey]);
-                });
-
+                data.forEach(row => { if (row[serviceKey]) uniqueServices.add(row[serviceKey]); });
                 const sortedServices = Array.from(uniqueServices).sort();
-                
                 sortedServices.forEach(service => {
                     const itemDiv = document.createElement('div');
                     itemDiv.className = 'service-item';
-
                     const label = document.createElement('label');
                     const checkbox = document.createElement('input');
                     checkbox.type = 'checkbox';
                     checkbox.value = service;
-                    
-                    if (service === '01_Masivo' || service === '10_Staff_Inbound') {
-                        checkbox.checked = true;
-                    }
+                    if (service === '01_Masivo' || service === '10_Staff_Inbound') checkbox.checked = true;
                     checkbox.addEventListener('change', filterTurnosData);
-                    
                     label.appendChild(checkbox);
                     label.appendChild(document.createTextNode(` ${service}`));
                     itemDiv.appendChild(label);
@@ -872,6 +794,7 @@
                 });
             }
 
+            // ---------- FUNCIÓN CORREGIDA: exporta horas/colaciones y LIBRE ----------
             async function applyAndDownloadShifts() {
                 try {
                     if (!turnosData || turnosData.length === 0) {
@@ -889,13 +812,34 @@
                         { width: 20.09 }
                     ];
 
-                    const headers = ['Rut','Lugar','Nombre','Estado','Fecha','Dia','INI','FIN','Dur_Tur','Desc_1','Ini_ Colac','Fin_ Colac','Desc_2','Dur_ Colac','HC','Encargado','Servicio'];
+                    const headers = ['Rut','Lugar','Nombre','Estado','Fecha','Dia','INI','FIN','Dur_Tur','Desc_1','Ini_Colac','Fin_Colac','Desc_2','Dur_Colac','HC','Encargado','Servicio'];
+
+                    // mapa flexible de nombres (soporta variantes con/ sin espacio/ acentos)
+                    const headerMap = {
+                        'Rut': ['Rut','ID','id'],
+                        'Lugar': ['Lugar','Sede','Ubicacion','Ubicación','Site','TT'],
+                        'Nombre': ['Nombre','nombre'],
+                        'Estado': ['Estado'],
+                        'Fecha': ['Fecha','fecha'],
+                        'Dia': ['Dia','Día','dia','día'],
+                        'INI': ['INI','Ini','INICIO TURNO','Inicio','Inicio turno','Inicio_Turno','INICIO'],
+                        'FIN': ['FIN','Fin','FIN DEL TURNO','Termino','Término','Fin_Turno'],
+                        'Dur_Tur': ['Dur_Tur','Duracion Turno','Dur_Turno','Duración Turno'],
+                        'Desc_1': ['Desc_1','DESC_1','Desc 1','Des_1','DESC 1'],
+                        'Ini_Colac': ['Ini_Colac','Ini_ Colac','Inicio Colacion','Inicio Colación','Ini Colac','IniColac'],
+                        'Fin_Colac': ['Fin_Colac','Fin_ Colac','Fin Colacion','Fin Colación','Fin Colac','FinColac'],
+                        'Desc_2': ['Desc_2','DESC_2','Desc 2','Des_2','DESC 2'],
+                        'Dur_Colac': ['Dur_Colac','Dur_ Colac','Dur Colac','Duracion Colacion','Duración Colación'],
+                        'HC': ['HC'],
+                        'Encargado': ['Encargado','Supervisor','Jefe'],
+                        'Servicio': ['Servicio','Service']
+                    };
+
+                    // encabezado con estilo
                     const headerRow = worksheet.getRow(1);
                     headerRow.height = 20;
-                    headerRow.customHeight = true;
-
-                    headers.forEach((header, index) => {
-                        const cell = headerRow.getCell(index + 1);
+                    headers.forEach((header, idx) => {
+                        const cell = headerRow.getCell(idx + 1);
                         cell.value = header;
                         cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFC00000' } };
                         cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD0CECE' } };
@@ -903,58 +847,67 @@
                         cell.border = { top: { style: 'dotted' }, left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' } };
                     });
 
-                    const sortedData = [...turnosData].sort((a,b) => (findVal(a, ['Rut', 'id']) || '').localeCompare(findVal(b, ['Rut', 'id']) || ''));
+                    const sortedData = [...turnosData].sort((a,b) => (findVal(a, ['Rut','id']) || '').localeCompare(findVal(b, ['Rut','id']) || ''));
 
                     sortedData.forEach((data, rowIndex) => {
                         const row = worksheet.getRow(rowIndex + 2);
-                        row.height = 14.50;
-                        row.customHeight = true;
-                        
-                        const newRow = { ...data };
-                        const nombreAgente = findVal(newRow, ['nombre']);
-                        const fechaTurno = new Date(findVal(newRow, ['fecha']));
+                        row.height = 14.5;
+
+                        const record = { ...data };
+
+                        // Lugar según calendario generado
+                        const nombreAgente = findVal(record, ['nombre','Nombre']);
+                        const fechaTurno = new Date(findVal(record, ['fecha','Fecha']));
                         const key = `${nombreAgente}_${fechaTurno.toDateString()}`;
                         const status = calendarResults.get(key);
-                        
-                        const lugarKey = findKey(newRow, ['Lugar']);
+                        const lugarKey = findKey(record, headerMap['Lugar']);
                         if (lugarKey) {
-                            if (isLibre(newRow)) {
-                                newRow[lugarKey] = 'Site';
-                            } else if (status) {
-                                newRow[lugarKey] = status;
-                            }
+                            if (isLibre(record)) record[lugarKey] = 'LIBRE';
+                            else if (status) record[lugarKey] = status;
                         }
 
-                        const currentRut = findVal(data, ['Rut', 'id']);
-                        const previousRut = rowIndex > 0 ? findVal(sortedData[rowIndex - 1], ['Rut', 'id']) : null;
-                        const isNewAgent = (rowIndex === 0) || (currentRut !== previousRut);
+                        headers.forEach((hdr, colIdx) => {
+                            const cell = row.getCell(colIdx + 1);
+                            const candidates = headerMap[hdr] || [hdr];
+                            const keyFound = findKey(record, candidates);
+                            let value = keyFound ? record[keyFound] : '';
 
-                        headers.forEach((header, colIndex) => {
-                            const cell = row.getCell(colIndex + 1);
-                            const originalHeaderKey = findKey(newRow, [header.trim()]);
-                            let value = originalHeaderKey ? newRow[originalHeaderKey] : '';
-
-                            if (['ini', 'fin', 'desc_1', 'ini_ colac', 'fin_ colac', 'desc_2'].includes(header.toLowerCase().trim()) && typeof value !== 'string') {
-                                value = formatTime(value);
+                            // Fecha con formato excel
+                            if (hdr.toLowerCase() === 'fecha') {
+                                if (value instanceof Date) {
+                                    cell.value = value;
+                                    cell.numFmt = 'dd-mm-yyyy';
+                                } else {
+                                    cell.value = value || '';
+                                }
+                                return;
                             }
 
-                            if (header.toLowerCase().trim() === 'fecha' && value instanceof Date) {
-                                cell.value = value;
-                                cell.numFmt = 'dd-mm-yyyy';
-                            } else {
-                                cell.value = value;
+                            // Horas / colaciones -> HH:mm o LIBRE
+                            const isTimeField = ['ini','fin','desc_1','ini_colac','fin_colac','desc_2'].includes(hdr.toLowerCase());
+                            if (isTimeField) {
+                                const s = value != null ? String(value) : '';
+                                if (/LIBRE/i.test(s)) {
+                                    cell.value = 'LIBRE';
+                                } else {
+                                    cell.value = formatTime(value);
+                                }
+                                return;
                             }
 
-                            cell.font = { name: 'Calibri', size: 11, color: { argb: 'FF000000' } };
-                            cell.alignment = { horizontal: 'left', vertical: 'middle' };
-                            cell.border = {
-                                top: { style: isNewAgent ? 'thin' : 'dotted' },
-                                left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' }
-                            };
+                            // otros
+                            cell.value = value !== undefined ? value : '';
                         });
+
+                        for (let i = 1; i <= headers.length; i++) {
+                            const c = row.getCell(i);
+                            c.font = { name: 'Calibri', size: 11, color: { argb: 'FF000000' } };
+                            c.alignment = { horizontal: 'left', vertical: 'middle' };
+                            c.border = { top: { style: 'dotted' }, left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' } };
+                        }
                     });
 
-                    worksheet.properties.defaultRowHeight = 14.50;
+                    worksheet.properties.defaultRowHeight = 14.5;
                     
                     const buffer = await workbook.xlsx.writeBuffer();
                     const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
@@ -970,15 +923,24 @@
                     a.click();
                     document.body.removeChild(a);
                     URL.revokeObjectURL(url);
-                    showStatus(`Malla de turnos aplicada y descargada.`, 'success');
+                    showStatus('Malla de turnos aplicada y descargada.', 'success');
 
                 } catch (error) {
                     console.error('Error al aplicar y descargar la malla:', error);
                     showStatus(`Error al generar la malla: ${error.message}`, 'error');
                 }
             }
+            // ---------- FIN FUNCIÓN CORREGIDA ----------
 
-            const findKey = (o, names) => { if (!o || !names) return null; const keys = Object.keys(o); const lowerCaseNames = names.map(n => n.toLowerCase()); return keys.find(k => lowerCaseNames.includes(k.trim().toLowerCase())); };
+            const findKey = (o, names) => {
+                // CORRECCIÓN: normaliza (sin espacios/subrayados, minúsculas) para encontrar claves
+                if (!o || !names) return null;
+                const norm = s => String(s).replace(/[\s_]+/g,'').toLowerCase();
+                const keys = Object.keys(o);
+                const wanted = new Set(names.map(n => norm(n)));
+                return keys.find(k => wanted.has(norm(k)));
+            };
+
             const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : null; };
             
             function isLibre(row) {
@@ -1006,7 +968,7 @@
             }
 
             function checkIfFestivo(day) {
-                const festivos = ['2024-01-01', '2024-03-29', '2024-03-30', '2024-05-01', '2024-05-21', '2024-06-29', '2024-07-16', '2024-08-15', '2024-09-18', '2024-09-19', '2024-10-12', '2024-11-01', '2024-12-08', '2024-12-25', '2025-01-01', '2025-04-18', '2025-04-19', '2025-05-01', '2025-05-21', '2025-06-29', '2025-07-16', '2025-08-15', '2025-09-18', '2025-09-19', '2025-10-12', '2025-11-01', '2025-12-08', '2025-12-25'];
+                const festivos = ['2024-01-01','2024-03-29','2024-03-30','2024-05-01','2024-05-21','2024-06-29','2024-07-16','2024-08-15','2024-09-18','2024-09-19','2024-10-12','2024-11-01','2024-12-08','2024-12-25','2025-01-01','2025-04-18','2025-04-19','2025-05-01','2025-05-21','2025-06-29','2025-07-16','2025-08-15','2025-09-18','2025-09-19','2025-10-12','2025-11-01','2025-12-08','2025-12-25'];
                 return festivos.includes(day.toISOString().split('T')[0]);
             }
 
@@ -1034,34 +996,35 @@
                 return positions[dayName] || 1;
             }
 
-            // --- FUNCIÓN CORREGIDA ---
+            // ---------- CORRECCIÓN: formatTime siempre devuelve HH:mm ----------
             function formatTime(t) {
                 if (t === null || t === undefined || t === '') return '';
-                
-                if (t instanceof Date) {
-                    // Arreglo para celdas de tiempo vacías que se leen como la fecha de la época (ej. 1899-12-31)
-                    if (t.getFullYear() < 1970) {
-                        return ''; 
-                    }
-                    return t.toTimeString().substring(0, 5);
+
+                // Date -> HH:mm (aunque sea 1900)
+                if (t instanceof Date || Object.prototype.toString.call(t) === '[object Date]') {
+                    const h = String(t.getHours()).padStart(2, '0');
+                    const m = String(t.getMinutes()).padStart(2, '0');
+                    return `${h}:${m}`;
                 }
 
-                if (typeof t === 'number' && t >= 0 && t < 1) { // Procesa el número de serie de Excel
-                    // Si el número de serie es 0, es medianoche, lo que tratamos como vacío.
-                    if (t === 0) return '';
-                    const totalSeconds = Math.round(t * 86400);
-                    const hours = Math.floor(totalSeconds / 3600).toString().padStart(2, '0');
-                    const minutes = Math.floor((totalSeconds % 3600) / 60).toString().padStart(2, '0');
-                    return `${hours}:${minutes}`;
+                // Número de Excel (fracción del día)
+                if (typeof t === 'number') {
+                    const frac = t % 1;
+                    const totalSeconds = Math.round(frac * 86400);
+                    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
+                    const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
+                    return `${hh}:${mm}`;
                 }
 
-                let timeStr = String(t).trim();
-                if (timeStr.match(/^\d{1,2}:\d{2}/)) {
-                    const [h, m] = timeStr.split(':');
-                    return `${h.padStart(2, '0')}:${m.padStart(2, '0')}`;
-                }
+                // Texto "H:MM" / "HH:MM" o LIBRE
+                const s = String(t).trim();
+                if (/LIBRE/i.test(s)) return 'LIBRE';
+                const m = s.match(/(\d{1,2}):(\d{2})/);
+                if (m) return `${m[1].padStart(2,'0')}:${m[2]}`;
+
                 return '';
             }
+            // ---------- FIN CORRECCIÓN formatTime ----------
 
             function showStatus(message, type) {
                 statusMessage.className = `status-message ${type}`;
