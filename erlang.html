@@ -2,14 +2,12 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
-  <title>Tester SAESA - Excel en SharePoint</title>
+  <title>Tester SAESA - User.Read</title>
   <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
-  <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
 </head>
 <body>
-  <h1>🧪 Tester SAESA: Login + Descarga Excel</h1>
-  <button id="btnLogin">1️⃣ Iniciar Sesión</button>
-  <button id="btnLoad" disabled>2️⃣ Descargar Excel</button>
+  <h1>🔑 Test Login con permiso básico (User.Read)</h1>
+  <button id="btnLogin">Iniciar Sesión</button>
   <pre id="output"></pre>
 
   <script>
@@ -18,11 +16,11 @@
       output.textContent += msg + "\n";
     }
 
-    // ===== CONFIG MSAL con datos SAESA =====
+    // ===== Configuración con tu app Gestor en SAESA =====
     const msalConfig = {
       auth: {
-        clientId: "3246b16d-65db-465a-b3de-fe633e5859cd",   // nuevo Client ID
-        authority: "https://login.microsoftonline.com/136d6ab5-5b55-496f-97cb-2424247715ed", // Tenant SAESA
+        clientId: "3246b16d-65db-465a-b3de-fe633e5859cd",   // Client ID de Gestor
+        authority: "https://login.microsoftonline.com/136d6ab5-5b55-496f-97cb-2424247715ed", // Tenant ID SAESA
         redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
       },
       cache: { cacheLocation: "localStorage", storeAuthStateInCookie: false }
@@ -31,72 +29,37 @@
     const msalInstance = new msal.PublicClientApplication(msalConfig);
     let account = null;
 
-    // ===== LOGIN =====
     document.getElementById("btnLogin").addEventListener("click", async () => {
       try {
-        log("➡️ Intentando iniciar sesión...");
+        log("➡️ Iniciando sesión...");
         const loginResponse = await msalInstance.loginPopup({
-          scopes: ["Files.ReadWrite", "Sites.Read.All", "User.Read"]
+          scopes: ["User.Read"]   // 👈 solo este permiso básico
         });
         account = loginResponse.account;
-        log("✅ Sesión iniciada como: " + account.username);
-        document.getElementById("btnLoad").disabled = false;
+        log("✅ Sesión iniciada: " + account.username);
+
+        // Obtener token
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          scopes: ["User.Read"],
+          account
+        });
+
+        const token = tokenResponse.accessToken;
+        log("✅ Token obtenido correctamente");
+
+        // Llamar a Microsoft Graph /me
+        const resp = await fetch("https://graph.microsoft.com/v1.0/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await resp.json();
+
+        log("📊 Datos de usuario:\n" + JSON.stringify(data, null, 2));
       } catch (e) {
         console.error(e);
-        log("❌ Error en login: " + e.message);
-      }
-    });
-
-    async function getToken() {
-      log("➡️ Solicitando token...");
-      const result = await msalInstance.acquireTokenSilent({
-        scopes: ["Files.ReadWrite", "Sites.Read.All"],
-        account
-      });
-      log("✅ Token obtenido");
-      return result.accessToken;
-    }
-
-    // ===== DESCARGA EXCEL DE SHAREPOINT =====
-    document.getElementById("btnLoad").addEventListener("click", async () => {
-      try {
-        const token = await getToken();
-
-        // 📂 Ruta del archivo en SharePoint (ajústala si es necesario)
-        const filePath = "/sites/INBOUND/Documentos Compartidos/INBOUND/Dimensionamientos/Turnos_dimensionamiento.xlsx";
-        const url = "https://graph.microsoft.com/v1.0/sites/root:" + encodeURI(filePath) + ":/content";
-
-        log("➡️ Descargando archivo desde Graph...");
-        log("🔗 URL usada: " + url);
-
-        const resp = await fetch(url, { headers: { Authorization: "Bearer " + token } });
-        log("📡 Respuesta HTTP: " + resp.status);
-
-        if (!resp.ok) {
-          const errText = await resp.text();
-          log("❌ Error al descargar archivo. Respuesta Graph:\n" + errText);
-          return;
-        }
-
-        const buffer = await resp.arrayBuffer();
-        let wb;
-        try {
-          wb = XLSX.read(new Uint8Array(buffer), { type: "array", cellDates: true });
-        } catch (e) {
-          log("❌ Error al leer Excel: " + e.message);
-          return;
-        }
-
-        log("✅ Excel leído correctamente.");
-        const sheetName = wb.SheetNames[0];
-        const data = XLSX.utils.sheet_to_json(wb.Sheets[sheetName]);
-        log("📊 Hoja: " + sheetName + " | Filas: " + data.length);
-        if (data.length > 0) log("Ejemplo primera fila: " + JSON.stringify(data[0]));
-      } catch (e) {
-        console.error(e);
-        log("❌ Error general: " + e.message);
+        log("❌ Error: " + e.message);
       }
     });
   </script>
 </body>
 </html>
+
