@@ -2,20 +2,29 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Prueba Excel Flow</title>
+  <title>Datos desde Excel vía Power Automate</title>
+  <style>
+    body { font-family: Arial, sans-serif; padding: 20px; }
+    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
+    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
+    th { background-color: #f4f4f4; }
+    .error { color: red; margin-top: 20px; }
+  </style>
 </head>
 <body>
   <h2>Datos desde Excel vía Power Automate</h2>
   <div id="tabla"></div>
+  <div id="mensaje" class="error"></div>
 
   <script>
     async function cargarDatos() {
-      const url = "AQUI_TU_URL_DEL_FLUJO"; // pega la URL completa
+      // 👉 URL del Flow de Power Automate
+      const flowUrl = "https://prod-31.westus.logic.azure.com:443/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=2016-06-01";
+
       try {
-        const resp = await fetch(url, { method: "POST" });
-        if (!resp.ok) {
-          throw new Error("Error HTTP: " + resp.status);
-        }
+        const resp = await fetch(flowUrl, { method: "POST" });
+        if (!resp.ok) throw new Error("Error HTTP: " + resp.status);
+
         const data = await resp.json();
         console.log("Datos recibidos:", data);
 
@@ -24,7 +33,7 @@
           return;
         }
 
-        let html = "<table border='1'><tr>";
+        let html = "<table><tr>";
         Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
         html += "</tr>";
         data.forEach(row => {
@@ -37,7 +46,7 @@
         document.getElementById("tabla").innerHTML = html;
       } catch (err) {
         console.error("Error al cargar datos:", err);
-        document.getElementById("tabla").innerHTML = "<p>Error al cargar datos. Revisa consola.</p>";
+        document.getElementById("mensaje").innerText = "Error al cargar datos: " + err.message;
       }
     }
 
