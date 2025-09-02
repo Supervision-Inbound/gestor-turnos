@@ -1,65 +1,47 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8" />
-  <title>Tester SAESA - User.Read</title>
-  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+  <meta charset="UTF-8">
+  <title>Prueba Excel Flow</title>
 </head>
 <body>
-  <h1>🔑 Test Login con permiso básico (User.Read)</h1>
-  <button id="btnLogin">Iniciar Sesión</button>
-  <pre id="output"></pre>
+  <h2>Datos desde Excel vía Power Automate</h2>
+  <div id="tabla"></div>
 
   <script>
-    const output = document.getElementById("output");
-    function log(msg) {
-      output.textContent += msg + "\n";
+    async function cargarDatos() {
+      const url = "AQUI_TU_URL_DEL_FLUJO"; // pega la URL completa
+      try {
+        const resp = await fetch(url, { method: "POST" });
+        if (!resp.ok) {
+          throw new Error("Error HTTP: " + resp.status);
+        }
+        const data = await resp.json();
+        console.log("Datos recibidos:", data);
+
+        if (!Array.isArray(data) || data.length === 0) {
+          document.getElementById("tabla").innerHTML = "<p>No hay datos en el Excel.</p>";
+          return;
+        }
+
+        let html = "<table border='1'><tr>";
+        Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
+        html += "</tr>";
+        data.forEach(row => {
+          html += "<tr>";
+          Object.values(row).forEach(v => html += `<td>${v}</td>`);
+          html += "</tr>";
+        });
+        html += "</table>";
+
+        document.getElementById("tabla").innerHTML = html;
+      } catch (err) {
+        console.error("Error al cargar datos:", err);
+        document.getElementById("tabla").innerHTML = "<p>Error al cargar datos. Revisa consola.</p>";
+      }
     }
 
-    // ===== Configuración con tu app Gestor en SAESA =====
-    const msalConfig = {
-      auth: {
-        clientId: "3246b16d-65db-465a-b3de-fe633e5859cd",   // Client ID de Gestor
-        authority: "https://login.microsoftonline.com/136d6ab5-5b55-496f-97cb-2424247715ed", // Tenant ID SAESA
-        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
-      },
-      cache: { cacheLocation: "localStorage", storeAuthStateInCookie: false }
-    };
-
-    const msalInstance = new msal.PublicClientApplication(msalConfig);
-    let account = null;
-
-    document.getElementById("btnLogin").addEventListener("click", async () => {
-      try {
-        log("➡️ Iniciando sesión...");
-        const loginResponse = await msalInstance.loginPopup({
-          scopes: ["User.Read"]   // 👈 solo este permiso básico
-        });
-        account = loginResponse.account;
-        log("✅ Sesión iniciada: " + account.username);
-
-        // Obtener token
-        const tokenResponse = await msalInstance.acquireTokenSilent({
-          scopes: ["User.Read"],
-          account
-        });
-
-        const token = tokenResponse.accessToken;
-        log("✅ Token obtenido correctamente");
-
-        // Llamar a Microsoft Graph /me
-        const resp = await fetch("https://graph.microsoft.com/v1.0/me", {
-          headers: { Authorization: `Bearer ${token}` }
-        });
-        const data = await resp.json();
-
-        log("📊 Datos de usuario:\n" + JSON.stringify(data, null, 2));
-      } catch (e) {
-        console.error(e);
-        log("❌ Error: " + e.message);
-      }
-    });
+    cargarDatos();
   </script>
 </body>
 </html>
-
