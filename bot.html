@@ -1,1 +1,65 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+  <meta charset="UTF-8" />
+  <title>Tester SAESA - User.Read</title>
+  <script src="https://alcdn.msauth.net/browser/2.38.0/js/msal-browser.min.js"></script>
+</head>
+<body>
+  <h1>🔑 Test Login con permiso básico (User.Read)</h1>
+  <button id="btnLogin">Iniciar Sesión</button>
+  <pre id="output"></pre>
+
+  <script>
+    const output = document.getElementById("output");
+    function log(msg) {
+      output.textContent += msg + "\n";
+    }
+
+    // ===== Configuración con tu app Gestor en SAESA =====
+    const msalConfig = {
+      auth: {
+        clientId: "3246b16d-65db-465a-b3de-fe633e5859cd",   // Client ID de Gestor
+        authority: "https://login.microsoftonline.com/136d6ab5-5b55-496f-97cb-2424247715ed", // Tenant ID SAESA
+        redirectUri: "https://andreseliecergonzalez-afk.github.io/gestor-turnos/"
+      },
+      cache: { cacheLocation: "localStorage", storeAuthStateInCookie: false }
+    };
+
+    const msalInstance = new msal.PublicClientApplication(msalConfig);
+    let account = null;
+
+    document.getElementById("btnLogin").addEventListener("click", async () => {
+      try {
+        log("➡️ Iniciando sesión...");
+        const loginResponse = await msalInstance.loginPopup({
+          scopes: ["User.Read"]   // 👈 solo este permiso básico
+        });
+        account = loginResponse.account;
+        log("✅ Sesión iniciada: " + account.username);
+
+        // Obtener token
+        const tokenResponse = await msalInstance.acquireTokenSilent({
+          scopes: ["User.Read"],
+          account
+        });
+
+        const token = tokenResponse.accessToken;
+        log("✅ Token obtenido correctamente");
+
+        // Llamar a Microsoft Graph /me
+        const resp = await fetch("https://graph.microsoft.com/v1.0/me", {
+          headers: { Authorization: `Bearer ${token}` }
+        });
+        const data = await resp.json();
+
+        log("📊 Datos de usuario:\n" + JSON.stringify(data, null, 2));
+      } catch (e) {
+        console.error(e);
+        log("❌ Error: " + e.message);
+      }
+    });
+  </script>
+</body>
+</html>
 
