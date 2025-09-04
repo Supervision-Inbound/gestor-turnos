@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Generador de Cartas Corporativas</title>
+    <title>Generador de Cartas Corporativas IA</title>
     
     <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
@@ -17,120 +17,114 @@
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bg: #f4f7fe;
-            --color-surface: #ffffff;
             --color-primary-start: #6a11cb;
             --color-primary-end: #2575fc;
-            --color-success-start: #16a34a;
-            --color-success-end: #15803d;
-            --color-text: #1e293b;
-            --color-text-secondary: #64748b;
-            --color-border: #e2e8f0;
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --color-accent-light: #00bcd4;
+            --color-glow: rgba(106, 17, 203, 0.5);
+            --color-success: #28a745;
+            --color-error: #dc3545;
             --font-family: 'Manrope', sans-serif;
+            --bg-dark: #0d1117;
+            --glass-bg: rgba(20, 22, 37, 0.6);
+            --glass-border: rgba(100, 120, 255, 0.2);
+            --text-light: #f0f0f0;
+            --text-medium: #a0a0b0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font-family); background-color: var(--color-bg); min-height: 100vh;
+            font-family: var(--font-family); min-height: 100vh;
             display: flex; justify-content: center; align-items: center; padding: 20px;
-            color: var(--color-text); position: relative; overflow: hidden;
+            background: var(--bg-dark); position: relative; overflow: hidden; color: var(--text-light);
+        }
+        #neuronCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.7;
         }
         .main-container {
-            display: grid; grid-template-columns: 1fr; max-width: 1000px; width: 100%;
-            background: var(--color-surface); border-radius: 24px; box-shadow: var(--shadow-lg);
-            border: 1px solid white; overflow: hidden; z-index: 10;
+            width: 100%; max-width: 1000px;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-glow);
+            display: grid; grid-template-columns: 1fr;
+            overflow: hidden; z-index: 10;
         }
         @media (min-width: 800px) { .main-container { grid-template-columns: 40% 60%; } }
         .illustration-panel {
-            background: linear-gradient(160deg, #f0f5ff, #e6efff); padding: 40px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--glass-border);
         }
-        /* Nueva animación de Documento Word */
-        .doc-animation {
-            width: 200px;
-            height: 220px;
-            background-color: #fff;
-            border-radius: 8px;
-            box-shadow: 0 10px 30px -10px rgba(0, 0, 0, 0.2);
-            padding: 20px;
-            display: flex;
-            flex-direction: column;
-            gap: 12px;
-            transform: perspective(800px) rotateX(10deg) rotateY(-20deg);
-            border-top: 25px solid #2b579a; /* Barra azul de Word */
-        }
-        .doc-line {
-            height: 8px;
-            background-color: #eef2f9;
-            border-radius: 4px;
-            opacity: 0;
-            animation: writeLine 6s ease-out infinite;
-        }
-        .doc-line.short { width: 60%; }
-        .doc-line.medium { width: 85%; }
-        .doc-line.long { width: 100%; }
-
-        /* Keyframes para la animación de escritura */
-        @keyframes writeLine {
-            0% { width: 0%; opacity: 1; }
-            80% { width: var(--final-width, 100%); opacity: 1; }
-            100% { width: var(--final-width, 100%); opacity: 1; }
-        }
-        
-        .doc-line:nth-child(1) { --final-width: 90%; animation-delay: 0s; }
-        .doc-line:nth-child(2) { --final-width: 100%; animation-delay: 0.5s; }
-        .doc-line:nth-child(3) { --final-width: 60%; animation-delay: 1s; }
-        .doc-line:nth-child(4) { --final-width: 80%; animation-delay: 1.5s; }
-        .doc-line:nth-child(5) { --final-width: 95%; animation-delay: 2s; }
-        .doc-line:nth-child(6) { --final-width: 70%; animation-delay: 2.5s; }
-
-        .illustration-panel h2 { margin-top: 20px; font-size: 22px; color: var(--color-text); }
-        .illustration-panel p { margin-top: 8px; font-size: 15px; color: var(--color-text-secondary); max-width: 300px; line-height: 1.6; }
+        .illustration-panel h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: var(--text-light); }
+        .illustration-panel p { font-size: 15px; color: var(--text-medium); line-height: 1.6; max-width: 300px; }
         .content-panel { padding: 40px; }
         .header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--color-text); font-size: 28px; font-weight: 700; }
-        .upload-area {
-            border: 2px dashed var(--color-border); border-radius: 12px; padding: 40px 20px;
-            text-align: center; transition: all 0.3s ease; cursor: pointer; background-color: #fafbff;
+        h1 { font-size: 28px; font-weight: 700; color: var(--text-light); }
+        .status-area {
+            border-radius: 12px; background: rgba(0, 0, 0, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 160px; margin-bottom: 25px;
+            position: relative; overflow: hidden; border: 1px solid var(--glass-border); transition: all 0.3s ease;
         }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
-        .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-        .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
-        .upload-text { color: var(--color-text); font-size: 16px; font-weight: 600; }
-        input[type="file"] { display: none; }
-        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; width: 100%; justify-content: center; margin-top: 15px; }
-        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .status { margin-top: 20px; padding: 15px; border-radius: 10px; text-align: center; font-weight: 500; display: none; animation: slideDown 0.5s; }
+        .status-content { display: none; }
+        .status-area.is-loading .loading-content, .status-area.is-success .success-content, .status-area.is-error .error-content {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 15px; z-index: 10; width: 100%;
+        }
+        .techno-loader { position: relative; width: 80px; height: 80px; }
+        .core-pulse {
+            width: 20%; height: 20%; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
+            position: absolute; top: 40%; left: 40%; animation: corePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes corePulse { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
+        .circuit-flow { fill: none; stroke-width: 1.5; stroke: var(--color-primary-start); stroke-dasharray: 100; stroke-dashoffset: 100; animation: flow 3s linear infinite; }
+        #flow-2 { animation-delay: 0.5s; stroke: var(--color-primary-end); } #flow-3 { animation-delay: 1s; }
+        @keyframes flow { to { stroke-dashoffset: -100; } }
+        .status-text-dynamic { font-size: 16px; font-weight: 600; color: var(--text-medium); text-align: center; transition: opacity 0.3s ease; margin-top: 10px; }
+        .success-icon svg path { stroke: var(--color-success); stroke-dasharray: 29; stroke-dashoffset: 29; animation: drawCheck 0.4s 0.2s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        .status-area.is-success { border-color: rgba(40, 167, 69, 0.5); box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        .success-text { color: var(--color-success); font-size: 16px; font-weight: 600; }
+        .error-icon { height: 40px; width: 40px; color: var(--color-error); }
+        .status-area.is-error { border-color: rgba(220, 53, 69, 0.5); box-shadow: 0 0 20px rgba(220, 53, 69, 0.4); }
+        .error-text { color: var(--color-error); font-size: 16px; font-weight: 600; }
+        .button {
+            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 28px;
+            border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-size: 200% auto; display: inline-flex; align-items: center; gap: 10px;
+            width: 100%; justify-content: center; margin-top: 25px;
+        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--color-glow); background-position: right center; }
+        .button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-position: left center; }
+        .status {
+            text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none;
+            animation: slideDown 0.5s; font-weight: 600;
+        }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .status.success { background: #e6f7f0; color: #0d8a54; display: block; }
-        .status.error { background: #fdeaea; color: #d92d20; display: block; }
-        .status.warning { background: #fffbeb; color: #b45309; display: block; }
+        .status.success { background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.5); color: #28a745; display: block; }
+        .status.error { background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: var(--color-error); display: block; }
+        .status.warning { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); color: #f59e0b; display: block; }
+
         .hidden { display: none; }
-        .date-filter-container { background-color: #f8faff; border-radius: 12px; padding: 20px; margin-top: 25px; border: 1px solid var(--color-border); }
-        .date-filter-container h3 { text-align: center; margin-bottom: 25px; color: var(--color-text); font-weight: 600; font-size: 18px; }
-        .slider-labels { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 600; color: var(--color-text-secondary); font-size: 14px; }
+        .date-filter-container {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 20px; margin-top: 25px; animation: fadeIn 0.5s;
+        }
+        .date-filter-container h3 { text-align: center; margin-bottom: 25px; color: var(--text-light); font-weight: 600; font-size: 18px; }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 600; color: var(--text-medium); font-size: 14px; }
         #date-slider { margin: 25px 10px 15px; }
-        /* Estilos para noUiSlider */
         #date-slider .noUi-connect { background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); }
-        #date-slider .noUi-handle { border: 3px solid var(--color-surface); border-radius: 50%; width: 24px; height: 24px; right: -12px; top: -9px; box-shadow: 0 3px 6px rgba(0,0,0,0.1); cursor: pointer; }
-        #date-slider .noUi-handle:focus { outline: none; }
-        #date-slider .noUi-handle::before, #date-slider .noUi-handle::after { display: none; }
+        #date-slider .noUi-handle { border: 3px solid var(--bg-dark); border-radius: 50%; width: 24px; height: 24px; right: -12px; top: -9px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); cursor: pointer; }
+        #date-slider .noUi-handle:focus { outline: none; } #date-slider .noUi-handle::before, #date-slider .noUi-handle::after { display: none; }
     </style>
 </head>
 <body>
+    <canvas id="neuronCanvas"></canvas>
+
     <div class="main-container">
         <div class="illustration-panel">
-            <div class="doc-animation">
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-                <div class="doc-line"></div>
-            </div>
-            <h2>Guía Rápida</h2>
-            <p>Sube tu archivo Excel con las incidencias, filtra por fecha si es necesario, y genera las cartas de amonestación o compromiso en segundos.</p>
+            <h2>Automatización de Documentos</h2>
+            <p>Sincroniza los datos de incidencias, filtra por fecha si es necesario y genera las cartas de amonestación o compromiso en segundos.</p>
         </div>
 
         <div class="content-panel">
@@ -138,14 +132,22 @@
                 <h1>🏢 Generador de Cartas</h1>
             </div>
             
-            <div class="upload-area" id="uploadArea">
-                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-                <div class="upload-icon">
-                    <svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2" style="width: 24px; height: 24px;">
-                        <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                    </svg>
-                </div>
-                <div id="uploadText" class="upload-text">Haz clic o arrastra tu archivo Excel</div>
+            <div class="status-area" id="statusContainer">
+                 <div class="status-content loading-content">
+                    <div class="techno-loader">
+                        <svg viewBox="0 0 100 100"><path class="circuit-flow" id="flow-1" d="M 50,50 m -25,0 a 25,25 0 1,1 50,0 a 25,25 0 1,1 -50,0"></path><path class="circuit-flow" id="flow-2" d="M 50,50 m -35,0 a 35,35 0 1,0 70,0 a 35,35 0 1,0 -70,0"></path></svg>
+                        <div class="core-pulse"></div>
+                    </div>
+                    <div class="status-text-dynamic" id="dynamicStatusText"></div>
+                 </div>
+                 <div class="status-content success-content">
+                    <div class="success-icon"><svg viewBox="0 0 24 24"><path fill="none" stroke-width="2.5" stroke="currentColor" d="M5,13 l4,4 l10,-10" /></svg></div>
+                    <div class="success-text">Sincronización completa</div>
+                 </div>
+                 <div class="status-content error-content">
+                    <div class="status-icon error-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg></div>
+                    <div class="error-text" id="errorText"></div>
+                 </div>
             </div>
 
             <div class="date-filter-container hidden" id="dateFilterContainer">
@@ -166,24 +168,27 @@
     </div>
 
     <script>
+        // --- VARIABLES GLOBALES Y CONFIGURACIÓN ---
         let fullProcessedData = []; 
         let processedData = []; 
         let dateSlider = null;
+        let statusInterval;
 
         const COLUMN_MAPPING = {
             nombres: ['nombre', 'nombres', 'agente', 'agentes', 'trabajador'],
             rut: ['rut', 'cedula', 'cédula', 'ci'],
             fecha: ['fecha', 'date', 'fecha_incidencia'],
             duracion: ['duracion', 'duración', 'minutos'],
-            inicioTurno: ['inicio turno', 'inicio_turno', 'turno', 'hora inicio'],
-            finTurno: ['fin turno', 'fin_turno', 'termino turno', 'hora fin'],
+            inicioTurno: ['inicio turno', 'inicio_turno', 'turno', 'hora inicio', 'ini', 'inicio'],
+            finTurno: ['fin turno', 'fin_turno', 'termino turno', 'hora fin', 'fin'],
             incidencia: ['incidencia'],
             tipoCarta: ['tipo de carta', 'tipo carta']
         };
 
         const elements = {
-            uploadArea: document.getElementById('uploadArea'),
-            fileInput: document.getElementById('fileInput'),
+            statusContainer: document.getElementById('statusContainer'),
+            dynamicStatusText: document.getElementById('dynamicStatusText'),
+            errorText: document.getElementById('errorText'),
             dateFilterContainer: document.getElementById('dateFilterContainer'),
             dateSlider: document.getElementById('date-slider'),
             sliderStartDate: document.getElementById('slider-start-date'),
@@ -192,120 +197,71 @@
             btnText: document.getElementById('btnText'),
             status: document.getElementById('status')
         };
-
-        elements.uploadArea.addEventListener('click', () => elements.fileInput.click());
-        elements.fileInput.addEventListener('change', handleFileSelect);
-        elements.generateBtn.addEventListener('click', generateDocuments);
         
-        // Soporte para Drag & Drop
-        elements.uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); elements.uploadArea.classList.add('dragover'); });
-        elements.uploadArea.addEventListener('dragleave', () => { elements.uploadArea.classList.remove('dragover'); });
-        elements.uploadArea.addEventListener('drop', (e) => {
-            e.preventDefault();
-            elements.uploadArea.classList.remove('dragover');
-            if (e.dataTransfer.files.length > 0) {
-                elements.fileInput.files = e.dataTransfer.files;
-                handleFileSelect({ target: elements.fileInput });
-            }
+        // --- INICIO DE LA APLICACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            animateParticles();
+            loadDataFromFlow();
+            elements.generateBtn.addEventListener('click', generateDocuments);
         });
 
-        function showStatus(message, type = 'success') {
-            elements.status.className = `status ${type}`;
-            elements.status.textContent = message;
-            elements.status.style.display = 'block';
-        }
+        // --- LÓGICA DE CARGA Y PROCESAMIENTO DE DATOS ---
+        async function loadDataFromFlow() {
+            elements.statusContainer.className = 'status-area is-loading';
+            const statusMessages = ["Conectando con el servidor...", "Solicitando datos de incidencias...", "Procesando registros..."];
+            let messageIndex = 0;
+            elements.dynamicStatusText.textContent = statusMessages[messageIndex];
+            statusInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % statusMessages.length;
+                elements.dynamicStatusText.textContent = statusMessages[messageIndex];
+            }, 1800);
 
-        function handleFileSelect(event) {
-            fullProcessedData = [];
-            processedData = [];
-            if(dateSlider) { dateSlider.destroy(); dateSlider = null; }
-            elements.dateFilterContainer.classList.add('hidden');
-            elements.generateBtn.classList.add('hidden');
-            
-            const file = event.target.files[0];
-            if (!file) return;
+            const flowUrl = "https://prod-171.westus.logic.azure.com:443/workflows/bb1e934ddf4c43048271481e59dd0768/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-dgOAypHiBiEuF3JiiNMesniPsgxFJTyYg08ewwTg-Y";
 
-            document.getElementById('uploadText').textContent = file.name;
-            showStatus('Procesando archivo...', 'warning');
-            
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = e.target.result;
-                    const workbook = XLSX.read(data, { type: 'binary', cellDates: true });
-                    const sheetName = workbook.SheetNames[0];
-                    const rawData = XLSX.utils.sheet_to_json(workbook.Sheets[sheetName], { defval: null });
-                    processData(rawData);
-                } catch (error) {
-                    console.error("Error detallado:", error);
-                    showStatus('Error al leer el archivo. Verifique que el formato sea correcto.', 'error');
-                }
-            };
-            reader.readAsBinaryString(file);
-        }
-        
-        function parseDate(dateValue) {
-            if (!dateValue) return null;
-            if (dateValue instanceof Date && !isNaN(dateValue)) return dateValue;
-            if (typeof dateValue === 'number') {
-                const excelEpoch = new Date(1899, 11, 30);
-                return new Date(excelEpoch.getTime() + dateValue * 86400000);
+            try {
+                const response = await fetch(flowUrl, { method: "POST" });
+                if (!response.ok) throw new Error(`Error de red: ${response.status}`);
+                const rawData = await response.json();
+                if (!Array.isArray(rawData) || rawData.length === 0) throw new Error("No se recibieron datos.");
+
+                processData(rawData);
+                clearInterval(statusInterval);
+                elements.statusContainer.className = 'status-area is-success';
+
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                clearInterval(statusInterval);
+                elements.statusContainer.className = 'status-area is-error';
+                elements.errorText.textContent = error.message;
             }
-            if (typeof dateValue === 'string') {
-                let date = new Date(dateValue);
-                if (!isNaN(date)) return date;
-                if (dateValue.includes('/')) {
-                    const parts = dateValue.split('/');
-                    if (parts.length === 3) {
-                        date = new Date(parts[2], parts[1] - 1, parts[0]);
-                        if (!isNaN(date)) return date;
-                    }
-                }
-            }
-            return null;
         }
 
-        function formatShiftTime(value) {
-            if (value instanceof Date && !isNaN(value)) {
-                const hours = value.getHours().toString().padStart(2, '0');
-                const minutes = value.getMinutes().toString().padStart(2, '0');
-                return `${hours}:${minutes}`;
-            }
-            return value;
-        }
-
-        function toProperCase(str) {
-            if (!str) return '';
-            return str.toString().toLowerCase().split(' ').map(word => word.charAt(0).toUpperCase() + word.slice(1)).join(' ');
-        }
-        
         function processData(data) {
-            if (!data || data.length === 0) {
-                showStatus('El archivo está vacío o no tiene un formato válido.', 'error'); return;
-            }
             const headers = Object.keys(data[0]);
             const columnMap = {};
+            const findKey = (names) => headers.find(h => names.some(alias => h.toLowerCase().includes(alias)));
             
-            const missingCols = Object.keys(COLUMN_MAPPING).filter(key => {
-                const foundHeader = headers.find(h => COLUMN_MAPPING[key].some(alias => h.toLowerCase().includes(alias)));
-                if(foundHeader) columnMap[key] = foundHeader;
-                return !foundHeader;
-            });
-
-            if (missingCols.length > 0) {
-                showStatus(`Error: Faltan las siguientes columnas en el archivo: ${missingCols.join(', ')}.`, 'error'); return;
+            for (const key in COLUMN_MAPPING) {
+                const foundKey = findKey(COLUMN_MAPPING[key]);
+                if (!foundKey) {
+                    showStatus(`Error: Falta la columna requerida para '${key}'.`, 'error'); return;
+                }
+                columnMap[key] = foundKey;
             }
-
-            const allData = data.map(row => ({
-                nombres: row[columnMap.nombres] || '',
-                rut: row[columnMap.rut] || '',
-                fecha: parseDate(row[columnMap.fecha]),
-                duracion: row[columnMap.duracion] || '',
-                inicioTurno: formatShiftTime(row[columnMap.inicioTurno]) || '00:00',
-                finTurno: formatShiftTime(row[columnMap.finTurno]) || '00:00',
-                incidencia: (row[columnMap.incidencia] || '').toString().toLowerCase().trim(),
-                tipoCarta: (row[columnMap.tipoCarta] || '').toString().toLowerCase().trim()
-            })).filter(row => row.nombres && row.rut && row.fecha);
+            
+            const allData = data.map(row => {
+                const dateRef = asDate(row[columnMap.fecha]);
+                return {
+                    nombres: row[columnMap.nombres] || '',
+                    rut: row[columnMap.rut] || '',
+                    fecha: dateRef,
+                    duracion: row[columnMap.duracion] || '',
+                    inicioTurno: fmtTime(row[columnMap.inicioTurno], dateRef),
+                    finTurno: fmtTime(row[columnMap.finTurno], dateRef),
+                    incidencia: (row[columnMap.incidencia] || '').toString().toLowerCase().trim(),
+                    tipoCarta: (row[columnMap.tipoCarta] || '').toString().toLowerCase().trim()
+                };
+            }).filter(row => row.nombres && row.rut && row.fecha);
 
             fullProcessedData = allData.filter(row => {
                 const esAtraso = (row.incidencia === 'atraso' || row.incidencia === 'atrasos') && ['amonestacion', 'amonestación', 'compromiso'].includes(row.tipoCarta);
@@ -315,10 +271,10 @@
             });
             
             if (fullProcessedData.length === 0) {
-                showStatus('No se encontraron registros que cumplan con los criterios definidos.', 'error'); return;
+                showStatus('No se encontraron registros válidos para generar cartas.', 'warning'); return;
             }
             
-            const uniqueTimestamps = [...new Set(fullProcessedData.map(d => new Date(d.fecha).setHours(0, 0, 0, 0)))].sort((a, b) => a - b);
+            const uniqueTimestamps = [...new Set(fullProcessedData.map(d => d.fecha.setHours(0, 0, 0, 0)))].sort((a, b) => a - b);
             
             if (uniqueTimestamps.length < 2) {
                 processedData = [...fullProcessedData];
@@ -329,6 +285,7 @@
             }
         }
 
+        // --- LÓGICA DE FILTRADO Y VISUALIZACIÓN ---
         function setupAndShowDateFilter(uniqueTimestamps) {
             const minTimestamp = uniqueTimestamps[0];
             const maxTimestamp = uniqueTimestamps[uniqueTimestamps.length - 1];
@@ -356,18 +313,6 @@
             showResults();
         }
 
-        function groupData(data) {
-            const grouped = {};
-            data.forEach(row => {
-                const key = `${row.rut}-${row.incidencia}-${row.tipoCarta}`;
-                if (!grouped[key]) {
-                    grouped[key] = [];
-                }
-                grouped[key].push(row);
-            });
-            return Object.values(grouped);
-        }
-
         function showResults() {
             const groupedData = groupData(processedData);
             const letterCount = groupedData.length;
@@ -378,10 +323,11 @@
                 showStatus(`${processedData.length} registros encontrados (se generarán ${letterCount} cartas).`, 'success');
             } else {
                 elements.generateBtn.classList.add('hidden');
-                showStatus('No se encontraron registros en el rango de fechas seleccionado.', 'warning');
+                showStatus('No hay registros en el rango de fechas seleccionado.', 'warning');
             }
         }
-        
+
+        // --- LÓGICA DE GENERACIÓN DE DOCUMENTOS ---
         function createWordDocument(incidentGroup) {
             const data = incidentGroup[0];
             const isPlural = incidentGroup.length > 1;
@@ -396,194 +342,102 @@
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo a lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
-                
-                const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ')).join(', ');
+                const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
                 const dayText = isPlural ? `los días ${datesString}` : `el día ${datesString}`;
-                const shiftText = isPlural 
-                    ? `durante sus jornadas de trabajo` 
-                    : `durante su jornada de trabajo desde las ${data.inicioTurno} a ${data.finTurno} horas`;
-
-                const page1 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr>
-                                    <td>
-                                        <p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p>
-                                        <p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p>
-                                        <br><br>
-                                        <p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p>
-                                        <p style='margin-bottom: 20px;'><b>Presente.</b></p>
-                                        <p style='margin-bottom: 20px;'>De mi consideración:</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral, para poder desempeñar en forma correcta las funciones para las que fue contratado, ${dayText}, sin justificación alguna y sin autorización de su jefatura directa se ha ausentado ${shiftText} y al ser buscado en plataforma Genesys iCloud no pudo ser ubicada en conexión desde su modalidad de teletrabajo.</p>
-                                    </td>
-                                </tr>
-                            </table>`;
-                
-                const page2 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr>
-                                    <td style='padding-top: 20px;'>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la letra A) del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las Prohibiciones en el Titulo XV en su artículo 87, indica …” Abandonar el trabajo o ausentarse intempestivamente del recinto en que éste se desarrolla durante la jornada laboral sin justificación y/o autorización.</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p>
-                                        <p style='margin-top: 30px;'>Sin otro particular,</p>
-                                        <p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p>
-                                        <table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table>
-                                        <div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div>
-                                    </td>
-                                </tr>
-                               </table>`;
+                const shiftText = isPlural ? `durante sus jornadas de trabajo` : `durante su jornada de trabajo desde las ${data.inicioTurno} a ${data.finTurno} horas`;
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral, para poder desempeñar en forma correcta las funciones para las que fue contratado, ${dayText}, sin justificación alguna y sin autorización de su jefatura directa se ha ausentado ${shiftText} y al ser buscado en plataforma Genesys iCloud no pudo ser ubicada en conexión desde su modalidad de teletrabajo.</p></td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la letra A) del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las Prohibiciones en el Titulo XV en su artículo 87, indica …” Abandonar el trabajo o ausentarse intempestivamente del recinto en que éste se desarrolla durante la jornada laboral sin justificación y/o autorización.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
-
             } else if (data.incidencia.includes('ausencia')) {
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
-
                 let incidentDetails;
                 if (isPlural) {
-                    const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ')).join(', ');
+                    const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
                     const shiftsString = incidentGroup.map(d => `turno de ${d.inicioTurno} a ${d.finTurno} horas`).join(', ');
                     incidentDetails = `los días en que ha dejado de prestar sus funciones injustificadamente ${datesString} en sus respectivos turnos (${shiftsString})`;
                 } else {
-                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
                     incidentDetails = `el día en que ha dejado de prestar sus funciones injustificadamente ${incidentDate} en su turno programado de ${data.inicioTurno} a ${data.finTurno} horas.`;
                 }
-
-                const page1 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr>
-                                    <td>
-                                        <p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p>
-                                        <p style='text-align: center; text-decoration: underline; font-weight:bold; padding-top:30px;'>${titulo}</p>
-                                        <br><br>
-                                        <p><b>Señor(a):</b> ${toProperCase(data.nombres)}</p>
-                                        <p><b>RUT:</b> ${data.rut}</p>
-                                        <p style='font-weight: bold; margin-bottom: 20px;'>Presente</p>
-                                        <p style='margin-bottom: 20px;'>De nuestra consideración:</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que, según lo dispuesto en su contrato individual de trabajo, usted debe entregar una atención de calidad al momento de realizar las atenciones.</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la Cláusula Primera y Cuarta de su Contrato Individual de trabajo... ${incidentDetails}, debe cumplir con lo establecido en el Reglamento Interno...</p>
-                                    </td>
-                                </tr>
-                            </table>`;
-                const page2 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr>
-                                    <td style='padding-top: 20px;'>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Con el objeto de que Ud. se comprometa a no presentar Alguna Ausencia y Cumplir con su Turno, se efectúa esta carta de Amonestación.</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a los puntos señalados con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de sus deberes laborales en nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p>
-                                        <p style='margin-top: 30px;'>Sin otro particular, le saluda atentamente,</p>
-                                        <br><br><br><br>
-                                        <table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicio</b><br>Konecta Chile Limitada.</td><td style="text-align:right; vertical-align:bottom;"><b>Nombre del Trabajador:</b> ${toProperCase(data.nombres)}<br>${data.rut}</td></tr></table>
-                                        <div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div>
-                                    </td>
-                                </tr>
-                               </table>`;
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; text-decoration: underline; font-weight:bold; padding-top:30px;'>${titulo}</p><br><br><p><b>Señor(a):</b> ${toProperCase(data.nombres)}</p><p><b>RUT:</b> ${data.rut}</p><p style='font-weight: bold; margin-bottom: 20px;'>Presente</p><p style='margin-bottom: 20px;'>De nuestra consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que, según lo dispuesto en su contrato individual de trabajo, usted debe entregar una atención de calidad al momento de realizar las atenciones.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la Cláusula Primera y Cuarta de su Contrato Individual de trabajo... ${incidentDetails}, debe cumplir con lo establecido en el Reglamento Interno...</p></td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Con el objeto de que Ud. se comprometa a no presentar Alguna Ausencia y Cumplir con su Turno, se efectúa esta carta de Amonestación.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a los puntos señalados con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de sus deberes laborales en nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular, le saluda atentamente,</p><br><br><br><br><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicio</b><br>Konecta Chile Limitada.</td><td style="text-align:right; vertical-align:bottom;"><b>Nombre del Trabajador:</b> ${toProperCase(data.nombres)}<br>${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
-
-            } else { // Lógica para cartas de Atraso
+            } else { // Atraso
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
-                
                 let parrafoPrincipal;
                 if (isPlural) {
                     const incidentsHtml = incidentGroup.map(incident => {
-                        const incidentDate = incident.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
-                        const duracionTexto = incident.duracion ? `de una duración de ${incident.duracion} minutos ` : ``;
-                        return `El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${incident.inicioTurno} horas.`;
+                        // ===== INICIO CORRECCIÓN (Múltiples Atrasos) =====
+                        const duracionTexto = incident.duracion ? `de una duración de ${incident.duracion} ` : ``;
+                        // ===== FIN CORRECCIÓN =====
+                        return `El día ${incident.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${incident.inicioTurno} horas.`;
                     }).join('<br>');
-
-                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>${incidentsHtml}</p>
-                                      <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Al presentar estos atrasos en su hora de ingreso, perjudica el normal funcionamiento de la plataforma, que necesita contar con una cantidad de ejecutivos disponibles para atender en el horario en que su turno fue programado, perjudicando gravemente los niveles de servicio de la compañía y la calidad de atención a nuestros clientes.</p>`;
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>${incidentsHtml}</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Al presentar estos atrasos en su hora de ingreso, perjudica el normal funcionamiento de la plataforma... perjudicando gravemente los niveles de servicio...</p>`;
                 } else {
-                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
-                    const duracionTexto = data.duracion ? `de una duración de ${data.duracion} minutos ` : `de una duración de AGREGAR `;
-                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${data.inicioTurno} horas, al presentar este atraso en su hora de ingreso, perjudica el normal funcionamiento de la plataforma, que necesita contar con una cantidad de ejecutivos disponibles para atender en el horario en que su turno fue programado, perjudicando gravemente los niveles de servicio de la compañía y la calidad de atención a nuestros clientes.</p>`;
+                    // ===== INICIO CORRECCIÓN (Atraso Único) =====
+                    const duracionTexto = data.duracion ? `de una duración de ${data.duracion} ` : `de una duración de AGREGAR `;
+                    // ===== FIN CORRECCIÓN =====
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${data.inicioTurno} horas...</p>`;
                 }
-                
-                const parrafoReglamento = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la <b>letra b)</b> del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las prohibiciones en el Titulo XV en su artículo 87, indica …” llegar atrasado o registrar en forma reiterada, atrasos en su hora de ingreso…”. En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p>`;
-                
-                const page1 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr>
-                                    <td>
-                                        <p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p>
-                                        <p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p>
-                                        <br><br>
-                                        <p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p>
-                                        <p style='margin-bottom: 20px;'><b>Presente.</b></p>
-                                        <p style='margin-bottom: 20px;'>De mi consideración:</p>
-                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral.</p>
-                                        ${parrafoPrincipal}
-                                    </td>
-                                </tr>
-                            </table>`;
-                const page2 = `<table style='width: 100%; border-collapse: collapse;'>
-                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
-                                <tr><td style='padding-top: 20px;'>${parrafoReglamento}<p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr>
-                            </table>`;
+                const parrafoReglamento = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la <b>letra b)</b> del Reglamento Interno...${parrafoInspeccion}</p>`;
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral.</p>${parrafoPrincipal}</td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'>${parrafoReglamento}<p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
             }
-            
-            return `<html xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'>
-                <head><meta charset='utf-8'><title>Carta Generada</title></head>
-                <body style='font-family: Calibri, sans-serif; font-size: 11pt;'>${bodyHtml}</body>
-                </html>`;
+            return `<html xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Carta</title></head><body style='font-family: Calibri, sans-serif; font-size: 11pt;'>${bodyHtml}</body></html>`;
         }
 
         async function generateDocuments() {
             elements.generateBtn.disabled = true;
             elements.btnText.textContent = '⏳ Generando...';
-            
             try {
                 const zip = new JSZip();
                 const groupedData = groupData(processedData);
-
                 for (const incidentGroup of groupedData) {
-                    const firstIncident = incidentGroup[0];
                     const htmlContent = createWordDocument(incidentGroup);
                     const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
-                    
-                    let nombreBase;
-                    if (firstIncident.incidencia.includes('abandono')) {
-                        const tipo = firstIncident.tipoCarta === 'compromiso' ? 'Compromiso' : 'Amonestacion';
-                        nombreBase = `${tipo}_Abandono_Trabajo`;
-                    } else if (firstIncident.incidencia.includes('ausencia')) {
-                        const tipo = firstIncident.tipoCarta === 'compromiso' ? 'Compromiso' : 'Amonestacion';
-                        nombreBase = `${tipo}_Ausencia`;
-                    } else {
-                        const tipo = firstIncident.tipoCarta === 'compromiso' ? 'Compromiso' : 'Amonestacion';
-                        nombreBase = `${tipo}_Atrasos`;
-                    }
-                    const cleanName = firstIncident.nombres.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
-                    const fileName = `${nombreBase}_${firstIncident.rut}_${cleanName}.doc`;
-
+                    const { incidencia, tipoCarta, rut, nombres } = incidentGroup[0];
+                    const tipo = tipoCarta === 'compromiso' ? 'Compromiso' : 'Amonestacion';
+                    const motivo = incidencia.includes('abandono') ? 'Abandono' : (incidencia.includes('ausencia') ? 'Ausencia' : 'Atrasos');
+                    const cleanName = nombres.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
+                    const fileName = `${tipo}_${motivo}_${rut}_${cleanName}.doc`;
                     zip.file(fileName, blob);
                     await new Promise(r => setTimeout(r, 10));
                 }
-
                 if (groupedData.length > 0) {
-                    const today = new Date();
-                    const day = String(today.getDate()).padStart(2, '0');
-                    const month = String(today.getMonth() + 1).padStart(2, '0'); // Enero es 0
-                    const year = today.getFullYear();
-                    const formattedDate = `${day}-${month}-${year}`;
-                    const zipFileName = `Cartas del ${formattedDate}.zip`;
-
+                    const zipFileName = `Cartas_${new Date().toLocaleDateString('es-CL').replace(/\//g, '-')}.zip`;
                     const zipBlob = await zip.generateAsync({ type: 'blob' });
                     saveAs(zipBlob, zipFileName);
                     showStatus(`¡Éxito! Se generaron ${groupedData.length} cartas.`, 'success');
                 }
             } catch (error) {
-                console.error("Error al generar documentos:", error);
-                showStatus('Ocurrió un error al generar el archivo ZIP.', 'error');
+                console.error("Error:", error);
+                showStatus('Ocurrió un error al generar el ZIP.', 'error');
             } finally {
                 elements.generateBtn.disabled = false;
-                const letterCount = groupData(processedData).length;
-                if (letterCount > 0) {
-                   elements.btnText.textContent = `🚀 Generar ${letterCount} Cartas`;
-                }
+                showResults(); // para actualizar el texto del botón
             }
         }
+        
+        // --- FUNCIONES UTILITARIAS Y DE ANIMACIÓN ---
+        function groupData(data) { const grouped = {}; data.forEach(row => { const key = `${row.rut}-${row.incidencia}-${row.tipoCarta}`; if (!grouped[key]) { grouped[key] = []; } grouped[key].push(row); }); return Object.values(grouped); }
+        function toProperCase(str) { return !str ? '' : str.toString().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+        function showStatus(message, type = 'success') { elements.status.className = `status ${type}`; elements.status.textContent = message; elements.status.style.display = 'block'; }
+        
+        // Lógica de fecha/hora del archivo de prueba
+        function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
+        function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
+        function asDate(val) { if (val instanceof Date) return val; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const d = excelSerialToDate(num); if (d) return d; } const d2 = new Date(val); return isNaN(d2) ? null : d2; }
+        function fmtTime(val, dateRef) { if (val instanceof Date) return `${String(val.getHours()).padStart(2, '0')}:${String(val.getMinutes()).padStart(2, '0')}`; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const dt = parseDateTime(num, dateRef); if (dt) return `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`; if (num >= 0 && num < 1) { const totalMin = Math.round(num * 24 * 60); const h = Math.floor(totalMin / 60), m = totalMin % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; } } return (val ?? '').toString(); }
+
+        // Animación de fondo
+        let particlesArray;
+        function animateParticles() { const canvas = document.getElementById('neuronCanvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; class Particle { constructor(x, y, size, speedX, speedY) { this.x = x; this.y = y; this.size = size; this.speedX = speedX; this.speedY = speedY; } draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); ctx.fillStyle = `rgba(200, 225, 255, 0.6)`; ctx.fill(); } update() { if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY; this.x += this.speedX; this.y += this.speedY; } } function init() { particlesArray = []; let num = (canvas.height * canvas.width) / 12000; for (let i = 0; i < num; i++) { let size = (Math.random() * 2) + 1; let x = Math.random() * innerWidth; let y = Math.random() * innerHeight; let speedX = (Math.random() * 0.5) - 0.25; let speedY = (Math.random() * 0.5) - 0.25; particlesArray.push(new Particle(x, y, size, speedX, speedY)); } } function connect() { for (let a = 0; a < particlesArray.length; a++) { for (let b = a; b < particlesArray.length; b++) { let dist = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2); if (dist < (canvas.width / 8) * (canvas.height / 8)) { let op = 1 - (dist / 20000); ctx.strokeStyle = `rgba(0, 188, 212, ${op})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y); ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke(); } } } } function animate() { requestAnimationFrame(animate); ctx.clearRect(0, 0, innerWidth, innerHeight); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } connect(); } window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; init(); }); init(); animate(); }
     </script>
 </body>
 </html>
