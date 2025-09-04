@@ -3,310 +3,266 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestiones Inbound - Generador Transporte</title>
+    <title>Gestiones Inbound - Generador de Reporte de Transporte</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bg: #f4f7fe;
-            --color-surface: #ffffff;
-            --color-primary-start: #6a11cb;
-            --color-primary-end: #2575fc;
+            --color-primary-start: #8e2de2;
+            --color-primary-end: #4a00e0;
+            --color-accent-light: #00bcd4;
+            --color-glow: rgba(142, 45, 226, 0.5);
+            --color-success: #28a745;
             --color-success-start: #16a34a;
             --color-success-end: #15803d;
-            --color-text: #1e293b;
-            --color-text-secondary: #64748b;
-            --color-border: #e2e8f0;
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --color-error: #dc3545;
             --font-family: 'Manrope', sans-serif;
+            --bg-dark: #0d1117;
+            --glass-bg: rgba(20, 22, 37, 0.6);
+            --glass-border: rgba(100, 120, 255, 0.2);
+            --text-light: #f0f0f0;
+            --text-medium: #a0a0b0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font-family); background-color: var(--color-bg); min-height: 100vh;
+            font-family: var(--font-family); min-height: 100vh;
             display: flex; justify-content: center; align-items: center; padding: 20px;
-            color: var(--color-text); position: relative; overflow: hidden;
+            background: var(--bg-dark); position: relative; overflow: hidden; color: var(--text-light);
+        }
+        #neuronCanvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; opacity: 0.7;
         }
         .main-container {
-            display: grid; grid-template-columns: 1fr; max-width: 1000px; width: 100%;
-            background: var(--color-surface); border-radius: 24px; box-shadow: var(--shadow-lg);
-            border: 1px solid white; overflow: hidden; z-index: 10;
+            width: 100%; max-width: 900px;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-glow);
+            display: grid; grid-template-columns: 1fr;
+            overflow: hidden; z-index: 10;
         }
-        @media (min-width: 800px) { .main-container { grid-template-columns: 40% 60%; } }
+        @media (min-width: 800px) { .main-container { grid-template-columns: 38% 62%; } }
         .illustration-panel {
-            background: linear-gradient(160deg, #f0f5ff, #e6efff); padding: 40px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--glass-border);
         }
-        
-        .route-animation {
-            width: 280px;
-            height: 180px;
-            position: relative;
-            transform: perspective(800px) rotateX(10deg) rotateY(-20deg);
+        .illustration-panel h2 {
+            font-size: 24px; font-weight: 700;
+            margin-bottom: 12px; color: var(--text-light);
         }
-        .road {
-            position: absolute;
-            bottom: 40px;
-            left: 0;
-            width: 100%;
-            height: 4px;
-            background-color: var(--color-border);
-            border-radius: 2px;
+        .illustration-panel p {
+            font-size: 15px; color: var(--text-medium);
+            line-height: 1.6; max-width: 300px;
         }
-        .van {
-            position: absolute;
-            bottom: 44px;
-            left: -60px;
-            width: 55px;
-            height: 30px;
-            background-image: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end));
-            border-radius: 6px 6px 4px 4px;
-            box-shadow: 0 4px 10px rgba(0,0,0,0.1);
-            animation: drive-route 8s ease-in-out infinite;
-        }
-        .van::before {
-            content: '';
-            position: absolute;
-            top: 5px;
-            left: 5px;
-            width: 12px;
-            height: 10px;
-            background: #f0f5ff;
-            border-radius: 2px;
-        }
-        .stop {
-            position: absolute;
-            bottom: 44px;
-            width: 24px;
-            height: 24px;
-        }
-        .stop-pin {
-            width: 100%;
-            height: 100%;
-            background-color: #cbd5e1;
-            border-radius: 50% 50% 50% 0;
-            transform: rotate(-45deg);
-        }
-        .stop-pin::after {
-            content: '';
-            position: absolute;
-            top: 50%;
-            left: 50%;
-            transform: translate(-50%, -50%);
-            width: 8px;
-            height: 8px;
-            background-color: #fff;
-            border-radius: 50%;
-        }
-        .person-icon {
-            position: absolute;
-            top: -22px;
-            left: 2px;
-            width: 18px;
-            height: 18px;
-            background-color: var(--color-primary-end);
-            border-radius: 50%;
-            opacity: 1;
-            animation-iteration-count: infinite;
-            animation-duration: 8s;
-        }
-        .person-icon::after {
-            content: '';
-            position: absolute;
-            bottom: -8px;
-            left: 2px;
-            width: 14px;
-            height: 10px;
-            background-color: var(--color-primary-end);
-            border-radius: 4px 4px 0 0;
-        }
-        .stop1 { left: 20%; }
-        .stop2 { left: 50%; }
-        .stop3 { left: 80%; }
-
-        .stop1 .person-icon { animation-name: person-pickup-1; }
-        .stop2 .person-icon { animation-name: person-pickup-2; }
-        .stop3 .person-icon { animation-name: person-pickup-3; }
-        
-        @keyframes drive-route {
-            0%   { left: -60px; }
-            15%  { left: calc(20% - 15px); }
-            30%  { left: calc(20% - 15px); }
-            45%  { left: calc(50% - 15px); }
-            60%  { left: calc(50% - 15px); }
-            75%  { left: calc(80% - 15px); }
-            90%  { left: calc(80% - 15px); }
-            100% { left: 110%; }
-        }
-        @keyframes person-pickup-1 {
-            0%, 14% { opacity: 1; transform: scale(1); }
-            20% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 0; }
-        }
-        @keyframes person-pickup-2 {
-            0%, 44% { opacity: 1; transform: scale(1); }
-            50% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 0; }
-        }
-        @keyframes person-pickup-3 {
-            0%, 74% { opacity: 1; transform: scale(1); }
-            80% { opacity: 0; transform: scale(0.5); }
-            100% { opacity: 0; }
-        }
-        
-        .illustration-panel h2 { margin-top: 20px; font-size: 22px; color: var(--color-text); }
-        .illustration-panel p { margin-top: 8px; font-size: 15px; color: var(--color-text-secondary); max-width: 300px; line-height: 1.6; }
         .content-panel { padding: 40px; }
         .header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--color-text); font-size: 28px; font-weight: 700; }
-        .upload-area {
-            border: 2px dashed var(--color-border); border-radius: 12px; padding: 40px 20px;
-            text-align: center; transition: all 0.3s ease; cursor: pointer; background-color: #fafbff;
-            display: flex;
-            flex-direction: column;
-            align-items: center;
-            justify-content: center;
+        h1 { font-size: 28px; font-weight: 700; color: var(--text-light); }
+        .status-area {
+            border-radius: 12px; background: rgba(0, 0, 0, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 160px; margin-bottom: 25px;
+            position: relative; overflow: hidden;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
         }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
-        .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-        .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
+        .status-content { display: none; }
+        .status-area.is-loading .loading-content,
+        .status-area.is-success .success-content,
+        .status-area.is-error .error-content {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 15px; z-index: 10; width: 100%;
+        }
+        .techno-loader { position: relative; width: 80px; height: 80px; }
+        .core-pulse {
+            width: 20%; height: 20%; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
+            position: absolute; top: 40%; left: 40%; animation: corePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes corePulse { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
+        .circuit-flow { fill: none; stroke-width: 1.5; stroke: var(--color-primary-start); stroke-dasharray: 100; stroke-dashoffset: 100; animation: flow 3s linear infinite; }
+        #flow-2 { animation-delay: 0.5s; stroke: var(--color-primary-end); }
+        .status-text-dynamic { font-size: 16px; font-weight: 600; color: var(--text-medium); text-align: center; transition: opacity 0.3s ease; margin-top: 10px; }
+        .success-icon svg path { stroke: var(--color-success); stroke-dasharray: 29; stroke-dashoffset: 29; animation: drawCheck 0.4s 0.2s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        .status-area.is-success { border-color: rgba(40, 167, 69, 0.5); box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        .success-text { color: var(--color-success); font-size: 16px; font-weight: 600; }
+        .error-icon { height: 40px; width: 40px; color: var(--color-error); }
+        .status-area.is-error { border-color: rgba(220, 53, 69, 0.5); box-shadow: 0 0 20px rgba(220, 53, 69, 0.4); }
+        .error-text { color: var(--color-error); font-size: 16px; font-weight: 600; }
         
-        .upload-area.file-loaded #uploadDefaultContent { display: none; }
-        .upload-area #uploadSuccessContent { display: none; }
-        .upload-area.file-loaded #uploadSuccessContent { display: block; }
-        #fileNameDisplay {
-            font-size: 18px;
-            font-weight: 600;
-            color: var(--color-primary-end);
-            word-break: break-all;
-        }
-        #changeFileText {
-            font-size: 13px;
-            color: var(--color-text-secondary);
-            margin-top: 8px;
-        }
-
-        input[type="file"] { display: none; }
-        .button-container { text-align: center; margin-top: 25px; }
-        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
-        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .button.is-success { background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%); }
-        .button.is-success:hover { box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3); }
-
-        .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
-        .progress-bar.active { display: block; }
-        .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
-        .status-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none; animation: slideDown 0.5s; }
+        #weekSelectorContainer, #mainActions { display: none; }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
-        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
-        .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-        #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
-        #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
+        #weekSelectorContainer { margin-top: 20px; animation: fadeIn 0.5s; }
+        #weekSelectorContainer label { display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-medium); }
         .custom-select-wrapper { position: relative; }
-        .custom-select-trigger { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--color-border); background-color: #f8fafc; font-family: var(--font-family); font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
-        .custom-select-trigger:hover { border-color: var(--color-primary-end); }
-        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--color-text-secondary); transition: transform 0.3s ease; }
+        .custom-select-trigger {
+            width: 100%; padding: 12px 15px; border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border);
+            color: var(--text-light); font-family: var(--font-family); font-size: 16px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center; transition: all 0.3s ease;
+        }
+        .custom-select-trigger:hover, .custom-select-wrapper.open .custom-select-trigger { border-color: rgba(142, 45, 226, 0.7); box-shadow: 0 0 15px var(--color-glow); }
+        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--text-medium); transition: transform 0.3s ease; }
         .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
-        .custom-options { position: absolute; top: 105%; left: 0; right: 0; background: var(--color-surface); border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 100; max-height: 200px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
+        .custom-options {
+            position: absolute; top: 105%; left: 0; right: 0; background: rgba(20, 22, 37, 0.85); 
+            backdrop-filter: blur(10px); border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 100; max-height: 200px; overflow-y: auto; border: 1px solid var(--glass-border);
+            opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease;
+        }
         .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
-        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid var(--color-border); }
+        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid rgba(100, 120, 255, 0.1); }
         .custom-option:last-child { border-bottom: none; }
-        .custom-option:hover { background-color: #f4f7fe; }
-        .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
+        .custom-option:hover { background-color: rgba(142, 45, 226, 0.2); }
+        .custom-option.selected { background-color: rgba(142, 45, 226, 0.3); font-weight: 600; color: #fff; }
         #weekSelector { display: none; }
         
-        .settings-container { display: none; position: relative; margin-top: 15px; text-align: right; }
-        .settings-button { background: transparent; border: none; cursor: pointer; color: var(--color-text-secondary); padding: 5px; border-radius: 50%; transition: all 0.2s ease; }
-        .settings-button:hover { background-color: #eef2ff; color: var(--color-primary-end); }
-        .settings-button.is-active { color: var(--color-primary-end); animation: blink-active 1.5s infinite; }
+        .button-container { text-align: center; margin-top: 25px; }
+        .button {
+            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
+            color: white; border: none; padding: 14px 35px; border-radius: 10px;
+            font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; 
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-size: 200% auto;
+        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--color-glow); background-position: right center; }
+        .button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); }
+        .button.is-success { background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%); }
+        .button.is-success:hover { box-shadow: 0 7px 30px rgba(40, 167, 69, 0.4); }
+        
+        .settings-container { display: none; position: relative; margin-top: 15px; text-align: right; animation: fadeIn 0.5s; }
+        .settings-button { background: transparent; border: none; cursor: pointer; color: var(--text-medium); padding: 5px; border-radius: 50%; transition: all 0.2s ease; }
+        .settings-button:hover { background-color: rgba(142, 45, 226, 0.2); color: var(--text-light); }
+        .settings-button.is-active { color: var(--color-accent-light); animation: blink-active 1.5s infinite; }
         @keyframes blink-active { 50% { opacity: 0.4; } }
         .settings-panel {
             display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
-            background: var(--color-surface); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 20px; z-index: 100; width: 320px; text-align: left; border: 1px solid var(--color-border);
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 20px; z-index: 100; width: 320px; text-align: left; border: 1px solid var(--glass-border);
         }
-        .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--color-text); }
+        .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--text-light); }
         .holiday-options-container { display: flex; flex-direction: column; gap: 12px; margin-bottom: 15px; }
         .holiday-option { display: flex; align-items: center; gap: 10px; }
-        .holiday-option label { font-size: 15px; cursor: pointer; text-transform: capitalize; }
+        .holiday-option label { font-size: 15px; cursor: pointer; text-transform: capitalize; margin: 0; }
         .holiday-checkbox { width: 18px; height: 18px; cursor: pointer; }
-        .button-small {
-            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
-            color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px;
-            font-weight: 600; cursor: pointer; transition: transform 0.2s ease;
-        }
+        .button-small { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 8px 16px; border-radius: 8px; font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s ease; }
         .button-small:hover { transform: translateY(-2px); }
+        .status-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none; animation: slideDown 0.5s; }
+        @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
+        .status-message.success { background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.5); color: #28a745; display: block; }
+        .status-message.error { background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: var(--color-error); display: block; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 </head>
 <body>
+    <canvas id="neuronCanvas"></canvas>
     <div class="main-container">
         <div class="illustration-panel">
-            <div class="route-animation">
-                <div class="road"></div>
-                <div class="stop stop1"><div class="person-icon"></div><div class="stop-pin"></div></div>
-                <div class="stop stop2"><div class="person-icon"></div><div class="stop-pin"></div></div>
-                <div class="stop stop3"><div class="person-icon"></div><div class="stop-pin"></div></div>
-                <div class="van"></div>
-            </div>
-            <h2>Guía Rápida</h2>
-            <p>Sube tu archivo Excel, selecciona la semana y genera un informe con los agentes que necesitan transporte.</p>
+            <h2>Reporte de Transporte</h2>
+            <p>Sincroniza automáticamente los turnos, direcciones y confirmaciones desde la nube. Selecciona la semana y genera tu informe de transporte con un solo clic.</p>
         </div>
         <div class="content-panel">
             <div class="header"><h1>Generador de Reporte de Transporte</h1></div>
-            <div class="upload-area" id="uploadArea">
-                <input type="file" id="fileInput" accept=".xlsx,.xls, .csv">
-                <div id="uploadDefaultContent">
-                    <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" class="button-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></div>
-                    <div class="upload-text">Haz clic para seleccionar o arrastra tu archivo</div>
-                </div>
-                <div id="uploadSuccessContent">
-                    <div id="fileNameDisplay"></div>
-                    <div id="changeFileText">Haz clic para cambiar el archivo</div>
-                </div>
+            <div class="status-area" id="statusContainer">
+                 <div class="status-content loading-content">
+                    <div class="techno-loader">
+                        <svg viewBox="0 0 100 100">
+                            <path class="circuit-flow" id="flow-1" d="M 50,50 m -25,0 a 25,25 0 1,1 50,0 a 25,25 0 1,1 -50,0"></path>
+                            <path class="circuit-flow" id="flow-2" d="M 50,50 m -35,0 a 35,35 0 1,0 70,0 a 35,35 0 1,0 -70,0"></path>
+                        </svg>
+                        <div class="core-pulse"></div>
+                    </div>
+                    <div class="status-text-dynamic" id="dynamicStatusText">Sincronizando datos...</div>
+                 </div>
+                 <div class="status-content success-content">
+                    <div class="success-icon"><svg viewBox="0 0 24 24"><path fill="none" stroke-width="2.5" stroke="currentColor" d="M5,13 l4,4 l10,-10" /></svg></div>
+                    <div class="success-text">Sincronización completa</div>
+                 </div>
+                 <div class="status-content error-content">
+                    <div class="status-icon error-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg></div>
+                    <div class="error-text" id="errorText"></div>
+                 </div>
             </div>
+
             <div id="weekSelectorContainer">
-                <label for="weekSelector">2. Selecciona la semana a generar</label>
+                <label for="weekSelector">1. Selecciona la semana a generar</label>
                 <div class="custom-select-wrapper" id="customSelect">
                     <select id="weekSelector"></select>
-                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando archivo --</div>
+                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando datos --</div>
                     <div class="custom-options" id="customOptions"></div>
                 </div>
             </div>
             
-            <div class="settings-container" id="settingsContainer">
-                <button id="settingsBtn" class="settings-button" title="Configurar Feriado">
-                    <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07-1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
-                </button>
-                <div class="settings-panel" id="settingsPanel">
-                    <h3>Activar arribo 08:00 en feriados</h3>
-                    <div class="holiday-options-container" id="holidayOptionsContainer"></div>
-                    <button id="holidayAcceptBtn" class="button-small">Aceptar</button>
+            <div id="mainActions">
+                <div class="settings-container" id="settingsContainer">
+                    <button id="settingsBtn" class="settings-button" title="Configurar Feriado">
+                        <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07-1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
+                    </button>
+                    <div class="settings-panel" id="settingsPanel">
+                        <h3>Activar arribo 08:00 en feriados</h3>
+                        <div class="holiday-options-container" id="holidayOptionsContainer"></div>
+                        <button id="holidayAcceptBtn" class="button-small">Aceptar</button>
+                    </div>
                 </div>
-            </div>
 
-            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
-            <div class="button-container">
-                <button class="button" id="generateBtn" disabled>Generar Excel</button>
+                <div class="button-container">
+                    <button class="button" id="generateBtn" disabled>Generar Excel</button>
+                </div>
+                <div class="status-message" id="statusMessage"></div>
             </div>
-            <div class="status-message" id="statusMessage"></div>
         </div>
     </div>
     
     <script>
+        // --- Canvas Animation ---
+        const canvas = document.getElementById('neuronCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+        class Particle {
+            constructor(x, y, size, speedX, speedY) { this.x = x; this.y = y; this.size = size; this.speedX = speedX; this.speedY = speedY; }
+            draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); ctx.fillStyle = `rgba(200, 225, 255, 0.6)`; ctx.fill(); }
+            update() { if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY; this.x += this.speedX; this.y += this.speedY; }
+        }
+        function initParticles() {
+            particlesArray = []; let num = (canvas.height * canvas.width) / 12000;
+            for (let i = 0; i < num; i++) {
+                let size = (Math.random() * 2) + 1; let x = Math.random() * innerWidth; let y = Math.random() * innerHeight;
+                let speedX = (Math.random() * 0.5) - 0.25; let speedY = (Math.random() * 0.5) - 0.25;
+                particlesArray.push(new Particle(x, y, size, speedX, speedY));
+            }
+        }
+        function connectParticles() {
+            for (let a = 0; a < particlesArray.length; a++) {
+                for (let b = a; b < particlesArray.length; b++) {
+                    let dist = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                    if (dist < (canvas.width / 8) * (canvas.height / 8)) {
+                        let op = 1 - (dist / 20000);
+                        ctx.strokeStyle = `rgba(0, 188, 212, ${op})`; ctx.lineWidth = 1;
+                        ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y); ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke();
+                    }
+                }
+            }
+        }
+        function animateParticles() {
+            requestAnimationFrame(animateParticles); ctx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); }
+            connectParticles();
+        }
+        window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; initParticles(); });
+        initParticles();
+        animateParticles();
+
+        // --- Main Application Logic ---
         let allData = null, turnosData = null, generatedWorkbook = null, fileName = '', addressMap = null, confirmacionMap = null;
         let selectedHolidays = []; 
         
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
         const generateBtn = document.getElementById('generateBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
         const statusMessage = document.getElementById('statusMessage');
         const weekSelectorContainer = document.getElementById('weekSelectorContainer');
         const weekSelector = document.getElementById('weekSelector');
@@ -318,19 +274,12 @@
         const settingsPanel = document.getElementById('settingsPanel');
         const holidayOptionsContainer = document.getElementById('holidayOptionsContainer');
         const holidayAcceptBtn = document.getElementById('holidayAcceptBtn');
+        const statusContainer = document.getElementById('statusContainer');
+        const dynamicStatusText = document.getElementById('dynamicStatusText');
+        const errorText = document.getElementById('errorText');
+        const mainActions = document.getElementById('mainActions');
 
-        function formatRut(rutValue) {
-            if (!rutValue) return null;
-            const cleanRut = String(rutValue).replace(/[^0-9kK]/g, '');
-            if (cleanRut.length < 2) {
-                return cleanRut;
-            }
-            const body = cleanRut.slice(0, -1);
-            let dv = cleanRut.slice(-1);
-            dv = dv.toUpperCase();
-            return `${body}-${dv}`;
-        }
-
+        // --- Event Listeners ---
         customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
         settingsBtn.addEventListener('click', (e) => { e.stopPropagation(); settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block'; });
         holidayAcceptBtn.addEventListener('click', () => {
@@ -343,153 +292,182 @@
             if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
             if (!settingsContainer.contains(e.target)) settingsPanel.style.display = 'none';
         });
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
-        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-        
-        function handleFile(file) {
-            fileNameDisplay.textContent = file.name;
-            uploadArea.classList.add('file-loaded');
-            generateBtn.disabled = true;
-            settingsContainer.style.display = 'none';
-            addressMap = null;
-            confirmacionMap = null;
-
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                    allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    
-                    const addressSheetName = workbook.SheetNames.find(name => name.toLowerCase().trim() === 'direcciones');
-                    if (!addressSheetName) {
-                        showStatus('Error: No se encontró la hoja "Direcciones".', 'error');
-                        return;
-                    }
-                    const addressJson = XLSX.utils.sheet_to_json(workbook.Sheets[addressSheetName]);
-                    addressMap = new Map();
-                    addressJson.forEach(row => {
-                        const rut = row['Rut'] || row['rut'] || row['RUT'];
-                        const formattedRut = formatRut(rut);
-                        if (formattedRut) {
-                            addressMap.set(formattedRut, {
-                                direccion: row['Direcciones'] || row['direcciones'] || row['DIRECCIONES'] || row['DIRECCION'] || row['Direccion'] || row['direccion'] || '',
-                                fono: row['Fono'] || row['fono'] || row['FONO'] || ''
-                            });
-                        }
-                    });
-
-                    const confirmacionSheetName = workbook.SheetNames.find(name => name.toLowerCase().trim() === 'confirmacion_transporte');
-                    confirmacionMap = new Map(); 
-                    if (confirmacionSheetName) {
-                        const confirmacionJson = XLSX.utils.sheet_to_json(workbook.Sheets[confirmacionSheetName], { header: 1 });
-                        if (confirmacionJson && confirmacionJson.length > 1) {
-                            for (let i = 1; i < confirmacionJson.length; i++) {
-                                const row = confirmacionJson[i];
-                                if (!row || row.length < 4) continue;
-
-                                const rawRut = row[1];
-                                const nombreConfirmado = row[2];
-                                const weekString = row[3]; 
-
-                                if (rawRut && weekString && typeof weekString === 'string') {
-                                    const formattedRut = formatRut(rawRut);
-                                    const mondayISO = parseWeekString(weekString);
-                                    if (formattedRut && mondayISO) {
-                                        const key = `${formattedRut}|${mondayISO}`;
-                                        confirmacionMap.set(key, { rut: formattedRut, nombre: nombreConfirmado });
-                                    }
-                                }
-                            }
-                        }
-                    } else {
-                        console.warn('Hoja "Confirmacion_Transporte" no encontrada.');
-                    }
-
-                    populateWeekSelector(allData);
-                    weekSelectorContainer.style.display = 'block';
-                    showStatus('Archivo cargado. Por favor, selecciona una semana.', 'success');
-                } catch(error) {
-                    showStatus('Error al leer el archivo. Revisa la consola (F12) para detalles.', 'error');
-                    console.error("Error en handleFile:", error);
-                }
-            };
-            reader.readAsArrayBuffer(file);
-        }
-
-        function parseWeekString(weekText) {
-            try {
-                const monthMap = {
-                    'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5,
-                    'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11
-                };
-                const regex = /semana del\s+(\d{1,2})\s+al\s+(\d{1,2})\s+de\s+([\w]+)\s+del\s+(\d{4})/i;
-                const match = weekText.match(regex);
-
-                if (match) {
-                    const day = parseInt(match[1], 10);
-                    const monthName = match[3].toLowerCase();
-                    const year = parseInt(match[4], 10);
-                    const month = monthMap[monthName];
-
-                    if (month !== undefined) {
-                        const date = new Date(year, month, day);
-                        if (!isNaN(date)) return getMonday(date).toISOString();
-                    }
-                }
-            } catch (error) {
-                console.error(`Error al parsear la semana: "${weekText}"`, error);
-            }
-            return null;
-        }
-
         weekSelector.addEventListener('change', handleWeekSelection);
+        generateBtn.addEventListener('click', generateTransportExcel);
+        
+        // --- Helper Functions ---
+        const findKey = (o, names) => { if (!o || !names) return null; const keys = Object.keys(o); const lowerCaseNames = names.map(n => String(n).replace(/[\s_]+/g,'').toLowerCase()); return keys.find(k => lowerCaseNames.includes(String(k).replace(/[\s_]+/g,'').toLowerCase())); };
+        const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : undefined; };
+        function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
+        function parseDateTime(value, dateRef) { if (value === null || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateRef instanceof Date) { const totalMs = Math.round(value * 24 * 60 * 60 * 1000); const combined = new Date(dateRef); combined.setHours(0,0,0,0); combined.setTime(combined.getTime() + totalMs); return combined; } return null; }
+        
+        function parseISODateAsLocal(isoString) {
+            const [year, month, day] = isoString.split('-').map(Number);
+            return new Date(year, month - 1, day);
+        }
 
         function getMonday(d) {
             d = new Date(d);
-            const day = d.getDay(), diff = d.getDate() - day + (day === 0 ? -6 : 1);
-            const monday = new Date(d.setDate(diff));
-            monday.setHours(0, 0, 0, 0);
+            const day = d.getDay();
+            const diff = d.getDate() - day + (day === 0 ? -6 : 1);
+            const monday = new Date(d.getFullYear(), d.getMonth(), diff);
+            monday.setHours(0,0,0,0);
             return monday;
+        }
+        
+        function ymdLocal(d){ const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const da=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${da}`; }
+        function formatRut(rutValue) { if (!rutValue) return null; const cleanRut = String(rutValue).replace(/[^0-9kK]/g, ''); if (cleanRut.length < 2) return cleanRut; const body = cleanRut.slice(0, -1); let dv = cleanRut.slice(-1).toUpperCase(); return `${body}-${dv}`; }
+
+        function parseWeekString(weekText) {
+            if (!weekText) return null;
+
+            if (typeof weekText === 'number' && weekText > 1) {
+                return getMonday(excelSerialToDate(weekText));
+            }
+
+            if (typeof weekText !== 'string') return null;
+
+            const regex = /semana del\s+(\d{1,2})\s+al\s+(\d{1,2})\s+de\s+([\w\u00C0-\u017F]+)\s+del\s+(\d{4})/i;
+            const match = weekText.match(regex);
+            if (match) {
+                const monthMap = { 'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5, 'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11 };
+                const day = parseInt(match[1], 10);
+                const monthName = match[3].toLowerCase();
+                const year = parseInt(match[4], 10);
+                const month = monthMap[monthName];
+                if (month !== undefined) {
+                    const date = new Date(year, month, day);
+                    if (!isNaN(date)) return getMonday(date);
+                }
+            }
+            try {
+                const directDate = new Date(weekText);
+                if (!isNaN(directDate.getTime())) {
+                    if (weekText.indexOf('T') === -1) {
+                       directDate.setMinutes(directDate.getMinutes() + directDate.getTimezoneOffset());
+                    }
+                    return getMonday(directDate);
+                }
+            } catch (error) {
+                 console.error(`Error al parsear la semana: "${weekText}"`, error);
+            }
+            
+            return null;
+        }
+        
+        // --- Data Fetching and Processing ---
+        async function fetchAllData() {
+            statusContainer.className = 'status-area is-loading';
+            
+            const urls = {
+                turnos: "https://prod-31.westus.logic.azure.com:443/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=mMrr6cxbsMA-cVu8pBVkiaDbJ2oMTJPBKx3MB_QPmyQ",
+                direcciones: "https://prod-145.westus.logic.azure.com:443/workflows/1017deda0bf0452d8963087c46ce7213/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=NsMZxLa3-cw0PQQwod0e2NmYhGT_zD1q6wfnjjsN0Aw",
+                confirmacion: "https://prod-85.westus.logic.azure.com:443/workflows/9c07a9ab754149108a8c84fd500f086f/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=pFUDUCEFE-_W-uXVngrpO47VGfk47ub3YWKHaEjM4y4"
+            };
+
+            try {
+                const [turnosRes, direccionesRes, confirmacionRes] = await Promise.all(
+                    Object.values(urls).map(url => fetch(url, { method: "POST" }))
+                );
+
+                if (!turnosRes.ok || !direccionesRes.ok || !confirmacionRes.ok) {
+                    throw new Error(`Error en la red: T-${turnosRes.status}, D-${direccionesRes.status}, C-${confirmacionRes.status}`);
+                }
+
+                const turnosRaw = await turnosRes.json();
+                const direccionesRaw = await direccionesRes.json();
+                const confirmacionText = await confirmacionRes.text();
+                const confirmacionRaw = JSON.parse(confirmacionText);
+                
+                allData = turnosRaw.map(row => {
+                    const newRow = { ...row };
+                    const dateComponent = findVal(newRow, ['Fecha', 'fecha']) ? excelSerialToDate(parseFloat(findVal(newRow, ['Fecha', 'fecha']))) : null;
+                    newRow.Fecha = dateComponent;
+                    const timeKeys = ['Ini', 'FIN'];
+                    timeKeys.forEach(key => {
+                        const foundKey = findKey(newRow, [key]);
+                        if (foundKey && newRow[foundKey] !== null) newRow[foundKey] = parseDateTime(parseFloat(newRow[foundKey]), dateComponent);
+                    });
+                    return newRow;
+                });
+
+                addressMap = new Map();
+                direccionesRaw.forEach(row => {
+                    const formattedRut = formatRut(findVal(row, ['Rut']));
+                    if (formattedRut) {
+                        addressMap.set(formattedRut, {
+                            direccion: findVal(row, ['Direcciones', 'Direccion']) || '',
+                            fono: findVal(row, ['Fono']) || ''
+                        });
+                    }
+                });
+
+                confirmacionMap = new Map();
+                if (Array.isArray(confirmacionRaw)) {
+                    confirmacionRaw.forEach(row => {
+                        const rawRut = findVal(row, ['Rut']);
+                        // ***** CORRECCIÓN CLAVE AQUÍ *****
+                        // Se busca por 'Semana de confirmaciom' y también por 'Semana' para más flexibilidad.
+                        const weekString = findVal(row, ['Semana de confirmaciom', 'Semana']);
+                        
+                        if (rawRut && weekString) {
+                            const formattedRut = formatRut(rawRut);
+                            const mondayDate = parseWeekString(weekString);
+                            if (formattedRut && mondayDate) {
+                                const key = `${formattedRut}|${ymdLocal(mondayDate)}`;
+                                confirmacionMap.set(key, { rut: formattedRut, nombre: findVal(row, ['Nombre']) });
+                            }
+                        }
+                    });
+                }
+                
+                statusContainer.className = 'status-area is-success';
+                setTimeout(() => {
+                    statusContainer.style.display = 'none';
+                    weekSelectorContainer.style.display = 'block';
+                    mainActions.style.display = 'block';
+                    populateWeekSelector(allData);
+                }, 1000);
+
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                statusContainer.className = 'status-area is-error';
+                errorText.textContent = 'Error al sincronizar: ' + error.message;
+            }
         }
 
         function populateWeekSelector(data) {
             const weekSet = new Set();
-            data.forEach(row => {
-                if (row.Fecha && !isNaN(new Date(row.Fecha))) {
-                     weekSet.add(getMonday(new Date(row.Fecha)).toISOString());
+            data.forEach(row => { 
+                if (row.Fecha instanceof Date && !isNaN(row.Fecha)) {
+                    const mondayDate = getMonday(row.Fecha);
+                    weekSet.add(mondayDate.getTime());
                 }
             });
-
-            const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
+            const sortedWeeks = Array.from(weekSet).sort((a, b) => b - a);
             const last4Weeks = sortedWeeks.slice(0, 4); 
 
-            weekSelector.innerHTML = '';
-            customOptions.innerHTML = '';
-            customSelectTrigger.textContent = '-- Selecciona una semana --';
+            weekSelector.innerHTML = ''; customOptions.innerHTML = ''; customSelectTrigger.textContent = '-- Selecciona una semana --';
             
-            last4Weeks.forEach(mondayISO => {
-                const monday = new Date(mondayISO);
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
+            last4Weeks.forEach(mondayTS => {
+                const monday = new Date(mondayTS);
+                const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
                 const optionText = `Semana del ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES', { month: 'long' })} del ${sunday.getFullYear()}`;
+                const optionValue = ymdLocal(monday);
                 
                 const option = document.createElement('option');
-                option.value = mondayISO;
+                option.value = optionValue;
                 option.textContent = optionText;
                 weekSelector.appendChild(option);
-
+                
                 const customOption = document.createElement('div');
-                customOption.classList.add('custom-option');
+                customOption.className = 'custom-option';
                 customOption.textContent = optionText;
-                customOption.dataset.value = mondayISO;
+                customOption.dataset.value = optionValue;
 
                 customOption.addEventListener('click', () => {
-                    customSelectTrigger.textContent = customOption.textContent;
-                    weekSelector.value = customOption.dataset.value;
+                    customSelectTrigger.textContent = optionText;
+                    weekSelector.value = optionValue;
                     weekSelector.dispatchEvent(new Event('change'));
                     document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
                     customOption.classList.add('selected');
@@ -498,142 +476,63 @@
                 customOptions.appendChild(customOption);
             });
         }
-
-        
-        function normalizeDate(d) {
-            const date = new Date(d);
-            date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // corrige desfase
-            date.setHours(0, 0, 0, 0); // elimina horas
-            return date;
-        }
     
         function handleWeekSelection(event) {
-            const selectedMondayISO = event.target.value;
-            if (!selectedMondayISO) {
-                turnosData = null;
-                generateBtn.disabled = true;
-                settingsContainer.style.display = 'none';
-                return;
-            }
-            const selectedMonday = new Date(selectedMondayISO);
+            const selectedMondayISOString = event.target.value;
+            if (!selectedMondayISOString) { turnosData = null; generateBtn.disabled = true; settingsContainer.style.display = 'none'; return; }
+            
+            const selectedMonday = parseISODateAsLocal(selectedMondayISOString);
             const sunday = new Date(selectedMonday);
             sunday.setDate(selectedMonday.getDate() + 6);
+            sunday.setHours(23, 59, 59, 999);
+
             turnosData = allData.filter(row => {
-                if (!row.Fecha || isNaN(new Date(row.Fecha))) return false;
-                const rowDate = normalizeDate(row.Fecha);
+                if (!(row.Fecha instanceof Date) || isNaN(row.Fecha)) return false;
+                const rowDate = row.Fecha;
                 return rowDate >= selectedMonday && rowDate <= sunday;
             });
+
             generateBtn.disabled = false;
-
-            holidayOptionsContainer.innerHTML = '';
-            selectedHolidays = [];
-            settingsBtn.classList.remove('is-active');
-
+            holidayOptionsContainer.innerHTML = ''; selectedHolidays = []; settingsBtn.classList.remove('is-active');
             for (let i = 0; i < 5; i++) {
                 const currentDay = new Date(selectedMonday);
                 currentDay.setDate(selectedMonday.getDate() + i);
-                
-                const valueFormat = currentDay.toISOString().split('T')[0];
+                const valueFormat = ymdLocal(currentDay);
                 const dayName = currentDay.toLocaleDateString('es-ES', { weekday: 'long', day: 'numeric', month: 'long' });
                 const optionDiv = document.createElement('div');
                 optionDiv.className = 'holiday-option';
                 optionDiv.innerHTML = `<input type="checkbox" class="holiday-checkbox" id="holiday-${valueFormat}" value="${valueFormat}"><label for="holiday-${valueFormat}">${dayName}</label>`;
                 holidayOptionsContainer.appendChild(optionDiv);
             }
-            settingsContainer.style.display = 'block';
-            settingsPanel.style.display = 'none';
+            settingsContainer.style.display = 'block'; settingsPanel.style.display = 'none';
         }
-        
-        function parseExcelTime(excelValue) {
-            if (!excelValue) return null;
-            if (excelValue instanceof Date && !isNaN(excelValue)) return excelValue;
-            if (typeof excelValue === 'number' && excelValue > 0 && excelValue < 1) {
-                const excelEpoch = new Date(Date.UTC(1899, 11, 30));
-                const date = new Date(excelEpoch.getTime() + excelValue * 24 * 60 * 60 * 1000);
-                const timezoneOffset = date.getTimezoneOffset() * 60 * 1000;
-                return new Date(date.getTime() + timezoneOffset);
-            }
-            if (typeof excelValue === 'string') {
-                const parts = excelValue.match(/(\d+):(\d+)(:(\d+))?/);
-                if (parts) {
-                    const [ , hours, minutes, , seconds] = parts.map(p => parseInt(p, 10) || 0);
-                    if (hours >= 0 && hours < 24 && minutes >= 0 && minutes < 60) {
-                        const date = new Date();
-                        date.setHours(hours, minutes, seconds, 0);
-                        return date;
-                    }
-                }
-            }
-            const parsedDate = new Date(excelValue);
-            return !isNaN(parsedDate) ? parsedDate : null;
-        }
-        
-        generateBtn.addEventListener('click', generateTransportExcel);
         
         async function triggerDownload() {
             if (generatedWorkbook && fileName) {
                 const buffer = await generatedWorkbook.xlsx.writeBuffer();
                 const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
                 const url = URL.createObjectURL(blob);
-                const a = document.createElement('a');
-                a.href = url;
-                a.download = fileName;
-                document.body.appendChild(a);
-                a.click();
-                document.body.removeChild(a);
-                URL.revokeObjectURL(url);
+                const a = document.createElement('a'); a.href = url; a.download = fileName;
+                document.body.appendChild(a); a.click(); document.body.removeChild(a); URL.revokeObjectURL(url);
             }
         }
 
         async function generateTransportExcel() {
-            if (!turnosData || turnosData.length === 0) {
-                showStatus('No hay datos válidos para procesar.', 'error');
-                return;
-            }
-            if (!addressMap) {
-                showStatus('Faltan datos de direcciones. Vuelve a cargar el archivo.', 'error');
-                return;
-            }
-
+            if (!turnosData || turnosData.length === 0 || !addressMap) { showStatus('Faltan datos para procesar.', 'error'); return; }
             generateBtn.disabled = true;
-            progressBar.classList.add('active');
-            progressFill.style.width = '0%';
-            
-            let progress = 0;
-            const interval = setInterval(() => {
-                progress = Math.min(progress + Math.random() * 10, 90);
-                progressFill.style.width = progress + '%';
-            }, 200);
-
             try {
                 await createTransportWorkbook(); 
-                
-                clearInterval(interval);
-                progressFill.style.width = '100%';
-                
                 if (fileName) { 
-                    generateBtn.classList.add('is-success');
-                    generateBtn.textContent = 'Descargando...';
+                    generateBtn.classList.add('is-success'); generateBtn.textContent = 'Descargando...';
                     showStatus('¡Listo! Iniciando descarga...', 'success');
                     await triggerDownload();
                     setTimeout(() => {
-                        generateBtn.classList.remove('is-success');
-                        generateBtn.textContent = 'Generar Excel';
-                        generateBtn.disabled = false;
+                        generateBtn.classList.remove('is-success'); generateBtn.textContent = 'Generar Excel'; generateBtn.disabled = false;
                     }, 2000);
-                } else {
-                    generateBtn.disabled = false;
-                }
+                } else { generateBtn.disabled = false; }
             } catch (error) {
-                clearInterval(interval);
-                showStatus('Ocurrió un error. Revisa la consola (F12) para detalles.', 'error');
-                console.error("Error en generateTransportExcel:", error);
-                generateBtn.disabled = false;
-            } finally {
-                 setTimeout(() => {
-                      progressBar.classList.remove('active');
-                      progressFill.style.width = '0%';
-                 }, 1000);
+                showStatus('Ocurrió un error. Revisa la consola para detalles.', 'error');
+                console.error("Error en generateTransportExcel:", error); generateBtn.disabled = false;
             }
         }
         
@@ -643,78 +542,53 @@
             const transportList = [];
 
             turnosData.forEach(row => {
-                const estado = row['Estado'] || row['estado'] || row['ESTADO'];
-                const lugar = (row['Lugar'] || row['lugar'] || '').toLowerCase();
-                if ((estado || '').toLowerCase() !== 'activo' || lugar === 'tt' || !row.Fecha || isNaN(new Date(row.Fecha))) return;
+                const estado = findVal(row, ['Estado']); const lugar = (findVal(row, ['Lugar']) || '').toLowerCase();
+                if ((estado || '').toLowerCase() !== 'activo' || lugar === 'tt' || !(row.Fecha instanceof Date)) return;
 
-                let fecha = new Date(row.Fecha);
-                // Corregir desfase de zona horaria
-                fecha.setMinutes(fecha.getMinutes() + fecha.getTimezoneOffset());
-                const ini = parseExcelTime(row['Ini'] || row['ini'] || row['INI']);
-                const fin = parseExcelTime(row['FIN'] || row['Fin'] || row['fin'] || row['FIN ']);
-                const nombre = row['Nombre'] || row['nombre'];
-                const rutValue = row['Rut'] || row['RUT'] || row['rut'];
-                
+                let fecha = row.Fecha;
+                const ini = findVal(row, ['Ini']); const fin = findVal(row, ['FIN', 'Fin']);
+                const nombre = findVal(row, ['Nombre']); const rutValue = findVal(row, ['Rut']);
                 const formattedRut = formatRut(rutValue);
                 if (!nombre || !formattedRut) return;
                 
                 const contactInfo = addressMap.get(formattedRut) || { direccion: '', fono: '' };
-                const mondayOfRow = getMonday(fecha).toISOString();
+                const mondayOfRow = ymdLocal(getMonday(fecha));
                 const confirmationKey = `${formattedRut}|${mondayOfRow}`;
-                const isConfirmed = confirmacionMap && confirmacionMap.has(confirmationKey);
-                
-                const confirmacionStatus = isConfirmed ? 'Confirmado' : 'No Confirmado';
+                const confirmacionStatus = (confirmacionMap && confirmacionMap.has(confirmationKey)) ? 'Confirmado' : 'No Confirmado';
 
-                const itemData = {
-                    rawDate: fecha,
-                    fecha: fecha.toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }),
-                    rut: formattedRut,
-                    nombre, ...contactInfo, servicio: 'Saesa',
-                    confirmacion: confirmacionStatus
-                };
+                const itemData = { rawDate: fecha, fecha: fecha.toLocaleDateString('es-CL', { year: 'numeric', month: '2-digit', day: '2-digit' }), rut: formattedRut, nombre, ...contactInfo, servicio: 'Saesa', confirmacion: confirmacionStatus };
 
-                if (ini) {
-                    const iniHour = ini.getHours();
-                    const dayOfWeek = fecha.getDay();
-                    const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                    const isHoliday = selectedHolidays.includes(fecha.toISOString().split('T')[0]);
-
+                if (ini instanceof Date) {
+                    const iniHour = ini.getHours(); const dayOfWeek = fecha.getDay(); const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
+                    const isHoliday = selectedHolidays.includes(ymdLocal(fecha));
                     if (iniHour === 0) transportList.push({ ...itemData, hora: '00:00', sentido: 'Arribo' });
                     else if (iniHour === 7 && dayOfWeek >= 1 && dayOfWeek <= 5) transportList.push({ ...itemData, hora: '07:00', sentido: 'Arribo' });
                     else if (iniHour === 8 && (isWeekend || isHoliday)) transportList.push({ ...itemData, hora: '08:00', sentido: 'Arribo' });
                 }
-
-                if (fin) {
+                if (fin instanceof Date) {
                     const finHour = fin.getHours();
                     if (finHour === 22) transportList.push({ ...itemData, hora: '22:00', sentido: 'Zarpe' });
                     else if (finHour === 0) transportList.push({ ...itemData, hora: '00:00', sentido: 'Zarpe' });
                 }
             });
 
-            if (transportList.length === 0) {
-                showStatus('No se encontraron agentes "Activos" que requieran transporte para la semana seleccionada.', 'error');
-                fileName = '';
-                return;
-            }
+            if (transportList.length === 0) { showStatus('No se encontraron agentes que requieran transporte.', 'error'); fileName = ''; return; }
 
             transportList.sort((a, b) => {
-                const dateDiff = a.rawDate - b.rawDate;
-                if (dateDiff !== 0) return dateDiff;
-                const getSortOrder = (sentido, hora) => {
-                    const order = { 'Arribo-00:00': 1, 'Arribo-07:00': 2, 'Arribo-08:00': 3, 'Zarpe-22:00': 4, 'Zarpe-00:00': 5 };
-                    return order[`${sentido}-${hora}`] || 99;
-                };
-                const orderDiff = getSortOrder(a.sentido, a.hora) - getSortOrder(b.sentido, b.hora);
+                const dateDiff = a.rawDate - b.rawDate; if (dateDiff !== 0) return dateDiff;
+                const order = { 'Arribo-00:00': 1, 'Arribo-07:00': 2, 'Arribo-08:00': 3, 'Zarpe-22:00': 4, 'Zarpe-00:00': 5 };
+                const orderDiff = (order[`${a.sentido}-${a.hora}`] || 99) - (order[`${b.sentido}-${b.hora}`] || 99);
                 if (orderDiff !== 0) return orderDiff;
                 return a.nombre.localeCompare(b.nombre);
             });
 
-            const sheetNameDate = new Date(weekSelector.value);
+            const sheetNameDate = parseISODateAsLocal(weekSelector.value);
             const d1 = String(sheetNameDate.getDate()).padStart(2, '0');
-            sheetNameDate.setDate(sheetNameDate.getDate() + 6);
-            const d2 = String(sheetNameDate.getDate()).padStart(2, '0');
-            const monthName = sheetNameDate.toLocaleString('es-ES', { month: 'long' });
-            const sheetName = `semana del ${d1} al ${d2} de ${monthName} ${sheetNameDate.getFullYear()}`;
+            const sunday = new Date(sheetNameDate);
+            sunday.setDate(sheetNameDate.getDate() + 6);
+            const d2 = String(sunday.getDate()).padStart(2, '0');
+            const monthName = sunday.toLocaleString('es-ES', { month: 'long' });
+            const sheetName = `semana del ${d1} al ${d2} de ${monthName} ${sunday.getFullYear()}`;
             
             const worksheet = workbook.addWorksheet(sheetName);
             worksheet.columns = [
@@ -724,86 +598,34 @@
                 { header: 'Nombre', key: 'nombre', width: 40 }, { header: 'Direcciones', key: 'direccion', width: 50 },
                 { header: 'Fono', key: 'fono', width: 15 }, { header: 'Confirmacion', key: 'confirmacion', width: 25 }
             ];
-            
-            const styleHeaderRow = (row) => {
-                row.eachCell(cell => {
-                    cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF538DD5' } };
-                    cell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
-                    cell.alignment = { vertical: 'middle', horizontal: 'center' };
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                });
-            };
-
+            const styleHeaderRow = (row) => row.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF538DD5' } }; cell.font = { color: { argb: 'FFFFFFFF' }, bold: true }; cell.alignment = { vertical: 'middle', horizontal: 'center' }; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; });
             styleHeaderRow(worksheet.getRow(1));
-
             let transportCounter = 1, currentDay = null;
             transportList.forEach(item => {
-                if (currentDay && currentDay !== item.rawDate.toDateString()) {
-                    styleHeaderRow(worksheet.addRow(worksheet.columns.map(c => c.header)));
-                    transportCounter = 1;
-                }
+                if (currentDay && currentDay !== item.rawDate.toDateString()) { styleHeaderRow(worksheet.addRow(worksheet.columns.map(c => c.header))); transportCounter = 1; }
                 currentDay = item.rawDate.toDateString();
                 const row = worksheet.addRow({ transporteId: transportCounter++, ...item });
                 const colors = { 'Arribo-00:00': 'FFFBE2D5', 'Arribo-07:00': 'FFF2CEEF', 'Arribo-08:00': 'FFF2CEEF', 'Zarpe-22:00': 'FFDAE9F8', 'Zarpe-00:00': 'FFDAF2D0' };
                 const rowColor = colors[`${item.sentido}-${item.hora}`];
                 if (rowColor) row.eachCell({ includeEmpty: true }, c => c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } });
-
                 row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
                     cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(worksheet.columns[colNumber - 1].key)) {
-                        cell.alignment = { horizontal: 'center' };
-                    }
+                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(worksheet.columns[colNumber - 1].key)) cell.alignment = { horizontal: 'center' };
                 });
             });
+            worksheet.addConditionalFormatting({ ref: `J2:J${worksheet.rowCount}`, rules: [ { type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } } }, { type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } } } ] });
+            worksheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && row.getCell(1).value) { row.getCell(10).dataValidation = { type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'] }; } });
             
-            worksheet.addConditionalFormatting({
-                ref: `J2:J${worksheet.rowCount}`,
-                rules: [
-                    { type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } } },
-                    { type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } } }
-                ]
-            });
-
-            worksheet.eachRow((row, rowNumber) => {
-                if (rowNumber > 1 && row.getCell(1).value) { 
-                     row.getCell(10).dataValidation = {
-                        type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'],
-                        showErrorMessage: true, errorStyle: 'stop', errorTitle: 'Valor no válido', error: 'Por favor, selecciona un valor de la lista.'
-                    };
-                }
-            });
-
             const scheduledRuts = new Set(transportList.map(item => item.rut));
             const notFoundConfirmations = [];
-            const selectedMondayISO = new Date(weekSelector.value).toISOString();
-
-            if (confirmacionMap) {
-                for (const [key, value] of confirmacionMap.entries()) {
-                    const [rut, weekISO] = key.split('|');
-                    if (weekISO === selectedMondayISO) {
-                        if (!scheduledRuts.has(value.rut)) {
-                            notFoundConfirmations.push({
-                                rut: value.rut,
-                                nombre: value.nombre
-                            });
-                        }
-                    }
-                }
-            }
-
+            const selectedMondayFormatted = weekSelector.value;
+            if (confirmacionMap) { for (const [key, value] of confirmacionMap.entries()) { const [rut, weekString] = key.split('|'); if (weekString === selectedMondayFormatted && !scheduledRuts.has(value.rut)) { notFoundConfirmations.push({ rut: value.rut, nombre: value.nombre }); } } }
             if (notFoundConfirmations.length > 0) {
                 const notFoundSheet = workbook.addWorksheet('Confirmados No Encontrados');
-                notFoundSheet.columns = [
-                    { header: 'RUT', key: 'rut', width: 20 },
-                    { header: 'Nombre', key: 'nombre', width: 45 }
-                ];
+                notFoundSheet.columns = [ { header: 'RUT', key: 'rut', width: 20 }, { header: 'Nombre', key: 'nombre', width: 45 } ];
                 styleHeaderRow(notFoundSheet.getRow(1));
                 notFoundSheet.addRows(notFoundConfirmations);
-                 notFoundSheet.eachRow({ includeHeader: false }, (row, rowNumber) => {
-                    if(rowNumber > 1) {
-                        row.eachCell(c => c.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } });
-                    }
-                });
+                notFoundSheet.eachRow({ includeHeader: false }, (row, rowNumber) => { if(rowNumber > 1) { row.eachCell(c => c.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }); } });
             }
 
             fileName = `Transporte ${sheetName}.xlsx`;
@@ -811,6 +633,9 @@
         }
 
         function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; }
+        
+        // --- Initial Load ---
+        document.addEventListener('DOMContentLoaded', fetchAllData);
     </script>
 </body>
 </html>
