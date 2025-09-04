@@ -3,173 +3,267 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestiones Inbound - Generador de Turnos</title>
+    <title>Gestiones Inbound - Generador de Turnos AI v3.0</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bg: #f4f7fe;
-            --color-surface: #ffffff;
-            --color-primary-start: #6a11cb;
-            --color-primary-end: #2575fc;
+            --color-primary-start: #8e2de2;
+            --color-primary-end: #4a00e0;
+            --color-accent-light: #00bcd4;
+            --color-glow: rgba(142, 45, 226, 0.5);
+            --color-success: #28a745;
             --color-success-start: #16a34a;
             --color-success-end: #15803d;
-            --color-text: #1e293b;
-            --color-text-secondary: #64748b;
-            --color-border: #e2e8f0;
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --color-error: #dc3545;
             --font-family: 'Manrope', sans-serif;
-        }
-        * { margin: 0; padding: 0; box-sizing: border-box; }
-        body {
-            font-family: var(--font-family); background-color: var(--color-bg); min-height: 100vh;
-            display: flex; justify-content: center; align-items: center; padding: 20px;
-            color: var(--color-text); position: relative; overflow: hidden;
-        }
-        .main-container {
-            display: grid; grid-template-columns: 1fr; max-width: 1000px; width: 100%;
-            background: var(--color-surface); border-radius: 24px; box-shadow: var(--shadow-lg);
-            border: 1px solid white; overflow: hidden; z-index: 10;
-        }
-        @media (min-width: 800px) { .main-container { grid-template-columns: 40% 60%; } }
-        .illustration-panel {
-            background: linear-gradient(160deg, #f0f5ff, #e6efff); padding: 40px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
-        }
-        .excel-animation {
-            width: 250px; height: 200px; background-color: #fff; border-radius: 8px;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); padding: 10px; display: flex;
-            flex-direction: column; gap: 8px; transform: perspective(800px) rotateX(15deg) rotateY(-25deg);
-        }
-        .excel-header { width: 100%; height: 20px; background-color: #eef2f9; border-radius: 4px; }
-        .excel-row { display: flex; gap: 8px; }
-        .excel-cell { flex-grow: 1; height: 20px; background-color: #f8fafc; border-radius: 4px; position: relative; overflow: hidden; animation: cellPulse 2.5s ease-in-out infinite alternate; }
-        .excel-cell::after { content: ''; position: absolute; top: 0; left: 0; height: 100%; background-image: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; animation: fillBar 2.5s ease-in-out infinite alternate; }
-        @keyframes cellPulse { from { opacity: 0.4; } to { opacity: 1; } }
-        @keyframes fillBar { from { width: 20%; } to { width: 100%; } }
-        .illustration-panel h2 { margin-top: 20px; font-size: 22px; color: var(--color-text); }
-        .illustration-panel p { margin-top: 8px; font-size: 15px; color: var(--color-text-secondary); max-width: 300px; line-height: 1.6; }
-        .content-panel { padding: 40px; }
-        .header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--color-text); font-size: 28px; font-weight: 700; }
-        .upload-area {
-            border: 2px dashed var(--color-border); border-radius: 12px; padding: 40px 20px;
-            text-align: center; transition: all 0.3s ease; cursor: pointer; background-color: #fafbff;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 190px;
-        }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
-        .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-        .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
-        .upload-text { color: var(--color-text); font-size: 16px; font-weight: 600; }
-        
-        .upload-area.file-loaded #uploadDefaultContent { display: none; }
-        .upload-area #uploadSuccessContent { display: none; }
-        .upload-area.file-loaded #uploadSuccessContent { display: block; }
-        #fileNameDisplay {
-            font-size: 18px; font-weight: 600; color: var(--color-primary-end);
-            word-break: break-all; padding: 0 15px;
-        }
-        #changeFileText {
-            font-size: 13px; color: var(--color-text-secondary); margin-top: 8px;
+            --bg-dark: #0d1117;
+            --glass-bg: rgba(20, 22, 37, 0.6);
+            --glass-border: rgba(100, 120, 255, 0.2);
+            --text-light: #f0f0f0;
+            --text-medium: #a0a0b0;
         }
 
-        input[type="file"] { display: none; }
+        * { margin: 0; padding: 0; box-sizing: border-box; }
+
+        body {
+            font-family: var(--font-family);
+            min-height: 100vh;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            padding: 20px;
+            background: var(--bg-dark);
+            position: relative;
+            overflow: hidden;
+            color: var(--text-light);
+        }
+
+        #neuronCanvas {
+            position: fixed; top: 0; left: 0;
+            width: 100%; height: 100%;
+            z-index: 0; opacity: 0.7;
+        }
+
+        .main-container {
+            width: 100%; max-width: 900px;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-glow);
+            display: grid; grid-template-columns: 1fr;
+            overflow: hidden; z-index: 10;
+        }
+        @media (min-width: 800px) { .main-container { grid-template-columns: 38% 62%; } }
+
+        .illustration-panel {
+            padding: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--glass-border);
+        }
+        .illustration-panel h2 {
+            font-size: 24px; font-weight: 700;
+            margin-bottom: 12px; color: var(--text-light);
+        }
+        .illustration-panel p {
+            font-size: 15px; color: var(--text-medium);
+            line-height: 1.6; max-width: 300px;
+        }
+
+        .content-panel { padding: 40px; }
+        .header { text-align: center; margin-bottom: 30px; }
+        h1 { font-size: 28px; font-weight: 700; color: var(--text-light); }
+        
+        .upload-area {
+            border-radius: 12px; background: rgba(0, 0, 0, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 160px; margin-bottom: 25px;
+            position: relative; overflow: hidden;
+            border: 1px solid var(--glass-border);
+            transition: all 0.3s ease;
+        }
+        .status-content { display: none; }
+        .upload-area.is-loading .loading-content,
+        .upload-area.is-success .success-content,
+        .upload-area.is-error .error-content {
+            display: flex; flex-direction: column; align-items: center;
+            justify-content: center; gap: 15px; z-index: 10;
+            width: 100%;
+        }
+
+        .techno-loader { position: relative; width: 80px; height: 80px; }
+        .core-pulse {
+            width: 20%; height: 20%;
+            background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
+            position: absolute; top: 40%; left: 40%;
+            animation: corePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes corePulse {
+            0%, 100% { transform: scale(0.8); opacity: 0.7; }
+            50% { transform: scale(1.2); opacity: 1; }
+        }
+        .circuit-flow {
+            fill: none; stroke-width: 1.5; stroke: var(--color-primary-start);
+            stroke-dasharray: 100; stroke-dashoffset: 100;
+            animation: flow 3s linear infinite;
+        }
+        #flow-2 { animation-delay: 0.5s; stroke: var(--color-primary-end); }
+        #flow-3 { animation-delay: 1s; }
+        @keyframes flow { to { stroke-dashoffset: -100; } }
+        .status-text-dynamic {
+            font-size: 16px; font-weight: 600; color: var(--text-medium);
+            text-align: center; transition: opacity 0.3s ease;
+            margin-top: 10px;
+        }
+        
+        .success-icon svg path {
+            stroke: var(--color-success); stroke-dasharray: 29; stroke-dashoffset: 29;
+            animation: drawCheck 0.4s 0.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
+        }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        .upload-area.is-success { border-color: rgba(40, 167, 69, 0.5); box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        .success-text { color: var(--color-success); font-size: 16px; font-weight: 600; }
+        
+        .error-icon { height: 40px; width: 40px; color: var(--color-error); }
+        .upload-area.is-error { border-color: rgba(220, 53, 69, 0.5); box-shadow: 0 0 20px rgba(220, 53, 69, 0.4); }
+        .error-text { color: var(--color-error); font-size: 16px; font-weight: 600; }
+
+        #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
+        #weekSelectorContainer label { display: block; margin-bottom: 10px; font-weight: 600; color: var(--text-medium); }
+        
+        .custom-select-wrapper { position: relative; }
+        .custom-select-trigger {
+            width: 100%; padding: 12px 15px; border-radius: 8px;
+            background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border);
+            color: var(--text-light); font-family: var(--font-family); font-size: 16px; cursor: pointer;
+            display: flex; justify-content: space-between; align-items: center;
+            transition: all 0.3s ease;
+        }
+        .custom-select-trigger:hover, .custom-select-wrapper.open .custom-select-trigger {
+            border-color: rgba(142, 45, 226, 0.7);
+            box-shadow: 0 0 15px var(--color-glow);
+        }
+        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--text-medium); transition: transform 0.3s ease; }
+        .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
+        
+        .custom-options {
+            position: absolute; top: 105%; left: 0; right: 0;
+            background: rgba(20, 22, 37, 0.7); backdrop-filter: blur(10px);
+            border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
+            z-index: 100; max-height: 200px; overflow-y: auto;
+            border: 1px solid var(--glass-border);
+            opacity: 0; visibility: hidden; transform: translateY(-10px);
+            transition: all 0.3s ease;
+        }
+        .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
+        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid rgba(100, 120, 255, 0.1); }
+        .custom-option:last-child { border-bottom: none; }
+        .custom-option:hover { background-color: rgba(142, 45, 226, 0.2); }
+        .custom-option.selected { background-color: rgba(142, 45, 226, 0.3); font-weight: 600; color: #fff; }
+        #weekSelector { display: none; }
+
         .button-container { text-align: center; margin-top: 25px; }
-        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 35px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
-        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
+        .button {
+            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
+            color: white; border: none; padding: 14px 35px; border-radius: 10px;
+            font-size: 16px; font-weight: 700; cursor: pointer;
+            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            background-size: 200% auto;
+        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--color-glow); background-position: right center; }
+        .button:disabled {
+            opacity: 0.4; cursor: not-allowed; transform: none;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-position: left center;
+        }
         .button.is-success {
             background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%);
         }
         .button.is-success:hover {
-            box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3);
+            box-shadow: 0 7px 30px rgba(40, 167, 69, 0.4);
         }
-        .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
-        .progress-bar.active { display: block; }
-        .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
-        .status-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none; animation: slideDown 0.5s; }
+
+        .status-message {
+            text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px;
+            display: none; animation: slideDown 0.5s;
+        }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
-        .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-        #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
-        #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
-        .custom-select-wrapper { position: relative; }
-        .custom-select-trigger { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--color-border); background-color: #f8fafc; font-family: var(--font-family); font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
-        .custom-select-trigger:hover { border-color: var(--color-primary-end); }
-        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--color-text-secondary); transition: transform 0.3s ease; }
-        .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
-        .custom-options { position: absolute; top: 105%; left: 0; right: 0; background: var(--color-surface); border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 100; max-height: 200px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
-        .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
-        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid var(--color-border); }
-        .custom-option:last-child { border-bottom: none; }
-        .custom-option:hover { background-color: #f4f7fe; }
-        .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
-        #weekSelector { display: none; }
+        .status-message.success { background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.5); color: #28a745; display: block; }
+        .status-message.error { background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: var(--color-error); display: block; }
         
-        .settings-container {
-            display: none; position: relative; margin-top: 15px; text-align: right;
-        }
-        .settings-button {
-            background: transparent; border: none; cursor: pointer; color: var(--color-text-secondary);
-            padding: 5px; border-radius: 50%; transition: all 0.2s ease;
-        }
-        .settings-button:hover { background-color: #eef2ff; color: var(--color-primary-end); }
-        .settings-button.is-active {
-            color: var(--color-primary-end); animation: blink-active 1.5s infinite;
-        }
+        /* --- INICIO: ESTILOS PARA EL PANEL DE CONFIGURACIÓN (ADAPTADOS) --- */
+        .settings-container { display: none; position: relative; margin-top: 20px; text-align: right; animation: fadeIn 0.5s; }
+        .settings-button { background: transparent; border: none; cursor: pointer; color: var(--text-medium); padding: 5px; border-radius: 50%; transition: all 0.2s ease; }
+        .settings-button:hover { background-color: rgba(142, 45, 226, 0.2); color: var(--text-light); }
+        .settings-button.is-active { color: var(--color-accent-light); animation: blink-active 1.5s infinite; }
         @keyframes blink-active { 50% { opacity: 0.4; } }
+        
         .settings-panel {
             display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
-            background: var(--color-surface); border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.1);
-            padding: 20px; z-index: 100; width: 320px; text-align: left; border: 1px solid var(--color-border);
+            background: var(--glass-bg); backdrop-filter: blur(10px);
+            border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
+            padding: 20px; z-index: 100; width: 320px; text-align: left;
+            border: 1px solid var(--glass-border);
         }
-        .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--color-text); }
+        .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--text-light); }
         #permanenciaInput {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--color-border);
-            background-color: #f8fafc; font-family: var(--font-family); font-size: 15px; margin-bottom: 15px;
+            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);
+            background-color: rgba(0,0,0,0.2); font-family: var(--font-family);
+            font-size: 15px; margin-bottom: 15px; color: var(--text-light);
         }
+        #permanenciaInput:focus { border-color: rgba(142, 45, 226, 0.7); box-shadow: 0 0 15px var(--color-glow); outline: none;}
+
         .button-small {
             background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
             color: white; border: none; padding: 8px 16px; border-radius: 8px;
-            font-size: 14px; font-weight: 600; cursor: pointer; transition: transform 0.2s ease;
+            font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
         }
-        .button-small:hover { transform: translateY(-2px); }
+        .button-small:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--color-glow); }
+        /* --- FIN: ESTILOS PARA EL PANEL DE CONFIGURACIÓN --- */
+
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 </head>
 <body>
+    <canvas id="neuronCanvas"></canvas>
+
     <div class="main-container">
         <div class="illustration-panel">
-            <div class="excel-animation">
-                <div class="excel-header"></div>
-                <div class="excel-row"><div class="excel-cell" style="animation-delay: 0.2s;"></div><div class="excel-cell" style="animation-delay: 0.5s;"></div></div>
-            </div>
-            <h2>Guía Rápida</h2>
-            <p>Sube tu archivo Excel con los datos de turnos, selecciona una de las últimas 4 semanas disponibles y genera tu informe.</p>
+            <h2>Gestión de Turnos IA</h2>
+            <p>Sincronización automática con la nube. Selecciona la semana y genera tu informe de turnos con un solo clic.</p>
         </div>
         <div class="content-panel">
-            <div class="header"><h1>Generador de Turnos Diarios Inbound</h1></div>
-            <div class="upload-area" id="uploadArea">
-                <input type="file" id="fileInput" accept=".xlsx,.xls, .csv">
-                <div id="uploadDefaultContent">
-                    <div class="upload-icon"><svg xmlns="http://www.w3.org/2000/svg" class="button-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2"><path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" /></svg></div>
-                    <div class="upload-text">Haz clic para seleccionar o arrastra tu archivo</div>
-                </div>
-                <div id="uploadSuccessContent">
-                    <div id="fileNameDisplay"></div>
-                    <div id="changeFileText">Haz clic para cambiar el archivo</div>
-                </div>
+            <div class="header"><h1>Generador de Turnos Diarios</h1></div>
+
+            <div class="upload-area" id="statusContainer">
+                 <div class="status-content loading-content">
+                    <div class="techno-loader">
+                        <svg viewBox="0 0 100 100">
+                            <path class="circuit-flow" id="flow-1" d="M 50,50 m -25,0 a 25,25 0 1,1 50,0 a 25,25 0 1,1 -50,0"></path>
+                            <path class="circuit-flow" id="flow-2" d="M 50,50 m -35,0 a 35,35 0 1,0 70,0 a 35,35 0 1,0 -70,0"></path>
+                            <path class="circuit-flow" id="flow-3" d="M 50,10 V 90 M 10,50 H 90"></path>
+                        </svg>
+                        <div class="core-pulse"></div>
+                    </div>
+                    <div class="status-text-dynamic" id="dynamicStatusText"></div>
+                 </div>
+                 <div class="status-content success-content">
+                    <div class="success-icon"><svg viewBox="0 0 24 24"><path fill="none" stroke-width="2.5" stroke="currentColor" d="M5,13 l4,4 l10,-10" /></svg></div>
+                    <div class="success-text">Sincronización completa</div>
+                 </div>
+                 <div class="status-content error-content">
+                    <div class="status-icon error-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg></div>
+                    <div class="error-text" id="errorText"></div>
+                 </div>
             </div>
 
             <div id="weekSelectorContainer">
-                <label for="weekSelector">2. Selecciona la semana a generar</label>
+                <label for="weekSelector">1. Selecciona la semana a generar</label>
                 <div class="custom-select-wrapper" id="customSelect">
                     <select id="weekSelector"></select>
-                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando archivo --</div>
+                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando datos --</div>
                     <div class="custom-options" id="customOptions"></div>
                 </div>
             </div>
@@ -185,7 +279,6 @@
                 </div>
             </div>
 
-            <div class="progress-bar" id="progressBar"><div class="progress-fill" id="progressFill"></div></div>
             <div class="button-container">
                 <button class="button" id="generateBtn" disabled>Generar Excel</button>
             </div>
@@ -195,20 +288,18 @@
     
     <script>
         let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
-        let permanenciaText = '';
+        let statusInterval, permanenciaText = '';
         
-        const uploadArea = document.getElementById('uploadArea');
-        const fileInput = document.getElementById('fileInput');
-        const fileNameDisplay = document.getElementById('fileNameDisplay');
         const generateBtn = document.getElementById('generateBtn');
-        const progressBar = document.getElementById('progressBar');
-        const progressFill = document.getElementById('progressFill');
-        const statusMessage = document.getElementById('statusMessage');
         const weekSelectorContainer = document.getElementById('weekSelectorContainer');
         const weekSelector = document.getElementById('weekSelector');
         const customSelect = document.getElementById('customSelect');
         const customSelectTrigger = document.getElementById('customSelectTrigger');
         const customOptions = document.getElementById('customOptions');
+        const statusMessage = document.getElementById('statusMessage');
+        const statusContainer = document.getElementById('statusContainer');
+        const dynamicStatusText = document.getElementById('dynamicStatusText');
+        const errorText = document.getElementById('errorText');
         
         const settingsContainer = document.getElementById('settingsContainer');
         const settingsBtn = document.getElementById('settingsBtn');
@@ -216,137 +307,205 @@
         const permanenciaInput = document.getElementById('permanenciaInput');
         const permanenciaAcceptBtn = document.getElementById('permanenciaAcceptBtn');
 
+        // --- INICIO: LÓGICA DE LA RED NEURONAL DE FONDO (CANVAS) ---
+        const canvas = document.getElementById('neuronCanvas');
+        const ctx = canvas.getContext('2d');
+        canvas.width = window.innerWidth;
+        canvas.height = window.innerHeight;
+        let particlesArray;
+        class Particle {
+            constructor(x, y, size, speedX, speedY) {
+                this.x = x; this.y = y; this.size = size;
+                this.speedX = speedX; this.speedY = speedY;
+                this.pulseSpeed = Math.random() * 0.02 + 0.005;
+                this.pulseOffset = Math.random() * Math.PI * 2;
+            }
+            draw() {
+                const pulse = Math.abs(Math.sin(this.pulseOffset + Date.now() * this.pulseSpeed));
+                const alpha = 0.5 + pulse * 0.5;
+                ctx.beginPath();
+                ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+                ctx.shadowBlur = 10;
+                ctx.shadowColor = `rgba(0, 188, 212, ${alpha})`;
+                ctx.fillStyle = `rgba(200, 225, 255, ${alpha})`;
+                ctx.fill();
+                ctx.shadowBlur = 0;
+            }
+            update() {
+                if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+                if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+                this.x += this.speedX; this.y += this.speedY;
+            }
+        }
+        function initParticles() {
+            particlesArray = [];
+            let numberOfParticles = (canvas.height * canvas.width) / 9000; // AUMENTADO: Más partículas
+            for (let i = 0; i < numberOfParticles; i++) {
+                let size = (Math.random() * 2) + 1;
+                let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+                let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+                let speedX = (Math.random() * 0.9) - 0.45; // AUMENTADO: Mayor velocidad
+                let speedY = (Math.random() * 0.9) - 0.45; // AUMENTADO: Mayor velocidad
+                particlesArray.push(new Particle(x, y, size, speedX, speedY));
+            }
+        }
+        function connectParticles() {
+            let opacityValue = 1;
+            for (let a = 0; a < particlesArray.length; a++) {
+                // Conexiones cercanas (como antes)
+                for (let b = a; b < particlesArray.length; b++) {
+                    let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                    if (distance < (canvas.width / 7) * (canvas.height / 7)) {
+                        opacityValue = 1 - (distance / 20000);
+                        ctx.strokeStyle = `rgba(0, 188, 212, ${opacityValue})`;
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                        ctx.stroke();
+                    }
+                }
+                // NUEVO: Conexiones aleatorias a larga distancia
+                if (Math.random() < 0.005) {
+                    const c = Math.floor(Math.random() * particlesArray.length);
+                    if (c !== a) {
+                        ctx.strokeStyle = 'rgba(226, 45, 142, 0.15)'; // Color "agresivo" y semitransparente
+                        ctx.lineWidth = 1;
+                        ctx.beginPath();
+                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                        ctx.lineTo(particlesArray[c].x, particlesArray[c].y);
+                        ctx.stroke();
+                    }
+                }
+            }
+        }
+        function animateParticles() {
+            requestAnimationFrame(animateParticles);
+            ctx.clearRect(0, 0, innerWidth, innerHeight);
+            for (let i = 0; i < particlesArray.length; i++) {
+                particlesArray[i].update();
+                particlesArray[i].draw();
+            }
+            connectParticles();
+        }
+        window.addEventListener('resize', () => {
+            canvas.width = innerWidth;
+            canvas.height = innerHeight;
+            initParticles();
+        });
+        initParticles();
+        animateParticles();
+        // --- FIN: LÓGICA DE LA RED NEURONAL ---
+        
+        // --- INICIO: MANEJO DE LA INTERFAZ (SELECTORES Y PANEL DE CONFIGURACIÓN) ---
         customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-
         settingsBtn.addEventListener('click', (e) => {
             e.stopPropagation();
             settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
         });
-
         permanenciaAcceptBtn.addEventListener('click', () => {
             permanenciaText = permanenciaInput.value;
-            if (permanenciaText.trim() !== '') {
-                settingsBtn.classList.add('is-active');
-            } else {
-                settingsBtn.classList.remove('is-active');
-            }
+            settingsBtn.classList.toggle('is-active', permanenciaText.trim() !== '');
             settingsPanel.style.display = 'none';
         });
-        
-        window.addEventListener('click', (e) => { 
+        window.addEventListener('click', (e) => {
             if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
             if (!settingsContainer.contains(e.target)) settingsPanel.style.display = 'none';
         });
-
-        uploadArea.addEventListener('click', () => fileInput.click());
-        uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-        uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
-        uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-        fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
+        // --- FIN: MANEJO DE LA INTERFAZ ---
         
-        function handleFile(file) {
-            fileNameDisplay.textContent = file.name;
-            uploadArea.classList.add('file-loaded');
-            generateBtn.disabled = true;
-            settingsContainer.style.display = 'none';
+        // --- INICIO: LÓGICA DE DATOS Y FECHAS ---
+        function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
+        function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
+        function normalizeDate(d) { if (!(d instanceof Date)) return null; const date = new Date(d); date.setHours(0, 0, 0, 0); return date; }
 
-            const reader = new FileReader();
-            reader.onload = (e) => {
-                try {
-                    const data = new Uint8Array(e.target.result);
-                    const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                    allData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-                    populateWeekSelector(allData);
-                    weekSelectorContainer.style.display = 'block';
-                    showStatus('Archivo cargado. Por favor, selecciona una semana.', 'success');
-                } catch(error) {
-                    showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
-                    console.error(error);
-                }
-            };
-            reader.readAsArrayBuffer(file);
+        async function loadDataFromFlow() {
+            statusContainer.className = 'upload-area is-loading';
+            const statusMessages = ["Iniciando conexión segura...", "Analizando topología de red...", "Enviando solicitud al núcleo central...", "Recibiendo streams de datos encriptados...", "Decodificando paquetes...", "Procesando registros con IA...", "Optimizando resultados..."];
+            let messageIndex = 0;
+            dynamicStatusText.textContent = statusMessages[messageIndex];
+            statusInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % statusMessages.length;
+                dynamicStatusText.style.opacity = '0';
+                setTimeout(() => {
+                    dynamicStatusText.textContent = statusMessages[messageIndex];
+                    dynamicStatusText.style.opacity = '1';
+                }, 300);
+            }, 1800);
+
+            const flowUrl = "https://prod-31.westus.logic.azure.com:443/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=mMrr6cxbsMA-cVu8pBVkiaDbJ2oMTJPBKx3MB_QPmyQ";
+
+            try {
+                const response = await fetch(flowUrl, { method: "POST" });
+                if (!response.ok) throw new Error("Respuesta de red no fue exitosa: " + response.status);
+                const rawData = await response.json();
+                if (!Array.isArray(rawData) || rawData.length === 0) throw new Error("No se recibieron datos.");
+
+                allData = rawData.map(row => { const newRow = { ...row }; const fechaKeys = ['Fecha', 'fecha', 'Date']; const iniKeys = ['Ini', 'ini', 'INICIO']; const finKeys = ['FIN', 'Fin', 'fin']; let dateComponent = null; for (const key of fechaKeys) { if (row[key] !== undefined) { dateComponent = excelSerialToDate(parseFloat(row[key])); break; } } newRow.Fecha = dateComponent; for (const key of iniKeys) { if (row[key] !== undefined) { newRow.Ini = parseDateTime(parseFloat(row[key]), dateComponent); break; } } for (const key of finKeys) { if (row[key] !== undefined) { newRow.FIN = parseDateTime(parseFloat(row[key]), dateComponent); break; } } return newRow; });
+                
+                clearInterval(statusInterval);
+                statusContainer.className = 'upload-area is-success';
+                populateWeekSelector(allData);
+                weekSelectorContainer.style.display = 'block';
+
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                clearInterval(statusInterval);
+                statusContainer.className = 'upload-area is-error';
+                errorText.textContent = error.message;
+            }
         }
+        
+        function getMonday(d) { d = new Date(d); const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1); const monday = new Date(d.setDate(diff)); monday.setHours(0, 0, 0, 0); return monday; }
+        
+        function populateWeekSelector(data) { const weekSet = new Set(); data.forEach(row => { if (row.Fecha instanceof Date && !isNaN(row.Fecha)) { weekSet.add(getMonday(row.Fecha).toISOString()); } }); const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)); const last4Weeks = sortedWeeks.slice(0, 4); weekSelector.innerHTML = ''; customOptions.innerHTML = ''; if (last4Weeks.length === 0) { customSelectTrigger.textContent = 'No se encontraron semanas válidas'; customSelectTrigger.style.color = 'var(--color-error)'; return; } customSelectTrigger.textContent = '-- Selecciona una semana --'; customSelectTrigger.style.color = ''; last4Weeks.forEach(mondayISO => { const monday = new Date(mondayISO); const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6); const mondayDay = monday.getDate(); const sundayDay = sunday.getDate(); const mondayMonth = monday.toLocaleString('es-ES', { month: 'long' }); const sundayMonth = sunday.toLocaleString('es-ES', { month: 'long' }); let optionText; if (mondayMonth === sundayMonth) { optionText = `Semana del ${mondayDay} al ${sundayDay} de ${sundayMonth}`; } else { optionText = `Semana del ${mondayDay} de ${mondayMonth} al ${sundayDay} de ${sundayMonth}`; } const option = document.createElement('option'); option.value = mondayISO; option.textContent = optionText; weekSelector.appendChild(option); const customOption = document.createElement('div'); customOption.classList.add('custom-option'); customOption.textContent = optionText; customOption.dataset.value = mondayISO; customOption.addEventListener('click', () => { customSelectTrigger.textContent = customOption.textContent; weekSelector.value = customOption.dataset.value; weekSelector.dispatchEvent(new Event('change')); document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected')); customOption.classList.add('selected'); customSelect.classList.remove('open'); }); customOptions.appendChild(customOption); }); }
+        
+        function handleWeekSelection(event) { const selectedMondayISO = event.target.value; if (!selectedMondayISO) { turnosData = null; generateBtn.disabled = true; settingsContainer.style.display = 'none'; return; } const selectedMonday = new Date(selectedMondayISO); const sunday = new Date(selectedMonday); sunday.setDate(selectedMonday.getDate() + 6); turnosData = allData.filter(row => { const rowDate = normalizeDate(row.Fecha); return rowDate && rowDate >= selectedMonday && rowDate <= sunday; }); generateBtn.disabled = false; settingsContainer.style.display = 'block'; }
+        
+        function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
+        function isLibre(row) { const ini = row['Ini']; const fin = row['FIN']; const iniStr = typeof ini === 'string' ? ini.trim().toUpperCase() : ''; const finStr = typeof fin === 'string' ? fin.trim().toUpperCase() : ''; const iniInvalid = !(ini instanceof Date); const finInvalid = !(fin instanceof Date); return iniStr.includes('LIBRE') || finStr.includes('LIBRE') || (iniInvalid && finInvalid); }
+        function formatTime(date) { if (!(date instanceof Date)) return ''; const d = date; return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+        function formatDate(date) { if (!(date instanceof Date)) return ''; const d = normalizeDate(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
+        // --- FIN: LÓGICA DE DATOS Y FECHAS ---
 
+        // --- INICIO: LÓGICA COMPLETA Y FUNCIONAL DE GENERACIÓN DE EXCEL (VERSIÓN MEJORADA) ---
+        generateBtn.addEventListener('click', generateExcel);
         weekSelector.addEventListener('change', handleWeekSelection);
-
-        function getMonday(d) {
-            d = new Date(d);
-            const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-            const monday = new Date(d.setDate(diff));
-            monday.setHours(0, 0, 0, 0);
-            return monday;
-        }
-
-        function populateWeekSelector(data) {
-            const weekSet = new Set();
-            data.forEach(row => {
-                if (row.Fecha) weekSet.add(getMonday(normalizeDate(row.Fecha)).toISOString());
-            });
-
-            const sortedWeeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a));
-            const last4Weeks = sortedWeeks.slice(0, 4); 
-
-            weekSelector.innerHTML = '';
-            customOptions.innerHTML = '';
-            customSelectTrigger.textContent = '-- Selecciona una semana --';
-            
-            last4Weeks.forEach(mondayISO => {
-                const monday = new Date(mondayISO);
-                const sunday = new Date(monday);
-                sunday.setDate(monday.getDate() + 6);
-                
-                const monthName = sunday.toLocaleString('es-ES', { month: 'long' });
-                const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${monthName}`;
-                
-                const option = document.createElement('option');
-                option.value = mondayISO;
-                option.textContent = optionText;
-                weekSelector.appendChild(option);
-
-                const customOption = document.createElement('div');
-                customOption.classList.add('custom-option');
-                customOption.textContent = optionText;
-                customOption.dataset.value = mondayISO;
-
-                customOption.addEventListener('click', () => {
-                    customSelectTrigger.textContent = customOption.textContent;
-                    weekSelector.value = customOption.dataset.value;
-                    weekSelector.dispatchEvent(new Event('change'));
-                    document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-                    customOption.classList.add('selected');
-                    customSelect.classList.remove('open');
-                });
-                customOptions.appendChild(customOption);
-            });
-        }
-
-        
-        function normalizeDate(d) {
-            const date = new Date(d);
-            date.setMinutes(date.getMinutes() + date.getTimezoneOffset()); // corrige desfase
-            date.setHours(0, 0, 0, 0); // elimina horas
-            return date;
-        }
-    
-        function handleWeekSelection(event) {
-            const selectedMondayISO = event.target.value;
-            if (!selectedMondayISO) {
-                turnosData = null;
-                generateBtn.disabled = true;
-                settingsContainer.style.display = 'none';
+       
+        async function generateExcel() {
+            if (!turnosData || turnosData.length === 0) {
+                showStatus('No hay datos válidos para procesar en la semana seleccionada.', 'error');
                 return;
             }
-            const selectedMonday = new Date(selectedMondayISO);
-            const sunday = new Date(selectedMonday);
-            sunday.setDate(selectedMonday.getDate() + 6);
-            turnosData = allData.filter(row => {
-                const rowDate = normalizeDate(row.Fecha);
-                return rowDate >= selectedMonday && rowDate <= sunday;
-            });
-            generateBtn.disabled = false;
-            settingsContainer.style.display = 'block';
+            generateBtn.disabled = true;
+            const originalText = generateBtn.textContent;
+            generateBtn.textContent = 'Generando...';
+            
+            setTimeout(async () => {
+                try {
+                    await createExcelWorkbookWithStyles();
+                    
+                    generateBtn.classList.add('is-success');
+                    generateBtn.textContent = 'Descargando...';
+
+                    await triggerDownload();
+                    
+                    setTimeout(() => {
+                        generateBtn.classList.remove('is-success');
+                        generateBtn.textContent = originalText;
+                        generateBtn.disabled = false;
+                        showStatus('Excel generado y descargado con éxito.', 'success');
+                    }, 2000);
+
+                } catch (error) {
+                    showStatus('Ocurrió un error al generar el archivo.', 'error');
+                    console.error(error);
+                    generateBtn.disabled = false;
+                    generateBtn.textContent = originalText;
+                }
+            }, 100);
         }
-        
+
         async function triggerDownload() {
             if (generatedWorkbook && fileName) {
                 const buffer = await generatedWorkbook.xlsx.writeBuffer();
@@ -355,70 +514,29 @@
                 const a = document.createElement('a');
                 a.href = url;
                 a.download = fileName;
+                document.body.appendChild(a);
                 a.click();
                 URL.revokeObjectURL(url);
+                document.body.removeChild(a);
             }
         }
-        
-        generateBtn.addEventListener('click', generateExcel);
-        
-        async function generateExcel() {
-            if (!turnosData || turnosData.length === 0) {
-                showStatus('No hay datos válidos para procesar en la semana seleccionada.', 'error');
-                return;
-            }
-            generateBtn.disabled = true;
-            progressBar.classList.add('active');
-            let progress = 0;
-            const progressInterval = setInterval(() => { progress += 10; progressFill.style.width = progress + '%'; if (progress >= 100) clearInterval(progressInterval); }, 100);
-            
-            setTimeout(async () => {
-                try {
-                    await createExcelWorkbookWithStyles();
-                    progressBar.classList.remove('active');
-                    progressFill.style.width = '0%';
-                    if (fileName) { 
-                        generateBtn.classList.add('is-success');
-                        generateBtn.textContent = 'Descargando...';
-                        showStatus('Excel generado. Iniciando descarga...', 'success');
-                        await triggerDownload();
-                        setTimeout(() => {
-                            generateBtn.classList.remove('is-success');
-                            generateBtn.textContent = 'Generar Excel';
-                            generateBtn.disabled = false;
-                        }, 2000);
-                    } else {
-                        generateBtn.disabled = false;
-                    }
-                } catch (error) {
-                    showStatus('Ocurrió un error al generar el archivo.', 'error');
-                    console.error(error);
-                    generateBtn.disabled = false;
-                }
-            }, 1500);
-        }
-        
+
         async function createExcelWorkbookWithStyles() {
             fileName = ''; 
             const workbook = new ExcelJS.Workbook();
             const sheetNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
             const jsDayToSheetIndex = [6, 0, 1, 2, 3, 4, 5]; 
 
-            let minDate = null, maxDate = null;
-            
             sheetNames.forEach((sheetName, index) => {
                 const dayOfWeekToFind = jsDayToSheetIndex.indexOf(index);
                 const dayData = turnosData.filter(row => {
-                    if (isLibre(row) || !row.Fecha) return false;
+                    if (isLibre(row) || !(row.Fecha instanceof Date)) return false;
                     const rowDate = normalizeDate(row.Fecha);
-                    return rowDate.getDay() === dayOfWeekToFind;
+                    return rowDate && rowDate.getDay() === dayOfWeekToFind;
                 });
                 
                 if (dayData.length > 0) {
                     const fechaDia = dayData[0]['Fecha'];
-                    if (!minDate || new Date(fechaDia) < new Date(minDate)) minDate = fechaDia;
-                    if (!maxDate || new Date(fechaDia) > new Date(maxDate)) maxDate = fechaDia;
-                    
                     const worksheet = workbook.addWorksheet(sheetName);
                     createStyledSheet(worksheet, dayData, fechaDia);
                 }
@@ -428,11 +546,12 @@
                 const monday = new Date(weekSelector.value);
                 const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
                 const d1 = normalizeDate(monday), d2 = normalizeDate(sunday);
-                const day1 = String(d1.getDate()).padStart(2, '0'), day2 = String(d2.getDate()).padStart(2, '0');
+                const day1 = String(d1.getDate()).padStart(2, '0');
+                const day2 = String(d2.getDate()).padStart(2, '0');
                 const monthName = d2.toLocaleString('es-ES', { month: 'long' });
                 fileName = `Turno diario semana del ${day1} al ${day2} de ${monthName} ${d2.getFullYear()}.xlsx`;
             } else {
-                showStatus('No se encontraron turnos válidos con fechas para la semana seleccionada.', 'error');
+                throw new Error("No se pudo determinar el nombre del archivo.");
             }
             generatedWorkbook = workbook;
         }
@@ -465,73 +584,13 @@
             const headers = ['SUPERVISOR / ANALISTA', 'HORA INGRESO', 'FURGON', 'INICIO TURNO', 'Break1', '30 MIN COLACIÓN', '60 MIN COLACIÓN', 'Break2', 'TERMINO TURNO', 'HORA SALIDA'];
             
             const processDataRows = (rIndex, data, startCol = 1) => { 
-                data.sort((a, b) => {
-                    const startTimeA = new Date(a['Ini']); const startTimeB = new Date(b['Ini']);
-                    if (startTimeA - startTimeB !== 0) return startTimeA - startTimeB;
-                    const endTimeA = new Date(a['FIN']); const endTimeB = new Date(b['FIN']);
-                    return endTimeA - endTimeB;
-                }).forEach(rowData => { 
-                    const row = worksheet.getRow(rIndex); 
-                    row.getCell(startCol).value = rowData['Nombre'] || ''; 
-                    const iniCell = row.getCell(startCol + 3);
-                    iniCell.value = formatTime(rowData['Ini']); 
-                    iniCell.font = { name: 'Calibri', size: 11, bold: true };
-                    row.getCell(startCol + 5).value = rowData['Dur_ Colac'] === 30 ? '30' : 'X'; 
-                    row.getCell(startCol + 6).value = rowData['Dur_ Colac'] === 60 ? '60' : 'X'; 
-                    const finCell = row.getCell(startCol + 8);
-                    finCell.value = formatTime(rowData['FIN']); 
-                    finCell.font = { name: 'Calibri', size: 11, bold: true };
-                    for (let i = 0; i < 10; i++) { 
-                        const cell = row.getCell(startCol + i);
-                        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; 
-                        if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; 
-                        if (i > 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; 
-                    } 
-                    rIndex++; 
-                }); 
-                return rIndex; 
+                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = rowData['Dur_ Colac'] === 30 ? '30' : 'X'; row.getCell(startCol + 6).value = rowData['Dur_ Colac'] === 60 ? '60' : 'X'; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i > 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex; 
             };
-
             const processInactiveDataRows = (rIndex, data, startCol = 1) => {
-                data.sort((a, b) => {
-                    const startTimeA = new Date(a['Ini']); const startTimeB = new Date(b['Ini']);
-                    if (startTimeA - startTimeB !== 0) return startTimeA - startTimeB;
-                    const endTimeA = new Date(a['FIN']); const endTimeB = new Date(b['FIN']);
-                    return endTimeA - endTimeB;
-                }).forEach(rowData => {
-                    const row = worksheet.getRow(rIndex);
-                    row.getCell(startCol).value = rowData['Nombre'] || '';
-                    const iniCell = row.getCell(startCol + 3);
-                    iniCell.value = formatTime(rowData['Ini']);
-                    iniCell.font = { name: 'Calibri', size: 11, bold: true };
-                    const finCell = row.getCell(startCol + 8);
-                    finCell.value = formatTime(rowData['FIN']);
-                    finCell.font = { name: 'Calibri', size: 11, bold: true };
-                    row.getCell(startCol + 5).value = 'X';
-                    row.getCell(startCol + 6).value = 'X';
-                    for (let i = 0; i < 10; i++) {
-                        const cell = row.getCell(startCol + i);
-                        if (!cell.value && cell.value !== 0) cell.value = '';
-                        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                        if (!cell.font) cell.font = { name: 'Calibri', size: 11 };
-                        if (i !== 0) cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                    }
-                    rIndex++;
-                });
-                return rIndex;
+                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = 'X'; row.getCell(startCol + 6).value = 'X'; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); if (!cell.value && cell.value !== 0) cell.value = ''; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i !== 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex;
             };
-
             const createHeaderRow = (rIndex, text, fill, startCol = 1) => { 
-                const row = worksheet.getRow(rIndex); 
-                headers.forEach((header, index) => { 
-                    const cell = row.getCell(startCol + index); 
-                    cell.value = index === 0 ? text : header; 
-                    cell.fill = fill; 
-                    cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri', size: 11 }; 
-                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; 
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; 
-                }); 
-                return rIndex + 1; 
+                const row = worksheet.getRow(rIndex); headers.forEach((header, index) => { const cell = row.getCell(startCol + index); cell.value = index === 0 ? text : header; cell.fill = fill; cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri', size: 11 }; cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; }); return rIndex + 1; 
             };
             
             rowIndex = createHeaderRow(rowIndex, 'SUPERVISOR / ANALISTA', { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF104862' } });
@@ -540,7 +599,6 @@
             rowIndex = createHeaderRow(rowIndex, 'AGENTE MASIVO', { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F5A87' } });
             const agentesSite = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar'] === 'Site');
             rowIndex = processDataRows(rowIndex, agentesSite);
-            
             const teletrabajoData = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar'] === 'TT');
             if (teletrabajoData.length > 0) {
                 const teletrabajoHeaderRow = worksheet.getRow(rowIndex);
@@ -554,13 +612,11 @@
                 rowIndex++;
                 rowIndex = processDataRows(rowIndex, teletrabajoData);
             }
-            
             const inactivos = dayData.filter(row => row['Estado'] !== 'Activo');
             if (inactivos.length > 0) {
                 const yellowFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFFFFF00' } };
                 const blackFont = { color: { argb: 'FF000000' }, bold: true, name: 'Calibri', size: 11 };
                 const border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
                 const inactivosHeaderRow = worksheet.getRow(rowIndex);
                 worksheet.mergeCells(rowIndex, 1, rowIndex, 10);
                 const mainInactiveCell = inactivosHeaderRow.getCell(1);
@@ -572,45 +628,34 @@
                 rowIndex++;
                 rowIndex = processInactiveDataRows(rowIndex, inactivos);
             }
-
-            const nightShiftStartCol = 12; 
-            worksheet.getColumn(nightShiftStartCol - 1).width = 10; 
-
+            
+            // --- Lógica para la tabla separada de turno madrugada ---
+            const nightShiftStartCol = 12;
+            worksheet.getColumn(nightShiftStartCol - 1).width = 10;
             worksheet.getColumn(nightShiftStartCol).width = 35;
             worksheet.getColumn(nightShiftStartCol + 1).width = 10;
             worksheet.getColumn(nightShiftStartCol + 2).width = 10;
             worksheet.getColumn(nightShiftStartCol + 3).width = 10;
             worksheet.getColumn(nightShiftStartCol + 4).width = 10;
-
             const nightShiftAgents = dayData.filter(row => {
-                if (!row['Ini'] || typeof row['Ini'].getHours !== 'function') return false;
-                const d = new Date(row['Ini']);
+                if (!(row['Ini'] instanceof Date)) return false;
+                const d = row['Ini'];
                 return d.getHours() === 0 && d.getMinutes() === 0;
             });
-
             if (nightShiftAgents.length > 0) {
-                const headerRowIndex1 = 1;
-                const headerRowIndex2 = 2;
-                const headerRow1 = worksheet.getRow(headerRowIndex1);
-                const headerRow2 = worksheet.getRow(headerRowIndex2);
-                
+                const headerRowIndex1 = 1, headerRowIndex2 = 2;
+                const headerRow1 = worksheet.getRow(headerRowIndex1), headerRow2 = worksheet.getRow(headerRowIndex2);
                 const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F5A87' } };
                 const headerFont = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri', size: 11 };
                 const border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-
                 const mainHeaderCell = headerRow1.getCell(nightShiftStartCol);
-                const days = ['Domingo', 'Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado'];
-                const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre'];
-                const d = normalizeDate(fechaDia);
-                const formattedDateHeader = `Turno de madrugada ${days[d.getDay()]} ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`;
-                mainHeaderCell.value = formattedDateHeader;
-
+                const formattedDateHeader = `Turno de madrugada ${formatDate(fechaDia)}`;
+                mainHeaderCell.value = formattedDateHeader.replace(/,/g, ''); // Remover comas
                 mainHeaderCell.fill = headerFill;
                 mainHeaderCell.font = headerFont;
                 mainHeaderCell.alignment = { horizontal: 'center', vertical: 'middle' };
                 worksheet.mergeCells(headerRowIndex1, nightShiftStartCol, headerRowIndex1, nightShiftStartCol + 4);
                 for (let i = 0; i < 5; i++) headerRow1.getCell(nightShiftStartCol + i).border = border;
-
                 const headers2 = ['Nombre', 'Break 1', 'Colación 30', 'Colación 60', 'Break 2'];
                 headers2.forEach((header, index) => {
                     const cell = headerRow2.getCell(nightShiftStartCol + index);
@@ -620,14 +665,12 @@
                     cell.border = border;
                     cell.alignment = { horizontal: 'center', vertical: 'middle' };
                 });
-
                 let dataRowIndex = headerRowIndex2 + 1;
                 nightShiftAgents.forEach(rowData => {
                     const row = worksheet.getRow(dataRowIndex);
                     row.getCell(nightShiftStartCol).value = rowData['Nombre'] || '';
                     row.getCell(nightShiftStartCol + 2).value = rowData['Dur_ Colac'] === 30 ? 30 : 'X';
                     row.getCell(nightShiftStartCol + 3).value = rowData['Dur_ Colac'] === 60 ? 60 : 'X';
-
                     for (let i = 0; i < 5; i++) {
                         const cell = row.getCell(nightShiftStartCol + i);
                         cell.border = border;
@@ -638,24 +681,9 @@
                 });
             }
         }
+        // --- FIN: LÓGICA COMPLETA DE GENERACIÓN DE EXCEL ---
 
-        function formatTime(date) { if (!date || typeof date.getHours !== 'function') return ''; const d = new Date(date); return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
-        function formatDate(date) { if (!date) return ''; const d = normalizeDate(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
-        
-        function isLibre(row) {
-            const ini = row['Ini'] ?? row['ini'] ?? row['INI'];
-            const fin = row['FIN'] ?? row['Fin'] ?? row['fin'] ?? row['FIN '];
-            const iniStr = typeof ini === 'string' ? ini.trim().toUpperCase() : '';
-            const finStr = typeof fin === 'string' ? fin.trim().toUpperCase() : '';
-            const iniEmpty = ini === null || ini === undefined || ini === '' || Number.isNaN(new Date(ini).getTime());
-            const finEmpty = fin === null || fin === undefined || fin === '' || Number.isNaN(new Date(fin).getTime());
-            // Es LIBRE si dice LIBRE o si no hay horas válidas en INI y FIN
-            return iniStr.includes('LIBRE') || finStr.includes('LIBRE') || (iniEmpty && finEmpty);
-        }
-
-        function areSameDay(date1, date2) { const d1 = new Date(date1); const d2 = new Date(date2); return d1.getFullYear() === d2.getFullYear() && d1.getMonth() === d2.getMonth() && d1.getDate() === d2.getDate(); }
-        
-        function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
+        document.addEventListener('DOMContentLoaded', loadDataFromFlow);
     </script>
 </body>
 </html>
