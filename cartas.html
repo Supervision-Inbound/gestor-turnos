@@ -74,9 +74,9 @@
         .core-pulse {
             width: 20%; height: 20%; background: #fff; border-radius: 50%;
             box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
-            position: absolute; top: 40%; left: 40%; animation: corePulse 1.5s ease-in-out infinite;
+            position: absolute; top: 40%; left: 40%; animation: core-pulse 1.5s ease-in-out infinite;
         }
-        @keyframes corePulse { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
+        @keyframes core-pulse { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
         .circuit-flow { fill: none; stroke-width: 1.5; stroke: var(--color-primary-start); stroke-dasharray: 100; stroke-dashoffset: 100; animation: flow 3s linear infinite; }
         #flow-2 { animation-delay: 0.5s; stroke: var(--color-primary-end); } #flow-3 { animation-delay: 1s; }
         @keyframes flow { to { stroke-dashoffset: -100; } }
@@ -342,51 +342,99 @@
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo a lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
-                const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
+                
+                const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ')).join(', ');
                 const dayText = isPlural ? `los días ${datesString}` : `el día ${datesString}`;
-                const shiftText = isPlural ? `durante sus jornadas de trabajo` : `durante su jornada de trabajo desde las ${data.inicioTurno} a ${data.finTurno} horas`;
-                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral, para poder desempeñar en forma correcta las funciones para las que fue contratado, ${dayText}, sin justificación alguna y sin autorización de su jefatura directa se ha ausentado ${shiftText} y al ser buscado en plataforma Genesys iCloud no pudo ser ubicada en conexión desde su modalidad de teletrabajo.</p></td></tr></table>`;
-                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la letra A) del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las Prohibiciones en el Titulo XV en su artículo 87, indica …” Abandonar el trabajo o ausentarse intempestivamente del recinto en que éste se desarrolla durante la jornada laboral sin justificación y/o autorización.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
+                const shiftText = isPlural 
+                    ? `durante sus jornadas de trabajo` 
+                    : `durante su jornada de trabajo desde las ${data.inicioTurno} a ${data.finTurno} horas`;
+
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'>
+                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
+                                <tr>
+                                    <td>
+                                        <p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p>
+                                        <p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p>
+                                        <br><br>
+                                        <p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p>
+                                        <p style='margin-bottom: 20px;'><b>Presente.</b></p>
+                                        <p style='margin-bottom: 20px;'>De mi consideración:</p>
+                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral, para poder desempeñar en forma correcta las funciones para las que fue contratado, ${dayText}, sin justificación alguna y sin autorización de su jefatura directa se ha ausentado ${shiftText} y al ser buscado en plataforma Genesys iCloud no pudo ser ubicada en conexión desde su modalidad de teletrabajo.</p>
+                                    </td>
+                                </tr>
+                            </table>`;
+                
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'>
+                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
+                                <tr>
+                                    <td style='padding-top: 20px;'>
+                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la letra A) del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las Prohibiciones en el Titulo XV en su artículo 87, indica …” Abandonar el trabajo o ausentarse intempestivamente del recinto en que éste se desarrolla durante la jornada laboral sin justificación y/o autorización.</p>
+                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p>
+                                        <p style='margin-top: 30px;'>Sin otro particular,</p>
+                                        <p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p>
+                                        <table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table>
+                                        <div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div>
+                                    </td>
+                                </tr>
+                               </table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
+
             } else if (data.incidencia.includes('ausencia')) {
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
                 let incidentDetails;
                 if (isPlural) {
-                    const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
+                    const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ')).join(', ');
                     const shiftsString = incidentGroup.map(d => `turno de ${d.inicioTurno} a ${d.finTurno} horas`).join(', ');
                     incidentDetails = `los días en que ha dejado de prestar sus funciones injustificadamente ${datesString} en sus respectivos turnos (${shiftsString})`;
                 } else {
-                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
                     incidentDetails = `el día en que ha dejado de prestar sus funciones injustificadamente ${incidentDate} en su turno programado de ${data.inicioTurno} a ${data.finTurno} horas.`;
                 }
                 const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; text-decoration: underline; font-weight:bold; padding-top:30px;'>${titulo}</p><br><br><p><b>Señor(a):</b> ${toProperCase(data.nombres)}</p><p><b>RUT:</b> ${data.rut}</p><p style='font-weight: bold; margin-bottom: 20px;'>Presente</p><p style='margin-bottom: 20px;'>De nuestra consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que, según lo dispuesto en su contrato individual de trabajo, usted debe entregar una atención de calidad al momento de realizar las atenciones.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la Cláusula Primera y Cuarta de su Contrato Individual de trabajo... ${incidentDetails}, debe cumplir con lo establecido en el Reglamento Interno...</p></td></tr></table>`;
                 const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Con el objeto de que Ud. se comprometa a no presentar Alguna Ausencia y Cumplir con su Turno, se efectúa esta carta de Amonestación.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a los puntos señalados con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de sus deberes laborales en nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular, le saluda atentamente,</p><br><br><br><br><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicio</b><br>Konecta Chile Limitada.</td><td style="text-align:right; vertical-align:bottom;"><b>Nombre del Trabajador:</b> ${toProperCase(data.nombres)}<br>${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
-            } else { // Atraso
+            } else { // Lógica para cartas de Atraso
                 const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
                 const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
                 const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
+                
                 let parrafoPrincipal;
                 if (isPlural) {
                     const incidentsHtml = incidentGroup.map(incident => {
-                        // ===== INICIO CORRECCIÓN (Múltiples Atrasos) =====
+                        const incidentDate = incident.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
                         const duracionTexto = incident.duracion ? `de una duración de ${incident.duracion} ` : ``;
-                        // ===== FIN CORRECCIÓN =====
-                        return `El día ${incident.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${incident.inicioTurno} horas.`;
+                        return `El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${incident.inicioTurno} horas.`;
                     }).join('<br>');
-                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>${incidentsHtml}</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Al presentar estos atrasos en su hora de ingreso, perjudica el normal funcionamiento de la plataforma... perjudicando gravemente los niveles de servicio...</p>`;
+
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>${incidentsHtml}</p>
+                                      <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Al presentar estos atrasos en su hora de ingreso, perjudica el normal funcionamiento de la plataforma, que necesita contar con una cantidad de ejecutivos disponibles para atender en el horario en que su turno fue programado, perjudicando gravemente los niveles de servicio de la compañía y la calidad de atención a nuestros clientes.</p>`;
                 } else {
-                    // ===== INICIO CORRECCIÓN (Atraso Único) =====
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' }).replace('-', ' de ');
                     const duracionTexto = data.duracion ? `de una duración de ${data.duracion} ` : `de una duración de AGREGAR `;
-                    // ===== FIN CORRECCIÓN =====
-                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
-                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${data.inicioTurno} horas...</p>`;
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${data.inicioTurno} horas, al presentar este atraso en su hora de ingreso, perjudica el normal funcionamiento de la plataforma, que necesita contar con una cantidad de ejecutivos disponibles para atender en el horario en que su turno fue programado, perjudicando gravemente los niveles de servicio de la compañía y la calidad de atención a nuestros clientes.</p>`;
                 }
-                const parrafoReglamento = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la <b>letra b)</b> del Reglamento Interno...${parrafoInspeccion}</p>`;
-                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral.</p>${parrafoPrincipal}</td></tr></table>`;
-                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'>${parrafoReglamento}<p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
+                
+                const parrafoReglamento = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la <b>letra b)</b> del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las prohibiciones en el Titulo XV en su artículo 87, indica …” llegar atrasado o registrar en forma reiterada, atrasos en su hora de ingreso…”. En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p>`;
+                
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'>
+                                <tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr>
+                                <tr>
+                                    <td>
+                                        <p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p>
+                                        <p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p>
+                                        <br><br>
+                                        <p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p>
+                                        <p style='margin-bottom: 20px;'><b>Presente.</b></p>
+                                        <p style='margin-bottom: 20px;'>De mi consideración:</p>
+                                        <p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral.</p>
+                                        ${parrafoPrincipal}
+                                    </td>
+                                </tr>
+                            </table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'>${parrafoReglamento}<p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr>
+                            </table>`;
                 bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
             }
             return `<html xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Carta</title></head><body style='font-family: Calibri, sans-serif; font-size: 11pt;'>${bodyHtml}</body></html>`;
