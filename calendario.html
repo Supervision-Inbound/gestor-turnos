@@ -3,1047 +3,441 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestiones Inbound - Calendario de Presencialidad</title>
-    <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
+    <title>Generador de Cartas Corporativas IA</title>
+    
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/jszip/3.10.1/jszip.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/FileSaver.js/2.0.5/FileSaver.min.js"></script>
+    
+    <link href="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.css" rel="stylesheet">
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/noUiSlider/15.7.1/nouislider.min.js"></script>
+
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
     <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
     <style>
         :root {
-            --color-bg: #f4f7fe;
-            --color-surface: #ffffff;
             --color-primary-start: #6a11cb;
             --color-primary-end: #2575fc;
-            --color-success-start: #16a34a;
-            --color-success-end: #15803d;
-            --color-apply-start: #1976d2;
-            --color-apply-end: #1565c0;
-            --color-text: #1e293b;
-            --color-text-secondary: #64748b;
-            --color-border: #e2e8f0;
-            --shadow-lg: 0 25px 50px -12px rgba(0, 0, 0, 0.15);
+            --color-accent-light: #00bcd4;
+            --color-glow: rgba(106, 17, 203, 0.5);
+            --color-success: #28a745;
+            --color-error: #dc3545;
             --font-family: 'Manrope', sans-serif;
+            --bg-dark: #0d1117;
+            --glass-bg: rgba(20, 22, 37, 0.6);
+            --glass-border: rgba(100, 120, 255, 0.2);
+            --text-light: #f0f0f0;
+            --text-medium: #a0a0b0;
         }
         * { margin: 0; padding: 0; box-sizing: border-box; }
         body {
-            font-family: var(--font-family); background-color: var(--color-bg);
-            color: var(--color-text); position: relative;
-            display: flex;
-            padding: 40px 20px;
-            min-height: 100vh;
+            font-family: var(--font-family); min-height: 100vh;
+            display: flex; justify-content: center; align-items: center; padding: 20px;
+            background: var(--bg-dark); position: relative; overflow: hidden; color: var(--text-light);
+        }
+        #neuronCanvas {
+            position: fixed; top: 0; left: 0; width: 100%; height: 100%;
+            z-index: 0; opacity: 0.7;
         }
         .main-container {
-            display: grid; grid-template-columns: 1fr; max-width: 1200px; width: 100%;
-            background: var(--color-surface); border-radius: 24px; box-shadow: var(--shadow-lg);
-            border: 1px solid white; overflow: hidden; z-index: 10;
-            margin: auto;
+            width: 100%; max-width: 1000px;
+            background: var(--glass-bg); backdrop-filter: blur(15px);
+            border-radius: 24px; border: 1px solid var(--glass-border);
+            box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-glow);
+            display: grid; grid-template-columns: 1fr;
+            overflow: hidden; z-index: 10;
         }
-        @media (min-width: 800px) { .main-container { grid-template-columns: 35% 65%; } }
+        @media (min-width: 800px) { .main-container { grid-template-columns: 40% 60%; } }
         .illustration-panel {
-            background: linear-gradient(160deg, #f0f5ff, #e6efff); padding: 40px;
-            display: flex; flex-direction: column; justify-content: center; align-items: center; text-align: center;
+            padding: 40px; display: flex; flex-direction: column;
+            justify-content: center; align-items: center; text-align: center;
+            background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--glass-border);
         }
-        .calendar-animation {
-            width: 250px; height: 200px; background-color: #fff; border-radius: 8px;
-            box-shadow: 0 10px 30px -10px rgba(0,0,0,0.2); padding: 15px; display: flex;
-            flex-direction: column; gap: 8px; transform: perspective(800px) rotateX(15deg) rotateY(-25deg);
-        }
-        .calendar-header { width: 100%; height: 25px; background-color: #eef2f9; border-radius: 4px; display: flex; align-items: center; justify-content: center; font-size: 12px; font-weight: bold; color: #6a11cb; }
-        .calendar-week { display: flex; gap: 4px; }
-        .calendar-day { flex: 1; height: 25px; border-radius: 4px; position: relative; overflow: hidden; animation: dayPulse 3s ease-in-out infinite; }
-        .calendar-day.site { background: linear-gradient(135deg, #2575fc, #6a11cb); }
-        .calendar-day.tt { background: linear-gradient(135deg, #16a34a, #15803d); }
-        .calendar-day.libre { background: #f8fafc; }
-        @keyframes dayPulse { 0%, 100% { opacity: 0.7; } 50% { opacity: 1; } }
-        .illustration-panel h2 { margin-top: 20px; font-size: 22px; color: var(--color-text); }
-        .illustration-panel p { margin-top: 8px; font-size: 15px; color: var(--color-text-secondary); max-width: 300px; line-height: 1.6; }
+        .illustration-panel h2 { font-size: 24px; font-weight: 700; margin-bottom: 12px; color: var(--text-light); }
+        .illustration-panel p { font-size: 15px; color: var(--text-medium); line-height: 1.6; max-width: 300px; }
         .content-panel { padding: 40px; }
         .header { text-align: center; margin-bottom: 30px; }
-        h1 { color: var(--color-text); font-size: 28px; font-weight: 700; }
-        .upload-area {
-            border: 2px dashed var(--color-border); border-radius: 12px; padding: 40px 20px;
-            text-align: center; transition: all 0.3s ease; cursor: pointer; background-color: #fafbff;
-            display: flex; flex-direction: column; align-items: center; justify-content: center; min-height: 160px;
+        h1 { font-size: 28px; font-weight: 700; color: var(--text-light); }
+        .status-area {
+            border-radius: 12px; background: rgba(0, 0, 0, 0.2);
+            display: flex; align-items: center; justify-content: center;
+            min-height: 160px; margin-bottom: 25px;
+            position: relative; overflow: hidden; border: 1px solid var(--glass-border); transition: all 0.3s ease;
         }
-        .upload-area:hover, .upload-area.dragover { border-color: var(--color-primary-end); background: #f7faff; transform: translateY(-4px); box-shadow: 0 10px 20px -5px rgba(37, 117, 252, 0.1); }
-        .upload-icon { width: 48px; height: 48px; margin: 0 auto 15px; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); color: white; border-radius: 50%; display: flex; align-items: center; justify-content: center; transition: transform 0.3s ease; }
-        .upload-area:hover .upload-icon { transform: scale(1.1) rotate(10deg); }
-        .upload-area.file-loaded #uploadDefaultContent { display: none; }
-        .upload-area #uploadSuccessContent { display: none; }
-        .upload-area.file-loaded #uploadSuccessContent { display: block; }
-        #fileNameDisplay { font-size: 18px; font-weight: 600; color: var(--color-primary-end); word-break: break-all; padding: 0 15px; }
-        #changeFileText { font-size: 13px; color: var(--color-text-secondary); margin-top: 8px; }
-        input[type="file"] { display: none; }
-        .button-container { display: flex; justify-content: center; gap: 15px; text-align: center; margin-top: 25px; }
-        .button { background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 28px; border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.1); display: inline-flex; align-items: center; gap: 10px; }
-        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 20px rgba(106, 17, 203, 0.3); }
-        .button:disabled { opacity: 0.5; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.1); }
-        .button.is-success { background-image: linear-gradient(45deg, var(--color-success-start) 0%, var(--color-success-end) 100%); }
-        .button.is-success:hover { box-shadow: 0 7px 20px rgba(22, 163, 74, 0.3); }
-        .button.apply { background-image: linear-gradient(135deg, var(--color-apply-start), var(--color-apply-end)); }
-        .button.apply:hover { box-shadow: 0 5px 15px rgba(25, 118, 210, 0.4); }
-        .button-icon { width: 20px; height: 20px; }
-        .button.icon-button { padding: 8px; width: 40px; height: 40px; border-radius: 50%; justify-content: center; }
-        .progress-bar { width: 100%; height: 8px; background: var(--color-border); border-radius: 4px; margin-top: 20px; overflow: hidden; display: none; }
-        .progress-bar.active { display: block; }
-        .progress-fill { height: 100%; background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); border-radius: 4px; width: 0%; transition: width 0.3s ease; }
-        .status-message { text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none; animation: slideDown 0.5s; }
-        @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
+        .status-content { display: none; }
+        .status-area.is-loading .loading-content, .status-area.is-success .success-content, .status-area.is-error .error-content {
+            display: flex; flex-direction: column; align-items: center; justify-content: center;
+            gap: 15px; z-index: 10; width: 100%;
+        }
+        .techno-loader { position: relative; width: 80px; height: 80px; }
+        .core-pulse {
+            width: 20%; height: 20%; background: #fff; border-radius: 50%;
+            box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
+            position: absolute; top: 40%; left: 40%; animation: corePulse 1.5s ease-in-out infinite;
+        }
+        @keyframes corePulse { 0%, 100% { transform: scale(0.8); opacity: 0.7; } 50% { transform: scale(1.2); opacity: 1; } }
+        .circuit-flow { fill: none; stroke-width: 1.5; stroke: var(--color-primary-start); stroke-dasharray: 100; stroke-dashoffset: 100; animation: flow 3s linear infinite; }
+        #flow-2 { animation-delay: 0.5s; stroke: var(--color-primary-end); } #flow-3 { animation-delay: 1s; }
+        @keyframes flow { to { stroke-dashoffset: -100; } }
+        .status-text-dynamic { font-size: 16px; font-weight: 600; color: var(--text-medium); text-align: center; transition: opacity 0.3s ease; margin-top: 10px; }
+        .success-icon svg path { stroke: var(--color-success); stroke-dasharray: 29; stroke-dashoffset: 29; animation: drawCheck 0.4s 0.2s cubic-bezier(0.76, 0, 0.24, 1) forwards; }
+        @keyframes drawCheck { to { stroke-dashoffset: 0; } }
+        .status-area.is-success { border-color: rgba(40, 167, 69, 0.5); box-shadow: 0 0 20px rgba(40, 167, 69, 0.4); }
+        .success-text { color: var(--color-success); font-size: 16px; font-weight: 600; }
+        .error-icon { height: 40px; width: 40px; color: var(--color-error); }
+        .status-area.is-error { border-color: rgba(220, 53, 69, 0.5); box-shadow: 0 0 20px rgba(220, 53, 69, 0.4); }
+        .error-text { color: var(--color-error); font-size: 16px; font-weight: 600; }
+        .button {
+            background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%); color: white; border: none; padding: 14px 28px;
+            border-radius: 10px; font-size: 16px; font-weight: 700; cursor: pointer; transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-size: 200% auto; display: inline-flex; align-items: center; gap: 10px;
+            width: 100%; justify-content: center; margin-top: 25px;
+        }
+        .button:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--color-glow); background-position: right center; }
+        .button:disabled { opacity: 0.4; cursor: not-allowed; transform: none; box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-position: left center; }
+        .status {
+            text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px; display: none;
+            animation: slideDown 0.5s; font-weight: 600;
+        }
         @keyframes slideDown { from { opacity: 0; transform: translateY(-10px); } to { opacity: 1; transform: translateY(0); } }
-        .status-message.success { background: #e6f7f0; color: #0d8a54; display: block; }
-        .status-message.error { background: #fdeaea; color: #d92d20; display: block; }
-        #weekSelectorContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; position: relative; }
-        #weekSelectorContainer label { display: block; margin-bottom: 8px; font-weight: 600; color: var(--color-text-secondary); }
-        .custom-select-wrapper { position: relative; }
-        .custom-select-trigger { width: 100%; padding: 12px 15px; border-radius: 8px; border: 1px solid var(--color-border); background-color: #f8fafc; font-family: var(--font-family); font-size: 16px; cursor: pointer; display: flex; justify-content: space-between; align-items: center; transition: all 0.2s ease; }
-        .custom-select-trigger:hover { border-color: var(--color-primary-end); }
-        .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--color-text-secondary); transition: transform 0.3s ease; }
-        .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
-        .custom-options { position: absolute; top: 105%; left: 0; right: 0; background: var(--color-surface); border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.1); z-index: 100; max-height: 200px; overflow-y: auto; opacity: 0; visibility: hidden; transform: translateY(-10px); transition: all 0.3s ease; }
-        .custom-select-wrapper.open .custom-options { opacity: 1; visibility: visible; transform: translateY(0); }
-        .custom-option { padding: 12px 15px; cursor: pointer; transition: background-color 0.2s ease; border-bottom: 1px solid var(--color-border); }
-        .custom-option:last-child { border-bottom: none; }
-        .custom-option:hover { background-color: #f4f7fe; }
-        .custom-option.selected { background-color: #eef2ff; font-weight: 600; color: var(--color-primary-end); }
-        #weekSelector { display: none; }
-        #agentConfigContainer { display: none; margin-top: 20px; animation: fadeIn 0.5s; }
-        .config-header { display: flex; justify-content: flex-end; gap: 10px; margin-bottom: 15px; }
-        #toggleAgentConfigBtn { background: var(--color-primary-end); color: white; animation: blink-blue 1.5s infinite ease-in-out; }
-        #toggleAgentConfigBtn:hover { background: var(--color-primary-start); }
-        @keyframes blink-blue {
-            0%, 100% { transform: scale(1); box-shadow: 0 0 4px rgba(37, 117, 252, 0.4); }
-            50% { transform: scale(1.05); box-shadow: 0 0 12px rgba(37, 117, 252, 0.7); }
+        .status.success { background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.5); color: #28a745; display: block; }
+        .status.error { background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: var(--color-error); display: block; }
+        .status.warning { background: rgba(245, 158, 11, 0.2); border: 1px solid rgba(245, 158, 11, 0.5); color: #f59e0b; display: block; }
+
+        .hidden { display: none; }
+        .date-filter-container {
+            background: rgba(0,0,0,0.2); border: 1px solid var(--glass-border);
+            border-radius: 12px; padding: 20px; margin-top: 25px; animation: fadeIn 0.5s;
         }
-        .agents-list { max-height: 60vh; overflow-y: auto; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
-        .agent-item { padding: 15px; border-bottom: 1px solid var(--color-border); display: grid; grid-template-columns: 2fr 1fr 2fr auto; gap: 15px; align-items: start; }
-        .agent-item:last-child { border-bottom: none; }
-        .agent-item:hover { background-color: #f4f7fe; }
-        .agent-name { font-weight: 600; color: var(--color-text); margin-bottom: 2px; }
-        .agent-config { display: flex; flex-direction: column; gap: 5px; }
-        .config-select { padding: 8px; border: 1px solid var(--color-border); border-radius: 6px; font-size: 14px; background: white; width: 100%; }
-        .day-checkboxes { display: flex; gap: 5px; flex-wrap: wrap; }
-        .day-checkbox-label { display: flex; align-items: center; gap: 3px; font-size: 12px; color: var(--color-text-secondary); }
-        .day-checkbox { width: 16px; height: 16px; cursor: pointer; }
-        .view-special-btn { padding: 6px 10px; font-size: 12px; margin-bottom: 10px; width: fit-content; }
-        .special-config { display: none; margin-top: 10px; padding: 15px; background: #f0f9ff; border: 1px solid #bae6fd; border-radius: 6px; max-height: 50vh; overflow-y: auto; }
-        .special-config.active { display: block; }
-        .special-columns { display: grid; grid-template-columns: 1fr 1fr; gap: 15px; }
-        .special-column h5 { margin: 0 0 8px 0; font-size: 13px; font-weight: 600; text-align: center; padding: 6px; border-radius: 4px; }
-        .special-column.tt h5 { background: #dcfce7; color: #166534; }
-        .special-column.site h5 { background: #fef3c7; color: #92400e; }
-        .special-row { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-bottom: 8px; align-items: center; }
-        .special-option label { display: flex; align-items: center; gap: 6px; font-size: 12px; cursor: pointer; }
-        .special-option input[type="checkbox"] { width: 14px; height: 14px; }
-        .special-description { font-size: 11px; color: var(--color-text-secondary); margin-top: 3px; font-style: italic; }
-        .remove-btn { padding: 8px 12px; background: #dc2626; color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .remove-btn:hover { background: #b91c1c; }
-        .add-agent-section { padding: 15px; background: #f8faff; border-top: 1px solid var(--color-border); }
-        .add-agent-controls { display: flex; gap: 10px; align-items: center; }
-        .add-agent-select { flex: 1; padding: 10px; border: 1px solid var(--color-border); border-radius: 6px; background: white; }
-        .add-btn { padding: 8px 15px; background: var(--color-primary-end); color: white; border: none; border-radius: 6px; cursor: pointer; font-weight: 600; }
-        .add-btn:hover { background: var(--color-primary-start); }
-        #serviceConfigContainer { margin-top: 15px; animation: fadeIn 0.5s; border: 1px solid var(--color-border); border-radius: 8px; background: #fafbff; }
-        #serviceConfigContainer h4 { padding: 12px 15px; margin: 0; font-size: 16px; font-weight: 600; color: var(--color-text); border-bottom: 1px solid var(--color-border); }
-        .service-list { padding: 15px; display: grid; grid-template-columns: repeat(auto-fill, minmax(200px, 1fr)); gap: 10px; max-height: 200px; overflow-y: auto; }
-        .service-item label { display: flex; align-items: center; gap: 8px; font-size: 14px; cursor: pointer; padding: 5px; border-radius: 4px; transition: background-color 0.2s ease; }
-        .service-item label:hover { background-color: #f4f7fe; }
-        .service-item input[type="checkbox"] { width: 16px; height: 16px; cursor: pointer; }
+        .date-filter-container h3 { text-align: center; margin-bottom: 25px; color: var(--text-light); font-weight: 600; font-size: 18px; }
+        .slider-labels { display: flex; justify-content: space-between; margin-top: 10px; font-weight: 600; color: var(--text-medium); font-size: 14px; }
+        #date-slider { margin: 25px 10px 15px; }
+        #date-slider .noUi-connect { background: linear-gradient(45deg, var(--color-primary-start), var(--color-primary-end)); }
+        #date-slider .noUi-handle { border: 3px solid var(--bg-dark); border-radius: 50%; width: 24px; height: 24px; right: -12px; top: -9px; box-shadow: 0 3px 6px rgba(0,0,0,0.2); cursor: pointer; }
+        #date-slider .noUi-handle:focus { outline: none; } #date-slider .noUi-handle::before, #date-slider .noUi-handle::after { display: none; }
     </style>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
-    <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 </head>
 <body>
+    <canvas id="neuronCanvas"></canvas>
+
     <div class="main-container">
         <div class="illustration-panel">
-            <div class="calendar-animation">
-                <div class="calendar-header">Calendario Presencialidad</div>
-                <div class="calendar-week">
-                    <div class="calendar-day site" style="animation-delay: 0.1s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 0.3s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 0.5s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 0.7s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 0.9s;"></div>
-                </div>
-                <div class="calendar-week">
-                    <div class="calendar-day libre" style="animation-delay: 1.1s;"></div>
-                    <div class="calendar-day libre" style="animation-delay: 1.3s;"></div>
-                    <div class="calendar-day site" style="animation-delay: 1.5s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 1.7s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 1.9s;"></div>
-                </div>
-                <div class="calendar-week">
-                    <div class="calendar-day tt" style="animation-delay: 2.1s;"></div>
-                    <div class="calendar-day tt" style="animation-delay: 2.3s;"></div>
-                    <div class="calendar-day libre" style="animation-delay: 2.5s;"></div>
-                    <div class="calendar-day libre" style="animation-delay: 2.7s;"></div>
-                    <div class="calendar-day site" style="animation-delay: 2.9s;"></div>
-                </div>
-            </div>
-            <h2>Calendario Inteligente</h2>
-            <p>Genera automáticamente la distribución de Site y Teletrabajo basado en patrones personalizables por agente.</p>
+            <h2>Automatización de Documentos</h2>
+            <p>Sincroniza los datos de incidencias, filtra por fecha si es necesario y genera las cartas de amonestación o compromiso en segundos.</p>
         </div>
+
         <div class="content-panel">
-            <div class="header"><h1>Generador de Calendario de Presencialidad</h1></div>
-
-            <div class="upload-area" id="uploadArea">
-                <input type="file" id="fileInput" accept=".xlsx,.xls,.csv">
-                <div id="uploadDefaultContent">
-                    <div class="upload-icon">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" fill="none" viewBox="0 0 24 24" stroke="currentColor" stroke-width="2">
-                            <path stroke-linecap="round" stroke-linejoin="round" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
-                        </svg>
-                    </div>
-                    <div class="upload-text">Cargar archivo de turnos (Excel/CSV)</div>
-                </div>
-                <div id="uploadSuccessContent">
-                    <div id="fileNameDisplay"></div>
-                    <div id="changeFileText">Haz clic para cambiar el archivo</div>
-                </div>
-            </div>
-
-            <div id="weekSelectorContainer">
-                <label for="weekSelector">2. Selecciona la semana a procesar</label>
-                <div class="custom-select-wrapper" id="customSelect">
-                    <select id="weekSelector"></select>
-                    <div class="custom-select-trigger" id="customSelectTrigger">-- Esperando archivo --</div>
-                    <div class="custom-options" id="customOptions"></div>
-                </div>
-            </div>
-
-            <div id="agentConfigContainer">
-                <div class="config-header">
-                    <button class="button icon-button" id="toggleAgentConfigBtn" title="Configurar Agentes">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
-                    </button>
-                    <button class="button icon-button" id="toggleServiceConfigBtn" title="Filtrar Servicios">
-                        <svg xmlns="http://www.w3.org/2000/svg" class="button-icon" viewBox="0 0 24 24" fill="currentColor"><path d="M3 4h18v2H3V4Zm2 7h14v2H5v-2Zm4 7h6v2H9v-2Z"/></svg>
-                    </button>
-                </div>
-                <div class="agents-list" id="agentsList" style="display: none;"></div>
-                <div class="add-agent-section" id="addAgentSection" style="display: none;">
-                    <div class="add-agent-controls">
-                        <select class="add-agent-select" id="addAgentSelect">
-                            <option value="">Seleccionar agente para agregar...</option>
-                        </select>
-                        <button class="add-btn" id="addAgentBtn">+ Agregar</button>
-                    </div>
-                </div>
-                <div id="serviceConfigContainer" style="display: none;">
-                    <h4>Servicios a Incluir</h4>
-                    <div class="service-list" id="serviceList"></div>
-                </div>
+            <div class="header">
+                <h1>🏢 Generador de Cartas</h1>
             </div>
             
-            <div class="progress-bar" id="progressBar">
-                <div class="progress-fill" id="progressFill"></div>
+            <div class="status-area" id="statusContainer">
+                 <div class="status-content loading-content">
+                    <div class="techno-loader">
+                        <svg viewBox="0 0 100 100"><path class="circuit-flow" id="flow-1" d="M 50,50 m -25,0 a 25,25 0 1,1 50,0 a 25,25 0 1,1 -50,0"></path><path class="circuit-flow" id="flow-2" d="M 50,50 m -35,0 a 35,35 0 1,0 70,0 a 35,35 0 1,0 -70,0"></path></svg>
+                        <div class="core-pulse"></div>
+                    </div>
+                    <div class="status-text-dynamic" id="dynamicStatusText"></div>
+                 </div>
+                 <div class="status-content success-content">
+                    <div class="success-icon"><svg viewBox="0 0 24 24"><path fill="none" stroke-width="2.5" stroke="currentColor" d="M5,13 l4,4 l10,-10" /></svg></div>
+                    <div class="success-text">Sincronización completa</div>
+                 </div>
+                 <div class="status-content error-content">
+                    <div class="status-icon error-icon"><svg xmlns="http://www.w3.org/2000/svg" fill="none" viewBox="0 0 24 24" stroke-width="2" stroke="currentColor"><path stroke-linecap="round" stroke-linejoin="round" d="M12 9v3.75m-9.303 3.376c-.866 1.5.217 3.374 1.948 3.374h14.71c1.73 0 2.813-1.874 1.948-3.374L13.949 3.378c-.866-1.5-3.032-1.5-3.898 0L2.697 16.126zM12 15.75h.007v.008H12v-.008z" /></svg></div>
+                    <div class="error-text" id="errorText"></div>
+                 </div>
             </div>
 
-            <div class="button-container" id="actionsContainer" style="display: none;">
-                <button class="button" id="generateBtn" disabled>Generar Calendario</button>
-                <button class="button apply" id="applyDownloadBtn" disabled>Aplicar y Descargar</button>
+            <div class="date-filter-container hidden" id="dateFilterContainer">
+                <h3>📅 Filtrar por Fecha de Incidencia</h3>
+                <div id="date-slider"></div>
+                <div class="slider-labels">
+                    <span id="slider-start-date"></span>
+                    <span id="slider-end-date"></span>
+                </div>
             </div>
-
-            <div class="status-message" id="statusMessage"></div>
+    
+            <button class="button hidden" id="generateBtn">
+                <span id="btnText">🚀 Generar Cartas</span>
+            </button>
+            
+            <div class="status" id="status"></div>
         </div>
     </div>
 
     <script>
-
-    function normalizeDate(date) {
-        if (!date) return null;
-        const d = new Date(date);
-        return new Date(d.getFullYear(), d.getMonth(), d.getDate());
-    }
-    
-        document.addEventListener('DOMContentLoaded', function() {
-
-            let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
-            let availableAgents = [], configuredAgents = new Map();
-            let uniqueServices = new Set();
-            let calendarResults = new Map();
-
-            let defaultAgentsConfig = [
-                { nombre: "Aros Medina Carla Yessenia", modalidad: "3x2", condicion: ["segundo", "cuarto"] },
-                { nombre: "Alvarado Catalán Yocelyn Susana", modalidad: "4x1", condicion: ["segundo"] },
-                { nombre: "Alvarez Valderas Eliana Del Carmen", modalidad: "especial", condicion: ["pm_tt", "noche_tt", "weekend_festivos_tt"] },
-                { nombre: "Cardenas Huenuqueo Valeria Constanza", modalidad: "especial", condicion: ["pm_tt"] },
-                { nombre: "Cortés Carmona Jessica Marcela", modalidad: "3x2", condicion: ["primer", "cuarto"] },
-                { nombre: "Garces Nuñez Nicole Andrea", modalidad: "3x2", condicion: ["primer", "tercer"] },
-                { nombre: "Neipán Lemuy Jessica Andrea", modalidad: "4x1", condicion: ["primer"] },
-                { nombre: "Planzer Huanquil Catalina Fernanda", modalidad: "4x1", condicion: ["primer"] },
-                { nombre: "Solís Yáñez Cristian Andrés", modalidad: "4x1", condicion: ["cuarto"] },
-                { nombre: "Tobar Barrientos Nayareth Soledad", modalidad: "especial", condicion: ["pm_tt"] },
-                { nombre: "Vargas Huirimilla Alisson Danitza", modalidad: "4x1", condicion: ["tercer"] },
-                { nombre: "Vidal Gatica Yanira Belen", modalidad: "3x2", condicion: ["segundo", "tercer"] },
-                { nombre: "Ovando Mancilla Cristóbal Alexis", modalidad: "3x2", condicion: ["tercer", "quinto"] },
-                { nombre: "Alvarado Rios Barbara Ivonne", modalidad: "3x2", condicion: ["tercer", "quinto"] },
-                { nombre: "Ricouz Ricouz Valentina Anhelore", modalidad: "3x2", condicion: ["tercer", "quinto"] },
-                { nombre: "Cheuquian Coyan Nataly Soledad", modalidad: "3x2", condicion: ["primer", "segundo"] }
-            ];
-
-            const uploadArea = document.getElementById('uploadArea');
-            const fileInput = document.getElementById('fileInput');
-            const fileNameDisplay = document.getElementById('fileNameDisplay');
-            const generateBtn = document.getElementById('generateBtn');
-            const progressBar = document.getElementById('progressBar');
-            const progressFill = document.getElementById('progressFill');
-            const statusMessage = document.getElementById('statusMessage');
-            const weekSelectorContainer = document.getElementById('weekSelectorContainer');
-            const weekSelector = document.getElementById('weekSelector');
-            const customSelect = document.getElementById('customSelect');
-            const customSelectTrigger = document.getElementById('customSelectTrigger');
-            const customOptions = document.getElementById('customOptions');
-            const agentConfigContainer = document.getElementById('agentConfigContainer');
-            const toggleAgentConfigBtn = document.getElementById('toggleAgentConfigBtn');
-            const agentsList = document.getElementById('agentsList');
-            const addAgentSection = document.getElementById('addAgentSection');
-            const addAgentSelect = document.getElementById('addAgentSelect');
-            const addAgentBtn = document.getElementById('addAgentBtn');
-            const applyDownloadBtn = document.getElementById('applyDownloadBtn');
-            const actionsContainer = document.getElementById('actionsContainer');
-            const serviceConfigContainer = document.getElementById('serviceConfigContainer');
-            const serviceList = document.getElementById('serviceList');
-            const toggleServiceConfigBtn = document.getElementById('toggleServiceConfigBtn');
-
-            customSelectTrigger.addEventListener('click', () => customSelect.classList.toggle('open'));
-            window.addEventListener('click', (e) => { if (!customSelect.contains(e.target)) customSelect.classList.remove('open'); });
-
-            uploadArea.addEventListener('click', () => fileInput.click());
-            uploadArea.addEventListener('dragover', (e) => { e.preventDefault(); uploadArea.classList.add('dragover'); });
-            uploadArea.addEventListener('dragleave', () => { uploadArea.classList.remove('dragover'); });
-            uploadArea.addEventListener('drop', (e) => { e.preventDefault(); uploadArea.classList.remove('dragover'); if (e.dataTransfer.files.length > 0) handleFile(e.dataTransfer.files[0]); });
-            fileInput.addEventListener('change', (e) => { if (e.target.files.length > 0) handleFile(e.target.files[0]); });
-
-            toggleAgentConfigBtn.addEventListener('click', () => {
-                const isVisible = agentsList.style.display !== 'none';
-                agentsList.style.display = isVisible ? 'none' : 'block';
-                addAgentSection.style.display = isVisible ? 'none' : 'block';
-            });
-            toggleServiceConfigBtn.addEventListener('click', () => {
-                const isVisible = serviceConfigContainer.style.display !== 'none';
-                serviceConfigContainer.style.display = isVisible ? 'none' : 'block';
-            });
-
-            addAgentBtn.addEventListener('click', addAgent);
-            weekSelector.addEventListener('change', filterTurnosData);
-            generateBtn.addEventListener('click', generateCalendar);
-            applyDownloadBtn.addEventListener('click', applyAndDownloadShifts);
-
-            function handleFile(file) {
-                turnosData = null; 
-                calendarResults.clear();
-                customSelectTrigger.textContent = '-- Selecciona una semana --';
-                fileInput.value = ''; 
-                
-                fileNameDisplay.textContent = file.name;
-                uploadArea.classList.add('file-loaded');
-                actionsContainer.style.display = 'none';
-                generateBtn.disabled = true;
-                applyDownloadBtn.disabled = true;
-
-                const reader = new FileReader();
-                reader.onload = (e) => {
-                    try {
-                        const data = new Uint8Array(e.target.result);
-                        const workbook = XLSX.read(data, { type: 'array', cellDates: true });
-                        let jsonData = XLSX.utils.sheet_to_json(workbook.Sheets[workbook.SheetNames[0]]);
-
-                        // columnas de tiempo a convertir (añadí Ini_Colac / Fin_Colac)
-                        const timeColumns = ['Ini','INI','FIN','Fin','Desc_1','Ini_ Colac','Ini_Colac','Fin_ Colac','Fin_Colac','Desc_2','INICIO TURNO','FIN DEL TURNO'];
-                        jsonData.forEach(row => {
-                            for (const key in row) {
-                                if (timeColumns.includes(key)) {
-                                    if (typeof row[key] === 'number' && row[key] < 2) {
-                                        const date = XLSX.SSF.parse_date_code(row[key]);
-                                        const jsDate = new Date(1900, 0, 1, date.H || 0, date.M || 0, date.S || 0);
-                                        jsDate.setDate(jsDate.getDate() + (row[key] > 1 ? -1 : 0));
-                                        row[key] = jsDate;
-                                    }
-                                }
-                            }
-                        });
-
-                        allData = jsonData.filter(row => row && typeof row.Nombre !== 'undefined' && row.Nombre !== null);
-
-                        // Corrección de fechas por zona horaria
-                        allData.forEach(row => {
-                            const fechaKey = findKey(row, ['Fecha']);
-                            if (fechaKey && row[fechaKey] instanceof Date) {
-                                const tzOffset = row[fechaKey].getTimezoneOffset() * 60000;
-                                row[fechaKey] = new Date(row[fechaKey].getTime() + tzOffset);
-                            }
-                        });
-
-                        extractAvailableAgents(allData);
-                        populateWeekSelector(allData);
-                        populateServiceFilter(allData);
-                        initializeDefaultConfigurations();
-                        updateAgentsList();
-                        updateAddAgentSelect();
-                        weekSelectorContainer.style.display = 'block';
-                        agentConfigContainer.style.display = 'block';
-                        actionsContainer.style.display = 'flex';
-                        showStatus('Archivo cargado correctamente.', 'success');
-                    } catch(error) {
-                        showStatus('Error al leer el archivo. Asegúrate que sea un Excel válido.', 'error');
-                        console.error(error);
-                    }
-                };
-                reader.readAsArrayBuffer(file);
-            }
-            
-            function populateServiceFilter(data) {
-                uniqueServices.clear();
-                serviceList.innerHTML = '';
-                const serviceKey = findKey(data[0] || {}, ['Servicio']);
-                if (!serviceKey) return; 
-                data.forEach(row => { if (row[serviceKey]) uniqueServices.add(row[serviceKey]); });
-                const sortedServices = Array.from(uniqueServices).sort();
-                sortedServices.forEach(service => {
-                    const itemDiv = document.createElement('div');
-                    itemDiv.className = 'service-item';
-                    const label = document.createElement('label');
-                    const checkbox = document.createElement('input');
-                    checkbox.type = 'checkbox';
-                    checkbox.value = service;
-                    if (service === '01_Masivo' || service === '10_Staff_Inbound') checkbox.checked = true;
-                    checkbox.addEventListener('change', filterTurnosData);
-                    label.appendChild(checkbox);
-                    label.appendChild(document.createTextNode(` ${service}`));
-                    itemDiv.appendChild(label);
-                    serviceList.appendChild(itemDiv);
-                });
-            }
-
-            function extractAvailableAgents(data) {
-                const agentsSet = new Set();
-                data.forEach(row => {
-                    const rut = findVal(row, ['Rut', 'id']);
-                    if (!row || typeof row.Nombre === 'undefined' || !rut) return;
-                    const normalizedRowName = String(row.Nombre).replace(/\s/g, '').toLowerCase();
-                    const isConfigured = defaultAgentsConfig.some(config =>
-                        String(config.nombre).replace(/\s/g, '').toLowerCase() === normalizedRowName
-                    );
-                    if (!isConfigured) {
-                        agentsSet.add(JSON.stringify({ nombre: row.Nombre, rut: rut }));
-                    }
-                });
-                availableAgents = Array.from(agentsSet).map(agentStr => JSON.parse(agentStr));
-            }
-
-            function initializeDefaultConfigurations() {
-                configuredAgents.clear();
-                defaultAgentsConfig.forEach(defaultConfig => {
-                    const normalizedConfigName = String(defaultConfig.nombre).replace(/\s/g, '').toLowerCase();
-                    const agentInFile = allData.find(row => {
-                        if (!row || typeof row.Nombre === 'undefined') return false;
-                        return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
-                    });
-                    if (agentInFile) {
-                        const rut = findVal(agentInFile, ['Rut', 'id']) || 'SIN_RUT';
-                        const key = `${defaultConfig.nombre}_${rut}`;
-                        configuredAgents.set(key, { ...defaultConfig, rut: rut });
-                    }
-                });
-                configuredAgents.forEach((config) => {
-                    if (config.modalidad === 'especial' && config.condicion) {
-                        config.condicion = fixIncoherentConfiguration(config.condicion);
-                    }
-                });
-            }
-
-            function fixIncoherentConfiguration(condicion) {
-                const fixed = [];
-                const types = ['am', 'pm', 'noche', 'weekend_festivos'];
-                types.forEach(type => {
-                    const ttOption = `${type}_tt`; const siteOption = `${type}_site`;
-                    if (condicion.includes(ttOption)) fixed.push(ttOption);
-                    else if (condicion.includes(siteOption)) fixed.push(siteOption);
-                });
-                return fixed;
-            }
-
-            function updateAgentsList() {
-                agentsList.innerHTML = '';
-                configuredAgents.forEach((config) => {
-                    agentsList.appendChild(createAgentItem(config));
-                });
-            }
-
-            function createAgentItem(config) {
-                const div = document.createElement('div');
-                div.className = 'agent-item';
-                const isSpecial = config.modalidad === 'especial';
-                const key = `${config.nombre}_${config.rut}`;
-
-                div.innerHTML = `
-                    <div class="agent-info"><div class="agent-name">${config.nombre}</div></div>
-                    <div class="agent-config">
-                        <select class="config-select modalidad-select">
-                            <option value="4x1" ${config.modalidad === '4x1' ? 'selected' : ''}>4x1</option>
-                            <option value="3x2" ${config.modalidad === '3x2' ? 'selected' : ''}>3x2</option>
-                            <option value="especial" ${config.modalidad === 'especial' ? 'selected' : ''}>Especiales</option>
-                        </select>
-                    </div>
-                    <div class="agent-config">
-                        <button class="button secondary view-special-btn" style="display: ${isSpecial ? 'block' : 'none'};">[+] Ver detalles</button>
-                        <div class="day-checkboxes" style="display: ${isSpecial ? 'none' : 'flex'};">
-                            ${['primer', 'segundo', 'tercer', 'cuarto', 'quinto'].map(day => `<label class="day-checkbox-label"><input type="checkbox" class="day-checkbox" value="${day}" ${config.condicion?.includes(day) ? 'checked' : ''}>${day.charAt(0).toUpperCase() + day.slice(1, 3)}</label>`).join('')}
-                        </div>
-                        <div class="special-config">
-                            <div class="special-columns">
-                                <div class="special-column tt"><h5>🏠 TT</h5></div><div class="special-column site"><h5>🏢 SITE</h5></div>
-                            </div>
-                            ${['am', 'pm', 'noche', 'weekend_festivos'].map(type => `
-                            <div class="special-row">
-                                <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_tt" ${config.condicion?.includes(`${type}_tt`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
-                                <div class="special-option"><label><input type="checkbox" class="special-checkbox" value="${type}_site" ${config.condicion?.includes(`${type}_site`) ? 'checked' : ''}> ${type.replace('weekend_festivos', 'FDS/Fest.')}</label></div>
-                            </div>`).join('')}
-                        </div>
-                    </div>
-                    <button class="remove-btn" data-key="${key}">×</button>`;
-
-                const modalidadSelect = div.querySelector('.modalidad-select');
-                const dayCheckboxContainer = div.querySelector('.day-checkboxes');
-                const specialConfigContainer = div.querySelector('.special-config');
-                const viewSpecialBtn = div.querySelector('.view-special-btn');
-
-                modalidadSelect.addEventListener('change', (e) => {
-                    const isNowSpecial = e.target.value === 'especial';
-                    dayCheckboxContainer.style.display = isNowSpecial ? 'none' : 'flex';
-                    viewSpecialBtn.style.display = isNowSpecial ? 'block' : 'none';
-                    specialConfigContainer.classList.remove('active');
-                    viewSpecialBtn.textContent = '[+] Ver detalles';
-                    updateAgentConfig(key);
-                });
-
-                viewSpecialBtn.addEventListener('click', () => {
-                    const isActive = specialConfigContainer.classList.toggle('active');
-                    viewSpecialBtn.textContent = isActive ? '[-] Ocultar' : '[+] Ver detalles';
-                });
-
-                div.querySelectorAll('.day-checkbox, .special-checkbox').forEach(cb => cb.addEventListener('change', (e) => {
-                    if (e.target.checked && e.target.classList.contains('special-checkbox')) {
-                        let conflictingValue = e.target.value.includes('_tt') ? e.target.value.replace('_tt', '_site') : e.target.value.replace('_site', '_tt');
-                        const conflictingCheckbox = div.querySelector(`input[value="${conflictingValue}"]`);
-                        if (conflictingCheckbox) conflictingCheckbox.checked = false;
-                    }
-                    updateAgentConfig(key);
-                }));
-                
-                return div;
-            }
-
-            agentsList.addEventListener('click', function(event) {
-                if (event.target.classList.contains('remove-btn')) {
-                    const key = event.target.dataset.key;
-                    if (key) {
-                        removeAgent(key);
-                    }
-                }
-            });
-
-            function updateAgentConfig(key) {
-                const config = configuredAgents.get(key);
-                if (!config) return;
-                const agentItem = Array.from(agentsList.children).find(item => {
-                    const btn = item.querySelector('.remove-btn');
-                    return btn && btn.dataset.key === key;
-                });
-                if (agentItem) {
-                    config.modalidad = agentItem.querySelector('.modalidad-select').value;
-                    config.condicion = config.modalidad === 'especial'
-                        ? Array.from(agentItem.querySelectorAll('.special-checkbox:checked')).map(cb => cb.value)
-                        : Array.from(agentItem.querySelectorAll('.day-checkbox:checked')).map(cb => cb.value);
-                }
-            }
-
-            function updateAddAgentSelect() {
-                addAgentSelect.innerHTML = '<option value="">Seleccionar agente para agregar...</option>';
-                availableAgents.forEach(agent => {
-                    const key = agent.nombre + '_' + agent.rut;
-                    if (!configuredAgents.has(key)) {
-                        const option = document.createElement('option');
-                        option.value = key;
-                        option.textContent = `${agent.nombre} (${agent.rut})`;
-                        addAgentSelect.appendChild(option);
-                    }
-                });
-            }
-
-            function addAgent() {
-                const selectedKey = addAgentSelect.value;
-                if (!selectedKey) return;
-                const [nombre, rut] = selectedKey.split('_');
-                configuredAgents.set(selectedKey, { nombre, rut, modalidad: '4x1', condicion: ['primer'] });
-                updateAgentsList();
-                updateAddAgentSelect();
-            }
-
-            function removeAgent(key) {
-                configuredAgents.delete(key);
-                updateAgentsList();
-                updateAddAgentSelect();
-            }
-
-            function getMonday(d) {
-                d = new Date(d);
-                const day = d.getDay(), diff = d.getDate() - day + (day == 0 ? -6 : 1);
-                return new Date(new Date(d.setDate(diff)).setHours(0, 0, 0, 0));
-            }
-
-            function populateWeekSelector(data) {
-                const weekSet = new Set();
-                data.forEach(row => { if (row && row.Fecha) weekSet.add(getMonday(normalizeDate(row.Fecha)).toISOString()); });
-                const last4Weeks = Array.from(weekSet).sort((a, b) => new Date(b) - new Date(a)).slice(0, 4);
-                weekSelector.innerHTML = ''; customOptions.innerHTML = '';
-                
-                last4Weeks.forEach(mondayISO => {
-                    const monday = new Date(mondayISO);
-                    const sunday = new Date(monday);
-                    sunday.setDate(monday.getDate() + 6);
-                    const optionText = `Semana ${monday.getDate()} al ${sunday.getDate()} de ${sunday.toLocaleString('es-ES', { month: 'long' })}`;
-                    const option = document.createElement('option');
-                    option.value = mondayISO; option.textContent = optionText;
-                    weekSelector.appendChild(option);
-                    const customOption = document.createElement('div');
-                    customOption.className = 'custom-option'; customOption.textContent = optionText;
-                    customOption.dataset.value = mondayISO;
-                    customOption.addEventListener('click', () => {
-                        customSelectTrigger.textContent = customOption.textContent;
-                        weekSelector.value = customOption.dataset.value;
-                        weekSelector.dispatchEvent(new Event('change'));
-                        document.querySelectorAll('.custom-option').forEach(opt => opt.classList.remove('selected'));
-                        customOption.classList.add('selected');
-                        customSelect.classList.remove('open');
-                    });
-                    customOptions.appendChild(customOption);
-                });
-            }
-
-            function filterTurnosData() {
-                const selectedMondayISO = weekSelector.value;
-                if (!selectedMondayISO || !allData) {
-                    turnosData = null; 
-                    generateBtn.disabled = true; 
-                    applyDownloadBtn.disabled = true;
-                    return;
-                }
-                
-                applyDownloadBtn.disabled = true;
-
-                const selectedServices = Array.from(serviceList.querySelectorAll('input:checked')).map(cb => cb.value);
-                const serviceKey = findKey(allData[0] || {}, ['Servicio']);
-
-                const selectedMonday = new Date(selectedMondayISO);
-                const nextMonday = new Date(selectedMonday);
-                nextMonday.setDate(selectedMonday.getDate() + 7);
-                
-                let weeklyData = allData.filter(row => {
-                    if (!row || !row.Fecha) return false;
-                    const rowDate = new Date(row.Fecha);
-                    return rowDate >= selectedMonday && rowDate < nextMonday;
-                });
-
-                if (serviceKey && selectedServices.length > 0) {
-                    turnosData = weeklyData.filter(row => selectedServices.includes(row[serviceKey]));
-                } else {
-                    turnosData = weeklyData;
-                }
-
-                generateBtn.disabled = turnosData.length === 0;
-            }
-
-            async function triggerDownload() {
-                if (generatedWorkbook && fileName) {
-                    const buffer = await generatedWorkbook.xlsx.writeBuffer();
-                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url; a.download = fileName; a.click(); URL.revokeObjectURL(url);
-                }
-            }
-
-            async function generateCalendar() {
-                if (!turnosData || turnosData.length === 0) {
-                    showStatus('No hay datos válidos para procesar (verifique la semana y servicios seleccionados).', 'error'); return;
-                }
-                if (configuredAgents.size === 0) {
-                    showStatus('Debes configurar al menos un agente.', 'error'); return;
-                }
-                calendarResults.clear();
-                generateBtn.disabled = true;
-                applyDownloadBtn.disabled = true;
-                progressBar.classList.add('active');
-                let progress = 0;
-                const progressInterval = setInterval(() => { progress += 10; progressFill.style.width = progress + '%'; if (progress >= 100) clearInterval(progressInterval); }, 100);
-
-                setTimeout(async () => {
-                    try {
-                        await createCalendarWorkbook();
-                        progressBar.classList.remove('active');
-                        progressFill.style.width = '0%';
-                        if (fileName) {
-                            generateBtn.classList.add('is-success');
-                            generateBtn.textContent = 'Descargando...';
-                            showStatus('Calendario generado. Iniciando descarga...', 'success');
-                            await triggerDownload();
-                            setTimeout(() => {
-                                generateBtn.classList.remove('is-success');
-                                generateBtn.textContent = 'Generar Calendario';
-                                generateBtn.disabled = false;
-                                applyDownloadBtn.disabled = false;
-                            }, 2000);
-                        } else {
-                            generateBtn.disabled = false;
-                        }
-                    } catch (error) {
-                        showStatus('Ocurrió un error al generar el archivo.', 'error');
-                        console.error("Error en generateCalendar:", error);
-                        generateBtn.disabled = false;
-                    }
-                }, 1500);
-            }
-
-            async function createCalendarWorkbook() {
-                fileName = '';
-                const workbook = new ExcelJS.Workbook();
-                const worksheet = workbook.addWorksheet('Calendario TT');
-
-                const mondayISO = weekSelector.value; const mondayUTC = new Date(mondayISO); const monday = getMonday(new Date(mondayUTC.getTime() + mondayUTC.getTimezoneOffset()*60000));
-                const monthName = monday.toLocaleString('es-ES', { month: 'long' }).toUpperCase();
-                const year = monday.getFullYear();
-
-                const weekDays = Array.from({length: 7}, (_, i) => new Date(monday.getFullYear(), monday.getMonth(), monday.getDate() + i));
-
-                fileName = `Calendario TT semana del ${weekDays[0].getDate()} al ${weekDays[6].getDate()} de ${monthName} ${year}.xlsx`;
-                createCalendarSheet(worksheet, weekDays, monthName, year);
-
-                generatedWorkbook = workbook;
-            }
-
-            function createCalendarSheet(worksheet, weekDays, monthName, year) {
-                worksheet.columns = [ { width: 5 }, { width: 35 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 12 }, { width: 80 } ];
-                let rowIndex = 1;
-
-                const headerFill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF366092' } };
-                const headerFont = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri' };
-
-                const titleRow = worksheet.getRow(rowIndex++);
-                const titleCell = titleRow.getCell(1);
-                titleCell.value = `CALENDARIO TT ${monthName} ${year}`;
-                worksheet.mergeCells(1, 1, 1, 10);
-                titleCell.font = { ...headerFont, size: 14 };
-                titleCell.fill = headerFill;
-                titleCell.alignment = { horizontal: 'center' };
-
-                const subtitleRow = worksheet.getRow(rowIndex++);
-                const subtitleCell = subtitleRow.getCell(1);
-                subtitleCell.value = `SEMANA ${weekDays[0].getDate()} AL ${weekDays[6].getDate()} ${monthName}`;
-                worksheet.mergeCells(2, 1, 2, 10);
-                subtitleCell.font = { ...headerFont, size: 12 };
-                subtitleCell.fill = headerFill;
-                subtitleCell.alignment = { horizontal: 'center' };
-
-                const headerRow = worksheet.getRow(rowIndex++);
-                const dayNames = ['Lunes', 'Martes', 'Miércoles', 'Jueves', 'Viernes', 'Sábado', 'Domingo'];
-                const headers = ['N°', 'NOMBRE', ...weekDays.map((day, i) => `${dayNames[i]} ${day.getDate()}`), 'condiciones'];
-                headers.forEach((header, index) => {
-                    const cell = headerRow.getCell(index + 1);
-                    cell.value = header;
-                    cell.fill = headerFill;
-                    cell.font = { ...headerFont, size: 11 };
-                    cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true };
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                });
-
-                let agentNumber = 1;
-                configuredAgents.forEach((config) => {
-                    const normalizedConfigName = String(config.nombre).replace(/\s/g, '').toLowerCase();
-                    const agentShifts = turnosData.filter(row => {
-                        if (!row || typeof row.Nombre === 'undefined' || row.Nombre === null) return false;
-                        return String(row.Nombre).replace(/\s/g, '').toLowerCase() === normalizedConfigName;
-                    });
-
-                    if (agentShifts.length > 0) {
-                        const agentRow = worksheet.getRow(rowIndex++);
-                        agentRow.getCell(1).value = agentNumber++;
-                        agentRow.getCell(2).value = config.nombre;
-
-                        weekDays.forEach((day, dayIndex) => {
-                            const dayShift = agentShifts.find(s => s.Fecha && normalizeDate(s.Fecha).toDateString() === day.toDateString());
-                            let status = 'LIBRE';
-                            if (dayShift && !isLibre(dayShift)) {
-                                if (config.modalidad === 'especial') {
-                                    status = applySpecialLogic(dayShift, config.condicion, day);
-                                } else {
-                                    const workingShifts = agentShifts.filter(s => !isLibre(s)).sort((a, b) => new Date(a.Fecha) - new Date(b.Fecha));
-                                    const shiftPosition = workingShifts.findIndex(s => new Date(s.Fecha).toDateString() === day.toDateString()) + 1;
-                                    status = config.condicion.map(getDayPosition).includes(shiftPosition) ? 'SITE' : 'TT';
-                                }
-                            }
-                            const cell = agentRow.getCell(3 + dayIndex);
-                            cell.value = status;
-                            if (status === 'TT') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD1FAE5' } };
-                            else if (status === 'SITE') cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFE0E7FF' } };
-
-                            calendarResults.set(`${config.nombre}_${day.toDateString()}`, status);
-                        });
-
-                        agentRow.getCell(10).value = generateConditionText(config);
-                        for (let i = 1; i <= 10; i++) {
-                            const cell = agentRow.getCell(i);
-                            cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                            cell.font = { name: 'Calibri', size: 11 };
-                            cell.alignment = { vertical: 'middle', horizontal: (i > 2 && i < 10) ? 'center' : (i==1 ? 'center' : 'left') };
-                        }
-                    }
-                });
-            }
-
-            // ---------- FUNCIÓN CORREGIDA: exporta horas/colaciones y LIBRE ----------
-            async function applyAndDownloadShifts() {
-                try {
-                    if (!turnosData || turnosData.length === 0) {
-                        return showStatus('No hay datos de turnos válidos para procesar.', 'error');
-                    }
-
-                    const workbook = new ExcelJS.Workbook();
-                    const worksheet = workbook.addWorksheet('Turnos Aplicados');
-
-                    worksheet.columns = [
-                        { width: 10.27 }, { width: 10.27 }, { width: 35.55 }, { width: 10.27 },
-                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 10.27 },
-                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 10.27 },
-                        { width: 10.27 }, { width: 10.27 }, { width: 10.27 }, { width: 11.73 },
-                        { width: 20.09 }
-                    ];
-
-                    const headers = ['Rut','Lugar','Nombre','Estado','Fecha','Dia','INI','FIN','Dur_Tur','Desc_1','Ini_Colac','Fin_Colac','Desc_2','Dur_Colac','HC','Encargado','Servicio'];
-
-                    // mapa flexible de nombres (soporta variantes con/ sin espacio/ acentos)
-                    const headerMap = {
-                        'Rut': ['Rut','ID','id'],
-                        'Lugar': ['Lugar','Sede','Ubicacion','Ubicación','Site','TT'],
-                        'Nombre': ['Nombre','nombre'],
-                        'Estado': ['Estado'],
-                        'Fecha': ['Fecha','fecha'],
-                        'Dia': ['Dia','Día','dia','día'],
-                        'INI': ['INI','Ini','INICIO TURNO','Inicio','Inicio turno','Inicio_Turno','INICIO'],
-                        'FIN': ['FIN','Fin','FIN DEL TURNO','Termino','Término','Fin_Turno'],
-                        'Dur_Tur': ['Dur_Tur','Duracion Turno','Dur_Turno','Duración Turno'],
-                        'Desc_1': ['Desc_1','DESC_1','Desc 1','Des_1','DESC 1'],
-                        'Ini_Colac': ['Ini_Colac','Ini_ Colac','Inicio Colacion','Inicio Colación','Ini Colac','IniColac'],
-                        'Fin_Colac': ['Fin_Colac','Fin_ Colac','Fin Colacion','Fin Colación','Fin Colac','FinColac'],
-                        'Desc_2': ['Desc_2','DESC_2','Desc 2','Des_2','DESC 2'],
-                        'Dur_Colac': ['Dur_Colac','Dur_ Colac','Dur Colac','Duracion Colacion','Duración Colación'],
-                        'HC': ['HC'],
-                        'Encargado': ['Encargado','Supervisor','Jefe'],
-                        'Servicio': ['Servicio','Service']
-                    };
-
-                    // encabezado con estilo
-                    const headerRow = worksheet.getRow(1);
-                    headerRow.height = 20;
-                    headers.forEach((header, idx) => {
-                        const cell = headerRow.getCell(idx + 1);
-                        cell.value = header;
-                        cell.font = { name: 'Calibri', size: 11, bold: true, color: { argb: 'FFC00000' } };
-                        cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FFD0CECE' } };
-                        cell.alignment = { horizontal: 'center', vertical: 'middle' };
-                        cell.border = { top: { style: 'dotted' }, left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' } };
-                    });
-
-                    const sortedData = [...turnosData].sort((a,b) => (findVal(a, ['Rut','id']) || '').localeCompare(findVal(b, ['Rut','id']) || ''));
-
-                    sortedData.forEach((data, rowIndex) => {
-                        const row = worksheet.getRow(rowIndex + 2);
-                        row.height = 14.5;
-
-                        const record = { ...data };
-
-                        // Lugar según calendario generado
-                        const nombreAgente = findVal(record, ['nombre','Nombre']);
-                        const fechaTurno = new Date(findVal(record, ['fecha','Fecha']));
-                        const key = `${nombreAgente}_${fechaTurno.toDateString()}`;
-                        const status = calendarResults.get(key);
-                        const lugarKey = findKey(record, headerMap['Lugar']);
-                        if (lugarKey) {
-                            if (isLibre(record)) record[lugarKey] = 'Site';
-                            else if (status) record[lugarKey] = status;
-                        }
-
-                        headers.forEach((hdr, colIdx) => {
-                            const cell = row.getCell(colIdx + 1);
-                            const candidates = headerMap[hdr] || [hdr];
-                            const keyFound = findKey(record, candidates);
-                            let value = keyFound ? record[keyFound] : '';
-
-                            // Fecha con formato excel
-                            if (hdr.toLowerCase() === 'fecha') {
-                                if (value instanceof Date) {
-                                    cell.value = value;
-                                    cell.numFmt = 'dd-mm-yyyy';
-                                } else {
-                                    cell.value = value || '';
-                                }
-                                return;
-                            }
-
-                            // Horas / colaciones -> HH:mm o LIBRE
-                            const isTimeField = ['ini','fin','desc_1','ini_colac','fin_colac','desc_2'].includes(hdr.toLowerCase());
-                            if (isTimeField) {
-                                const s = value != null ? String(value) : '';
-                                if (/LIBRE/i.test(s)) {
-                                    cell.value = 'LIBRE';
-                                } else {
-                                    cell.value = formatTime(value);
-                                }
-                                return;
-                            }
-
-                            // otros
-                            cell.value = value !== undefined ? value : '';
-                        });
-
-                        for (let i = 1; i <= headers.length; i++) {
-                            const c = row.getCell(i);
-                            c.font = { name: 'Calibri', size: 11, color: { argb: 'FF000000' } };
-                            c.alignment = { horizontal: 'left', vertical: 'middle' };
-                            c.border = { top: { style: 'dotted' }, left: { style: 'dotted' }, bottom: { style: 'dotted' }, right: { style: 'dotted' } };
-                        }
-                    });
-
-                    worksheet.properties.defaultRowHeight = 14.5;
-                    
-                    const buffer = await workbook.xlsx.writeBuffer();
-                    const blob = new Blob([buffer], { type: 'application/vnd.openxmlformats-officedocument.spreadsheetml.sheet' });
-                    const mondayISO = weekSelector.value; const mondayUTC = new Date(mondayISO); const monday = getMonday(new Date(mondayUTC.getTime() + mondayUTC.getTimezoneOffset()*60000));
-                    const monthName = monday.toLocaleString('es-ES', { month: 'long' });
-                    const downloadFileName = `Malla de Turnos Aplicada - Semana ${monday.getDate()} ${monthName} ${monday.getFullYear()}.xlsx`;
-                    
-                    const url = URL.createObjectURL(blob);
-                    const a = document.createElement('a');
-                    a.href = url;
-                    a.download = downloadFileName;
-                    document.body.appendChild(a);
-                    a.click();
-                    document.body.removeChild(a);
-                    URL.revokeObjectURL(url);
-                    showStatus('Malla de turnos aplicada y descargada.', 'success');
-
-                } catch (error) {
-                    console.error('Error al aplicar y descargar la malla:', error);
-                    showStatus(`Error al generar la malla: ${error.message}`, 'error');
-                }
-            }
-            // ---------- FIN FUNCIÓN CORREGIDA ----------
-
-            const findKey = (o, names) => {
-                // CORRECCIÓN: normaliza (sin espacios/subrayados, minúsculas) para encontrar claves
-                if (!o || !names) return null;
-                const norm = s => String(s).replace(/[\s_]+/g,'').toLowerCase();
-                const keys = Object.keys(o);
-                const wanted = new Set(names.map(n => norm(n)));
-                return keys.find(k => wanted.has(norm(k)));
-            };
-
-            const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : null; };
-            
-            function isLibre(row) {
-                if (!row) return true;
-                const ini = findVal(row, ['ini', 'inicio', 'inicio turno']);
-                return typeof ini === 'string' && String(ini).toUpperCase().includes('LIBRE');
-            }
-
-            function applySpecialLogic(shift, specialConditions, day) {
-                const iniValue = findVal(shift, ['ini', 'inicio', 'inicio turno']);
-                if (!iniValue || typeof iniValue.getHours !== 'function') return 'SITE';
-                const hour = new Date(iniValue).getHours();
-                const dayOfWeek = day.getDay();
-                const isWeekend = dayOfWeek === 0 || dayOfWeek === 6;
-                const isFestivo = checkIfFestivo(day);
-                const isWeekendOrFestivo = isWeekend || isFestivo;
-                let shiftType = (hour >= 0 && hour <= 6) ? 'noche' : (hour >= 7 && hour <= 11) ? 'am' : 'pm';
-                if (isWeekendOrFestivo) {
-                    if (specialConditions.includes('weekend_festivos_tt')) return 'TT';
-                    if (specialConditions.includes('weekend_festivos_site')) return 'SITE';
-                }
-                if (specialConditions.includes(`${shiftType}_tt`)) return 'TT';
-                if (specialConditions.includes(`${shiftType}_site`)) return 'SITE';
-                return 'SITE';
-            }
-
-            function checkIfFestivo(day) {
-                const festivos = ['2024-01-01','2024-03-29','2024-03-30','2024-05-01','2024-05-21','2024-06-29','2024-07-16','2024-08-15','2024-09-18','2024-09-19','2024-10-12','2024-11-01','2024-12-08','2024-12-25','2025-01-01','2025-04-18','2025-04-19','2025-05-01','2025-05-21','2025-06-29','2025-07-16','2025-08-15','2025-09-18','2025-09-19','2025-10-12','2025-11-01','2025-12-08','2025-12-25'];
-                return festivos.includes(day.toISOString().split('T')[0]);
-            }
-
-            function generateConditionText(config) {
-                if (config.modalidad === 'especial') {
-                    const format = (arr, type) => arr.filter(c => c.endsWith(type)).map(c => {
-                        const prefix = c.split('_')[0].replace('weekendfestivos', 'FDS/Fest.');
-                        return prefix.toUpperCase();
-                    }).join(', ');
-                    const ttText = format(config.condicion, '_tt');
-                    const siteText = format(config.condicion, '_site');
-                    let result = 'PERSONALIZADO: ';
-                    if(ttText) result += `${ttText} TT`;
-                    if(ttText && siteText) result += ' X ';
-                    if(siteText) result += `${siteText} PRESENCIAL`;
-                    return result;
-                } else {
-                    const positions = config.condicion.map(pos => pos.toUpperCase().substring(0,3)).join(' Y ');
-                    return `DISTRIBUCIÓN ${config.modalidad.toUpperCase()} (${positions} TURNO)`;
-                }
-            }
-
-            function getDayPosition(dayName) {
-                const positions = { 'primer': 1, 'segundo': 2, 'tercer': 3, 'cuarto': 4, 'quinto': 5 };
-                return positions[dayName] || 1;
-            }
-
-            // ---------- CORRECCIÓN: formatTime siempre devuelve HH:mm ----------
-            function formatTime(t) {
-                if (t === null || t === undefined || t === '') return '';
-
-                // Date -> HH:mm (aunque sea 1900)
-                if (t instanceof Date || Object.prototype.toString.call(t) === '[object Date]') {
-                    const h = String(t.getHours()).padStart(2, '0');
-                    const m = String(t.getMinutes()).padStart(2, '0');
-                    return `${h}:${m}`;
-                }
-
-                // Número de Excel (fracción del día)
-                if (typeof t === 'number') {
-                    const frac = t % 1;
-                    const totalSeconds = Math.round(frac * 86400);
-                    const hh = String(Math.floor(totalSeconds / 3600)).padStart(2, '0');
-                    const mm = String(Math.floor((totalSeconds % 3600) / 60)).padStart(2, '0');
-                    return `${hh}:${mm}`;
-                }
-
-                // Texto "H:MM" / "HH:MM" o LIBRE
-                const s = String(t).trim();
-                if (/LIBRE/i.test(s)) return 'LIBRE';
-                const m = s.match(/(\d{1,2}):(\d{2})/);
-                if (m) return `${m[1].padStart(2,'0')}:${m[2]}`;
-
-                return '';
-            }
-            // ---------- FIN CORRECCIÓN formatTime ----------
-
-            function showStatus(message, type) {
-                statusMessage.className = `status-message ${type}`;
-                statusMessage.textContent = message;
-                setTimeout(() => {
-                    statusMessage.className = 'status-message';
-                    statusMessage.textContent = '';
-                }, 4000);
-            }
-
+        // --- VARIABLES GLOBALES Y CONFIGURACIÓN ---
+        let fullProcessedData = []; 
+        let processedData = []; 
+        let dateSlider = null;
+        let statusInterval;
+
+        const COLUMN_MAPPING = {
+            nombres: ['nombre', 'nombres', 'agente', 'agentes', 'trabajador'],
+            rut: ['rut', 'cedula', 'cédula', 'ci'],
+            fecha: ['fecha', 'date', 'fecha_incidencia'],
+            duracion: ['duracion', 'duración', 'minutos'],
+            inicioTurno: ['inicio turno', 'inicio_turno', 'turno', 'hora inicio', 'ini', 'inicio'],
+            finTurno: ['fin turno', 'fin_turno', 'termino turno', 'hora fin', 'fin'],
+            incidencia: ['incidencia'],
+            tipoCarta: ['tipo de carta', 'tipo carta']
+        };
+
+        const elements = {
+            statusContainer: document.getElementById('statusContainer'),
+            dynamicStatusText: document.getElementById('dynamicStatusText'),
+            errorText: document.getElementById('errorText'),
+            dateFilterContainer: document.getElementById('dateFilterContainer'),
+            dateSlider: document.getElementById('date-slider'),
+            sliderStartDate: document.getElementById('slider-start-date'),
+            sliderEndDate: document.getElementById('slider-end-date'),
+            generateBtn: document.getElementById('generateBtn'),
+            btnText: document.getElementById('btnText'),
+            status: document.getElementById('status')
+        };
+        
+        // --- INICIO DE LA APLICACIÓN ---
+        document.addEventListener('DOMContentLoaded', () => {
+            animateParticles();
+            loadDataFromFlow();
+            elements.generateBtn.addEventListener('click', generateDocuments);
         });
+
+        // --- LÓGICA DE CARGA Y PROCESAMIENTO DE DATOS ---
+        async function loadDataFromFlow() {
+            elements.statusContainer.className = 'status-area is-loading';
+            const statusMessages = ["Conectando con el servidor...", "Solicitando datos de incidencias...", "Procesando registros..."];
+            let messageIndex = 0;
+            elements.dynamicStatusText.textContent = statusMessages[messageIndex];
+            statusInterval = setInterval(() => {
+                messageIndex = (messageIndex + 1) % statusMessages.length;
+                elements.dynamicStatusText.textContent = statusMessages[messageIndex];
+            }, 1800);
+
+            const flowUrl = "https://prod-171.westus.logic.azure.com:443/workflows/bb1e934ddf4c43048271481e59dd0768/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=-dgOAypHiBiEuF3JiiNMesniPsgxFJTyYg08ewwTg-Y";
+
+            try {
+                const response = await fetch(flowUrl, { method: "POST" });
+                if (!response.ok) throw new Error(`Error de red: ${response.status}`);
+                const rawData = await response.json();
+                if (!Array.isArray(rawData) || rawData.length === 0) throw new Error("No se recibieron datos.");
+
+                processData(rawData);
+                clearInterval(statusInterval);
+                elements.statusContainer.className = 'status-area is-success';
+
+            } catch (error) {
+                console.error("Error al cargar datos:", error);
+                clearInterval(statusInterval);
+                elements.statusContainer.className = 'status-area is-error';
+                elements.errorText.textContent = error.message;
+            }
+        }
+
+        function processData(data) {
+            const headers = Object.keys(data[0]);
+            const columnMap = {};
+            const findKey = (names) => headers.find(h => names.some(alias => h.toLowerCase().includes(alias)));
+            
+            for (const key in COLUMN_MAPPING) {
+                const foundKey = findKey(COLUMN_MAPPING[key]);
+                if (!foundKey) {
+                    showStatus(`Error: Falta la columna requerida para '${key}'.`, 'error'); return;
+                }
+                columnMap[key] = foundKey;
+            }
+            
+            const allData = data.map(row => {
+                const dateRef = asDate(row[columnMap.fecha]);
+                return {
+                    nombres: row[columnMap.nombres] || '',
+                    rut: row[columnMap.rut] || '',
+                    fecha: dateRef,
+                    duracion: row[columnMap.duracion] || '',
+                    inicioTurno: fmtTime(row[columnMap.inicioTurno], dateRef),
+                    finTurno: fmtTime(row[columnMap.finTurno], dateRef),
+                    incidencia: (row[columnMap.incidencia] || '').toString().toLowerCase().trim(),
+                    tipoCarta: (row[columnMap.tipoCarta] || '').toString().toLowerCase().trim()
+                };
+            }).filter(row => row.nombres && row.rut && row.fecha);
+
+            fullProcessedData = allData.filter(row => {
+                const esAtraso = (row.incidencia === 'atraso' || row.incidencia === 'atrasos') && ['amonestacion', 'amonestación', 'compromiso'].includes(row.tipoCarta);
+                const esAusencia = (row.incidencia === 'ausencia') && ['amonestacion', 'amonestación', 'compromiso'].includes(row.tipoCarta);
+                const esAbandono = (row.incidencia === 'abandono de trabajo') && ['amonestacion', 'amonestación', 'compromiso'].includes(row.tipoCarta);
+                return esAtraso || esAusencia || esAbandono;
+            });
+            
+            if (fullProcessedData.length === 0) {
+                showStatus('No se encontraron registros válidos para generar cartas.', 'warning'); return;
+            }
+            
+            const uniqueTimestamps = [...new Set(fullProcessedData.map(d => d.fecha.setHours(0, 0, 0, 0)))].sort((a, b) => a - b);
+            
+            if (uniqueTimestamps.length < 2) {
+                processedData = [...fullProcessedData];
+                elements.dateFilterContainer.classList.add('hidden');
+                showResults();
+            } else {
+                setupAndShowDateFilter(uniqueTimestamps);
+            }
+        }
+
+        // --- LÓGICA DE FILTRADO Y VISUALIZACIÓN ---
+        function setupAndShowDateFilter(uniqueTimestamps) {
+            const minTimestamp = uniqueTimestamps[0];
+            const maxTimestamp = uniqueTimestamps[uniqueTimestamps.length - 1];
+            if (dateSlider) dateSlider.destroy();
+            dateSlider = noUiSlider.create(elements.dateSlider, {
+                start: [minTimestamp, maxTimestamp], connect: true,
+                range: { min: minTimestamp, max: maxTimestamp }, step: 24 * 60 * 60 * 1000,
+            });
+            const formatDateForDisplay = (ts) => new Date(parseInt(ts)).toLocaleDateString('es-CL', { timeZone: 'UTC' });
+            dateSlider.on('slide', (values) => { applyFiltersAndShowResults(values.map(v => parseInt(v))); });
+            dateSlider.on('update', (values) => {
+                 elements.sliderStartDate.textContent = formatDateForDisplay(values[0]);
+                 elements.sliderEndDate.textContent = formatDateForDisplay(values[1]);
+            });
+            elements.dateFilterContainer.classList.remove('hidden');
+            applyFiltersAndShowResults(dateSlider.get(true));
+        }
+
+        function applyFiltersAndShowResults(values) {
+            const [startTimestamp, endTimestamp] = values;
+            processedData = fullProcessedData.filter(row => {
+                const rowTimestamp = new Date(row.fecha).setHours(0,0,0,0);
+                return rowTimestamp >= startTimestamp && rowTimestamp <= endTimestamp;
+            });
+            showResults();
+        }
+
+        function showResults() {
+            const groupedData = groupData(processedData);
+            const letterCount = groupedData.length;
+
+            if (letterCount > 0) {
+                elements.generateBtn.classList.remove('hidden');
+                elements.btnText.textContent = `🚀 Generar ${letterCount} Cartas`;
+                showStatus(`${processedData.length} registros encontrados (se generarán ${letterCount} cartas).`, 'success');
+            } else {
+                elements.generateBtn.classList.add('hidden');
+                showStatus('No hay registros en el rango de fechas seleccionado.', 'warning');
+            }
+        }
+
+        // --- LÓGICA DE GENERACIÓN DE DOCUMENTOS ---
+        function createWordDocument(incidentGroup) {
+            const data = incidentGroup[0];
+            const isPlural = incidentGroup.length > 1;
+
+            const today = new Date().toLocaleDateString('es-CL', { day: '2-digit', month: 'long', year: 'numeric' });
+            const headerHtml = `<div style='font-family: Calibri, sans-serif; color: #1f4e9b; font-weight: bold; font-size: 18pt;'>Konecta</div><div style='font-family: Calibri, sans-serif; font-size: 10pt; line-height: 1.2;'><b>KALLPLAT CHILE LIMITADA</b><br>RUT: 76.071.717-7<br>Giro: Actividades de Call Center<br>Calle Rodrigo de Araya Nº 1045, Macul. Santiago.</div>`;
+            
+            let bodyHtml;
+            const esCompromiso = data.tipoCarta === 'compromiso';
+
+            if (data.incidencia.includes('abandono')) {
+                const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
+                const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo a lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
+                const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
+                const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
+                const dayText = isPlural ? `los días ${datesString}` : `el día ${datesString}`;
+                const shiftText = isPlural ? `durante sus jornadas de trabajo` : `durante su jornada de trabajo desde las ${data.inicioTurno} a ${data.finTurno} horas`;
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral, para poder desempeñar en forma correcta las funciones para las que fue contratado, ${dayText}, sin justificación alguna y sin autorización de su jefatura directa se ha ausentado ${shiftText} y al ser buscado en plataforma Genesys iCloud no pudo ser ubicada en conexión desde su modalidad de teletrabajo.</p></td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la letra A) del Reglamento Interno de Orden Higiene y Seguridad que en el apartado referido a las Prohibiciones en el Titulo XV en su artículo 87, indica …” Abandonar el trabajo o ausentarse intempestivamente del recinto en que éste se desarrolla durante la jornada laboral sin justificación y/o autorización.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a lo señalado con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
+                bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
+            } else if (data.incidencia.includes('ausencia')) {
+                const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
+                const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
+                const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
+                let incidentDetails;
+                if (isPlural) {
+                    const datesString = incidentGroup.map(d => d.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })).join(', ');
+                    const shiftsString = incidentGroup.map(d => `turno de ${d.inicioTurno} a ${d.finTurno} horas`).join(', ');
+                    incidentDetails = `los días en que ha dejado de prestar sus funciones injustificadamente ${datesString} en sus respectivos turnos (${shiftsString})`;
+                } else {
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
+                    incidentDetails = `el día en que ha dejado de prestar sus funciones injustificadamente ${incidentDate} en su turno programado de ${data.inicioTurno} a ${data.finTurno} horas.`;
+                }
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; text-decoration: underline; font-weight:bold; padding-top:30px;'>${titulo}</p><br><br><p><b>Señor(a):</b> ${toProperCase(data.nombres)}</p><p><b>RUT:</b> ${data.rut}</p><p style='font-weight: bold; margin-bottom: 20px;'>Presente</p><p style='margin-bottom: 20px;'>De nuestra consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que, según lo dispuesto en su contrato individual de trabajo, usted debe entregar una atención de calidad al momento de realizar las atenciones.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la Cláusula Primera y Cuarta de su Contrato Individual de trabajo... ${incidentDetails}, debe cumplir con lo establecido en el Reglamento Interno...</p></td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Con el objeto de que Ud. se comprometa a no presentar Alguna Ausencia y Cumplir con su Turno, se efectúa esta carta de Amonestación.</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>En atención a los puntos señalados con anterioridad se le solicita encarecidamente, que tome las medidas pertinentes para solucionar estas dificultades que entorpecen el normal funcionamiento de sus deberes laborales en nuestra empresa, a fin de evitar sanciones posteriores.${parrafoInspeccion}</p><p style='margin-top: 30px;'>Sin otro particular, le saluda atentamente,</p><br><br><br><br><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicio</b><br>Konecta Chile Limitada.</td><td style="text-align:right; vertical-align:bottom;"><b>Nombre del Trabajador:</b> ${toProperCase(data.nombres)}<br>${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
+                bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
+            } else { // Atraso
+                const titulo = esCompromiso ? 'Carta de Compromiso' : 'Carta de Amonestación';
+                const parrafoInspeccion = esCompromiso ? '' : ' De acuerdo con lo anterior, esta amonestación será informada a la Inspección del Trabajo y quedará una copia en su carpeta personal.';
+                const textoCC = esCompromiso ? 'CC. Carpeta personal' : 'CC. Carpeta personal<br>Inspección del Trabajo';
+                let parrafoPrincipal;
+                if (isPlural) {
+                    const incidentsHtml = incidentGroup.map(incident => {
+                        // ===== INICIO CORRECCIÓN (Múltiples Atrasos) =====
+                        const duracionTexto = incident.duracion ? `de una duración de ${incident.duracion} ` : ``;
+                        // ===== FIN CORRECCIÓN =====
+                        return `El día ${incident.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' })}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${incident.inicioTurno} horas.`;
+                    }).join('<br>');
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>${incidentsHtml}</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Al presentar estos atrasos en su hora de ingreso, perjudica el normal funcionamiento de la plataforma... perjudicando gravemente los niveles de servicio...</p>`;
+                } else {
+                    // ===== INICIO CORRECCIÓN (Atraso Único) =====
+                    const duracionTexto = data.duracion ? `de una duración de ${data.duracion} ` : `de una duración de AGREGAR `;
+                    // ===== FIN CORRECCIÓN =====
+                    const incidentDate = data.fecha.toLocaleDateString('es-CL', { day: '2-digit', month: 'long', timeZone: 'UTC' });
+                    parrafoPrincipal = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>El día ${incidentDate}, presenta un atraso injustificado, ${duracionTexto}ya que su turno programado para ese día era a partir de las ${data.inicioTurno} horas...</p>`;
+                }
+                const parrafoReglamento = `<p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Le recordamos que debe respetar la <b>letra b)</b> del Reglamento Interno...${parrafoInspeccion}</p>`;
+                const page1 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td><p style='text-align: right; padding-top:20px;'>Osorno, ${today}</p><p style='text-align: center; font-weight: bold; text-decoration: underline; padding-top:30px;'>${titulo}</p><br><br><p style='margin-bottom: 20px;'><b>Señor (a):</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</p><p style='margin-bottom: 20px;'><b>Presente.</b></p><p style='margin-bottom: 20px;'>De mi consideración:</p><p style='text-align: justify; margin-bottom: 12px; line-height: 1.4;'>Cumplo con informarle a Ud. que es su obligación cumplir en forma íntegra su jornada laboral.</p>${parrafoPrincipal}</td></tr></table>`;
+                const page2 = `<table style='width: 100%; border-collapse: collapse;'><tr><td style='padding-bottom: 10px;'>${headerHtml}</td></tr><tr><td style='padding-top: 20px;'>${parrafoReglamento}<p style='margin-top: 30px;'>Sin otro particular,</p><p style='margin-top: 10px; margin-bottom: 80px;'>Le saluda atentamente,</p><table style="width:100%;"><tr><td style="text-align:left; vertical-align:bottom;"><b>Jefe de Servicios</b></td><td style="text-align:right; vertical-align:bottom;"><b>Nombre:</b> ${toProperCase(data.nombres)}<br><b>Rut:</b> ${data.rut}</td></tr></table><div style='margin-top: 50px; font-weight: bold;'>${textoCC}</div></td></tr></table>`;
+                bodyHtml = `${page1}<br clear=all style='mso-special-character:line-break; page-break-before:always'>${page2}`;
+            }
+            return `<html xmlns:w='urn:schemas-microsoft-com:office:word' xmlns='http://www.w3.org/TR/REC-html40'><head><meta charset='utf-8'><title>Carta</title></head><body style='font-family: Calibri, sans-serif; font-size: 11pt;'>${bodyHtml}</body></html>`;
+        }
+
+        async function generateDocuments() {
+            elements.generateBtn.disabled = true;
+            elements.btnText.textContent = '⏳ Generando...';
+            try {
+                const zip = new JSZip();
+                const groupedData = groupData(processedData);
+                for (const incidentGroup of groupedData) {
+                    const htmlContent = createWordDocument(incidentGroup);
+                    const blob = new Blob(['\ufeff', htmlContent], { type: 'application/msword' });
+                    const { incidencia, tipoCarta, rut, nombres } = incidentGroup[0];
+                    const tipo = tipoCarta === 'compromiso' ? 'Compromiso' : 'Amonestacion';
+                    const motivo = incidencia.includes('abandono') ? 'Abandono' : (incidencia.includes('ausencia') ? 'Ausencia' : 'Atrasos');
+                    const cleanName = nombres.replace(/[^\w\s-]/g, '').trim().replace(/\s+/g, '_');
+                    const fileName = `${tipo}_${motivo}_${rut}_${cleanName}.doc`;
+                    zip.file(fileName, blob);
+                    await new Promise(r => setTimeout(r, 10));
+                }
+                if (groupedData.length > 0) {
+                    const zipFileName = `Cartas_${new Date().toLocaleDateString('es-CL').replace(/\//g, '-')}.zip`;
+                    const zipBlob = await zip.generateAsync({ type: 'blob' });
+                    saveAs(zipBlob, zipFileName);
+                    showStatus(`¡Éxito! Se generaron ${groupedData.length} cartas.`, 'success');
+                }
+            } catch (error) {
+                console.error("Error:", error);
+                showStatus('Ocurrió un error al generar el ZIP.', 'error');
+            } finally {
+                elements.generateBtn.disabled = false;
+                showResults(); // para actualizar el texto del botón
+            }
+        }
+        
+        // --- FUNCIONES UTILITARIAS Y DE ANIMACIÓN ---
+        function groupData(data) { const grouped = {}; data.forEach(row => { const key = `${row.rut}-${row.incidencia}-${row.tipoCarta}`; if (!grouped[key]) { grouped[key] = []; } grouped[key].push(row); }); return Object.values(grouped); }
+        function toProperCase(str) { return !str ? '' : str.toString().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
+        function showStatus(message, type = 'success') { elements.status.className = `status ${type}`; elements.status.textContent = message; elements.status.style.display = 'block'; }
+        
+        // Lógica de fecha/hora del archivo de prueba
+        function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
+        function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
+        function asDate(val) { if (val instanceof Date) return val; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const d = excelSerialToDate(num); if (d) return d; } const d2 = new Date(val); return isNaN(d2) ? null : d2; }
+        function fmtTime(val, dateRef) { if (val instanceof Date) return `${String(val.getHours()).padStart(2, '0')}:${String(val.getMinutes()).padStart(2, '0')}`; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const dt = parseDateTime(num, dateRef); if (dt) return `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`; if (num >= 0 && num < 1) { const totalMin = Math.round(num * 24 * 60); const h = Math.floor(totalMin / 60), m = totalMin % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; } } return (val ?? '').toString(); }
+
+        // Animación de fondo
+        let particlesArray;
+        function animateParticles() { const canvas = document.getElementById('neuronCanvas'); const ctx = canvas.getContext('2d'); canvas.width = window.innerWidth; canvas.height = window.innerHeight; class Particle { constructor(x, y, size, speedX, speedY) { this.x = x; this.y = y; this.size = size; this.speedX = speedX; this.speedY = speedY; } draw() { ctx.beginPath(); ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false); ctx.fillStyle = `rgba(200, 225, 255, 0.6)`; ctx.fill(); } update() { if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX; if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY; this.x += this.speedX; this.y += this.speedY; } } function init() { particlesArray = []; let num = (canvas.height * canvas.width) / 12000; for (let i = 0; i < num; i++) { let size = (Math.random() * 2) + 1; let x = Math.random() * innerWidth; let y = Math.random() * innerHeight; let speedX = (Math.random() * 0.5) - 0.25; let speedY = (Math.random() * 0.5) - 0.25; particlesArray.push(new Particle(x, y, size, speedX, speedY)); } } function connect() { for (let a = 0; a < particlesArray.length; a++) { for (let b = a; b < particlesArray.length; b++) { let dist = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2); if (dist < (canvas.width / 8) * (canvas.height / 8)) { let op = 1 - (dist / 20000); ctx.strokeStyle = `rgba(0, 188, 212, ${op})`; ctx.lineWidth = 1; ctx.beginPath(); ctx.moveTo(particlesArray[a].x, particlesArray[a].y); ctx.lineTo(particlesArray[b].x, particlesArray[b].y); ctx.stroke(); } } } } function animate() { requestAnimationFrame(animate); ctx.clearRect(0, 0, innerWidth, innerHeight); for (let i = 0; i < particlesArray.length; i++) { particlesArray[i].update(); particlesArray[i].draw(); } connect(); } window.addEventListener('resize', () => { canvas.width = innerWidth; canvas.height = innerHeight; init(); }); init(); animate(); }
     </script>
 </body>
 </html>
-
