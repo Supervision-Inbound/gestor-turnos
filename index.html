@@ -4,37 +4,44 @@
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor Operativo — Plataforma de Automatización</title>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@500;700&display=swap" rel="stylesheet">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
+  <link rel="preconnect" href="https://fonts.googleapis.com">
+  <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
   <style>
-    /* ===== TEMA MINIMALISTA PROFESIONAL (VERSIÓN CORREGIDA Y COMPLETA) ===== */
     :root {
-      --color-background: #f8f9fa;
-      --color-surface: #ffffff;
-      --color-border: #eaecf0;
-      --accent-gradient-start: #7F56D9;
-      --accent-gradient-end: #2970FF;
-      --color-text-primary: #101828;
-      --color-text-secondary: #667085;
-      --font: 'Manrope', sans-serif;
+      --color-primary-start: #8e2de2;
+      --color-primary-end: #4a00e0;
+      --color-accent-light: #00bcd4;
+      --color-glow: rgba(142, 45, 226, 0.5);
+      --color-success: #28a745;
+      --color-error: #dc3545;
+      --font-family: 'Manrope', sans-serif;
+      --bg-dark: #0d1117;
+      --glass-bg: rgba(20, 22, 37, 0.6);
+      --glass-border: rgba(100, 120, 255, 0.2);
+      --text-light: #f0f0f0;
+      --text-medium: #a0a0b0;
     }
 
     * { box-sizing: border-box; }
 
     body {
       margin: 0;
-      font-family: var(--font);
-      background-color: var(--color-background);
-      color: var(--color-text-primary);
+      font-family: var(--font-family);
+      background-color: var(--bg-dark);
+      color: var(--text-light);
       display: flex;
       min-height: 100vh;
       overflow: hidden;
     }
 
-    /* ===== BARRA LATERAL COLAPSABLE Y ALINEADA ===== */
+    /* BARRA LATERAL */
     .sidebar {
-      width: 80px; /* Ancho colapsado */
-      background: var(--color-surface);
-      border-right: 1px solid var(--color-border);
+      width: 80px;
+      background: var(--glass-bg);
+      backdrop-filter: blur(15px);
+      border-right: 1px solid var(--glass-border);
       padding: 24px 0;
       display: flex;
       flex-direction: column;
@@ -46,7 +53,7 @@
       overflow-x: hidden;
     }
     .sidebar:hover {
-      width: 280px; /* Ancho expandido */
+      width: 280px;
     }
 
     .sidebar-header {
@@ -60,8 +67,8 @@
       opacity: 1;
     }
 
-    .sidebar h1 { margin: 0; font-size: 20px; font-weight: 700; color: var(--color-text-primary); }
-    .sidebar h2 { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--color-text-secondary); }
+    .sidebar h1 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-light); }
+    .sidebar h2 { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--text-medium); }
 
     .sidebar ul { list-style: none; padding: 0 16px; margin: 0; display: flex; flex-direction: column; gap: 8px; width: 100%; }
 
@@ -75,7 +82,7 @@
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
-      color: var(--color-text-secondary);
+      color: var(--text-medium);
       text-decoration: none;
       transition: all 0.2s ease;
       white-space: nowrap;
@@ -101,33 +108,34 @@
     }
 
     .sidebar a:hover {
-      color: var(--color-text-primary);
-      background-color: var(--color-background);
+      color: var(--text-light);
+      background-color: rgba(142, 45, 226, 0.2);
     }
     .sidebar a.active {
       color: #fff;
-      background: linear-gradient(90deg, var(--accent-gradient-start), var(--accent-gradient-end));
-      box-shadow: 0 4px 10px -2px rgba(127, 86, 217, 0.3);
+      background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
+      box-shadow: 0 4px 10px -2px rgba(142, 45, 226, 0.3);
     }
     .sidebar a.active .nav-icon { color: #fff; }
+    .sidebar a.active svg { stroke: currentColor; }
 
-    /* ===== CONTENIDO PRINCIPAL ===== */
+    /* CONTENIDO PRINCIPAL */
     .main {
       flex: 1;
-      margin-left: 80px; /* Coincide con sidebar colapsado */
+      margin-left: 80px;
       padding: 32px;
       overflow-y: auto;
       height: 100vh;
       transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
     }
     .sidebar:hover ~ .main {
-        margin-left: 280px; /* Coincide con sidebar expandido */
+        margin-left: 280px;
     }
     
-    .main-header h1 { font-size: 28px; }
-    .main-header p { font-size: 16px; color: var(--color-text-secondary); margin-top: -10px; }
+    .main-header h1 { font-size: 28px; font-weight: 700; }
+    .main-header p { font-size: 16px; color: var(--text-medium); margin-top: -10px; }
 
-    /* ===== TARJETAS DE MÓDULOS RESTAURADAS ===== */
+    /* TARJETAS DE MÓDULOS */
     .card-grid {
         display: grid;
         grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
@@ -135,18 +143,19 @@
         margin-top: 26px;
     }
     .card {
-        background: var(--color-surface);
-        border: 1px solid var(--color-border);
+        background: var(--glass-bg);
+        border: 1px solid var(--glass-border);
         border-radius: 12px;
         padding: 24px;
         cursor: pointer;
         text-decoration: none;
         color: inherit;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
+        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
     }
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 10px 20px rgba(0,0,0,0.07);
+        box-shadow: 0 0 20px var(--color-glow);
     }
     .card-icon {
         width: 48px;
@@ -154,24 +163,152 @@
         border-radius: 10px;
         display: grid;
         place-items: center;
-        background-color: var(--accent-gradient-start);
-        background-image: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end));
+        background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
         color: #fff;
     }
     .card-icon svg { width: 28px; height: 28px; stroke-width: 1.5; }
-    .card h2 { margin: 16px 0 6px; font-size: 18px; font-weight: 700; }
-    .card p { margin: 0; color: var(--color-text-secondary); font-size: 14px; line-height: 1.6; }
+    .card h2 { margin: 16px 0 6px; font-size: 18px; font-weight: 700; color: var(--text-light); }
+    .card p { margin: 0; color: var(--text-medium); font-size: 14px; line-height: 1.6; }
 
     /* IFRAME Y CONTENIDO */
-    .content-frame { width: 100%; height: calc(100vh - 64px); border: none; display: none; background-color: var(--color-surface); border-radius: 12px; border: 1px solid var(--color-border);}
+    .content-frame {
+        width: 100%;
+        height: calc(100vh - 64px);
+        border: none;
+        display: none;
+        background-color: transparent;
+        border-radius: 12px;
+        border: 1px solid var(--glass-border);
+    }
     .content-frame.active { display: block; }
     .home-content.hidden { display: none; }
 
-    /* Asistente IA */
-    .ia-helper { position: fixed; right: 24px; bottom: 24px; display: flex; align-items: flex-end; gap: 12px; z-index: 100;}
-    .ia-msg { background: var(--color-surface); border: 1px solid var(--color-border); padding: 12px 16px; border-radius: 10px; box-shadow: 0 5px 15px rgba(0,0,0,0.08); font-size: 13px; color: var(--color-text-secondary); }
-    .ia-avatar { width: 48px; height: 48px; border-radius: 50%; background: linear-gradient(135deg, var(--accent-gradient-start), var(--accent-gradient-end)); color: #fff; display: grid; place-items: center; font-size: 20px; animation: float 3s ease-in-out infinite; cursor: pointer; }
-    @keyframes float { 0%,100% { transform: translateY(0);} 50% { transform: translateY(-8px);} }
+    /* Asistente IA con Bot Pulsante personalizado */
+    .ia-helper {
+      position: fixed;
+      right: 24px;
+      bottom: 24px;
+      display: flex;
+      align-items: flex-end;
+      gap: 12px;
+      z-index: 100;
+    }
+    .ia-msg {
+      background: var(--glass-bg);
+      border: 1px solid var(--glass-border);
+      padding: 12px 16px;
+      border-radius: 10px;
+      box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
+      font-size: 13px;
+      color: var(--text-medium);
+      backdrop-filter: blur(8px);
+    }
+    
+    .ia-avatar-wrapper {
+        position: relative;
+        width: 54px; /* Slightly larger for the design */
+        height: 54px; /* Slightly larger for the design */
+        cursor: pointer;
+        animation: float 3s ease-in-out infinite;
+    }
+
+    .ia-avatar {
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        position: relative;
+        z-index: 2;
+    }
+
+    .ia-avatar-design {
+        position: relative;
+        width: 100%;
+        height: 100%;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+    }
+
+    .ia-avatar-design .center-glow {
+        position: absolute;
+        width: 20px;
+        height: 20px;
+        border-radius: 50%;
+        background-color: rgba(255, 255, 255, 0.8);
+        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.6), 0 0 20px 10px var(--color-accent-light);
+        animation: subtle-pulse 1.5s infinite alternate;
+    }
+
+    .ia-avatar-design .line {
+        position: absolute;
+        border-radius: 2px;
+        background: linear-gradient(to right, #8e2de2, #4a00e0); /* Purple gradient */
+        box-shadow: 0 0 8px rgba(142, 45, 226, 0.7);
+    }
+    .ia-avatar-design .line.horizontal {
+        width: 60%;
+        height: 2px;
+        transform: translateY(-50%) rotate(45deg);
+        animation: line-rotate 6s linear infinite;
+    }
+    .ia-avatar-design .line.vertical {
+        height: 60%;
+        width: 2px;
+        transform: translateX(-50%) rotate(-45deg);
+        animation: line-rotate 6s linear infinite reverse;
+    }
+
+    .ia-avatar-design .arc {
+        position: absolute;
+        width: 50px; /* Adjust size */
+        height: 50px; /* Adjust size */
+        border: 2px solid transparent;
+        border-radius: 50%;
+        animation: arc-rotate 8s linear infinite;
+    }
+    .ia-avatar-design .arc.blue {
+        border-top-color: #00bcd4; /* Light blue */
+        border-left-color: #00bcd4;
+        transform: rotate(0deg);
+        animation: arc-rotate 8s linear infinite, blue-glow 2s infinite alternate;
+        box-shadow: 0 0 8px rgba(0, 188, 212, 0.7);
+    }
+    .ia-avatar-design .arc.purple {
+        border-bottom-color: #8e2de2; /* Purple */
+        border-right-color: #8e2de2;
+        transform: rotate(180deg);
+        animation: arc-rotate 8s linear infinite reverse, purple-glow 2s infinite alternate;
+        box-shadow: 0 0 8px rgba(142, 45, 226, 0.7);
+    }
+
+    @keyframes subtle-pulse {
+        0% { transform: scale(1); opacity: 0.9; }
+        100% { transform: scale(1.05); opacity: 1; }
+    }
+
+    @keyframes line-rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes arc-rotate {
+        0% { transform: rotate(0deg); }
+        100% { transform: rotate(360deg); }
+    }
+    @keyframes blue-glow {
+        0% { box-shadow: 0 0 8px rgba(0, 188, 212, 0.7); }
+        100% { box-shadow: 0 0 15px rgba(0, 188, 212, 1); }
+    }
+    @keyframes purple-glow {
+        0% { box-shadow: 0 0 8px rgba(142, 45, 226, 0.7); }
+        100% { box-shadow: 0 0 15px rgba(142, 45, 226, 1); }
+    }
+
+    @keyframes float {
+        0%, 100% { transform: translateY(0); }
+        50% { transform: translateY(-8px); }
+    }
   </style>
 </head>
 <body>
@@ -186,25 +323,25 @@
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
             <span class="nav-text">Inicio</span>
         </a></li>
-        <li><a href="#" onclick="loadModule('transporte.html', this)" data-page="transporte">
-            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
-            <span class="nav-text">Gestión de Transporte</span>
+        <li><a href="#" onclick="loadModule('Cambios de turnos.html', this)" data-page="cambio-turnos">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></span>
+            <span class="nav-text">Cambio de Turnos</span>
         </a></li>
-        <li><a href="#" onclick="loadModule('calendario.html', this)" data-page="calendario">
+        <li><a href="#" onclick="loadModule('Calendario_TT.HTML', this)" data-page="calendario">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
             <span class="nav-text">Calendario Teletrabajo</span>
         </a></li>
-        <li><a href="#" onclick="loadModule('turnos.html', this)" data-page="turnos">
+        <li><a href="#" onclick="loadModule('Turnos diario.html', this)" data-page="turnos">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></span>
             <span class="nav-text">Turnos Diarios</span>
         </a></li>
-        <li><a href="#" onclick="loadModule('cartas.html', this)" data-page="cartas">
+        <li><a href="#" onclick="loadModule('Cartas.html', this)" data-page="cartas">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
             <span class="nav-text">Carta Amonestación</span>
         </a></li>
-        <li><a href="#" onclick="loadModule('cambio-turnos.html', this)" data-page="cambio-turnos">
-            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></span>
-            <span class="nav-text">Cambio de Turnos</span>
+        <li><a href="#" onclick="loadModule('transporte.html', this)" data-page="transporte">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
+            <span class="nav-text">Gestión de Transporte</span>
         </a></li>
         <li><a href="#" onclick="loadModule('erlang.html', this)" data-page="erlang">
             <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></span>
@@ -220,30 +357,30 @@
             <p>Seleccione un módulo en el menú de la izquierda para comenzar a trabajar.</p>
         </div>
         <div class="card-grid">
-            <a href="#" onclick="loadModule('transporte.html', document.querySelector('[data-page=transporte]'))" class="card">
-                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
-                <h2>Gestión de Transporte</h2>
-                <p>Genera reportes de arribo y zarpe de personal.</p>
+            <a href="#" onclick="loadModule('Cambios de turnos.html', document.querySelector('[data-page=cambio-turnos]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></div>
+                <h2>Cambio de Turnos</h2>
+                <p>Gestiona solicitudes de cambio entre agentes.</p>
             </a>
-            <a href="#" onclick="loadModule('calendario.html', document.querySelector('[data-page=calendario]'))" class="card">
+            <a href="#" onclick="loadModule('Calendario_TT.HTML', document.querySelector('[data-page=calendario]'))" class="card">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
                 <h2>Calendario Teletrabajo</h2>
                 <p>Gestiona la presencialidad y el trabajo remoto.</p>
             </a>
-            <a href="#" onclick="loadModule('turnos.html', document.querySelector('[data-page=turnos]'))" class="card">
+            <a href="#" onclick="loadModule('Turnos diario.html', document.querySelector('[data-page=turnos]'))" class="card">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></div>
                 <h2>Turnos Diarios</h2>
                 <p>Genera turnos de forma automática y optimizada.</p>
             </a>
-            <a href="#" onclick="loadModule('cartas.html', document.querySelector('[data-page=cartas]'))" class="card">
+            <a href="#" onclick="loadModule('Cartas.html', document.querySelector('[data-page=cartas]'))" class="card">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
                 <h2>Carta Amonestación</h2>
                 <p>Crea documentos formales en segundos.</p>
             </a>
-            <a href="#" onclick="loadModule('cambio-turnos.html', document.querySelector('[data-page=cambio-turnos]'))" class="card">
-                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></div>
-                <h2>Cambio de Turnos</h2>
-                <p>Gestiona solicitudes de cambio entre agentes.</p>
+            <a href="#" onclick="loadModule('transporte.html', document.querySelector('[data-page=transporte]'))" class="card">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
+                <h2>Gestión de Transporte</h2>
+                <p>Genera reportes de arribo y zarpe de personal.</p>
             </a>
             <a href="#" onclick="loadModule('erlang.html', document.querySelector('[data-page=erlang]'))" class="card">
                 <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></div>
@@ -257,7 +394,17 @@
 
   <div class="ia-helper">
     <div class="ia-msg" id="iaMsg">💡 Seleccione un módulo para comenzar.</div>
-    <div class="ia-avatar">🤖</div>
+    <div class="ia-avatar-wrapper">
+        <div class="ia-avatar">
+            <div class="ia-avatar-design">
+                <div class="center-glow"></div>
+                <div class="line horizontal"></div>
+                <div class="line vertical"></div>
+                <div class="arc blue"></div>
+                <div class="arc purple"></div>
+            </div>
+        </div>
+    </div>
   </div>
 
   <script>
@@ -293,11 +440,11 @@
         this.currentModule = 'home';
         this.moduleData = {
           home: { name: 'Panel Principal', welcome: '¡Hola! Soy tu asistente inteligente. Te ayudo a optimizar tu flujo de trabajo.' },
+          'Cambios de turnos.html': { name: 'Cambio de Turnos', tips: ['Gestiona solicitudes de cambio entre agentes.'] },
+          'Calendario_TT.HTML': { name: 'Calendario Teletrabajo', tips: ['Gestiona la presencialidad y el trabajo remoto.'] },
+          'Turnos diario.html': { name: 'Turnos Diarios', tips: ['Genera turnos de forma automática y optimizada.'] },
+          'Cartas.html': { name: 'Carta Amonestación', tips: ['Crea documentos formales en segundos.'] },
           'transporte.html': { name: 'Gestión de Transporte', tips: ['Genera reportes de arribo y zarpe de personal.'] },
-          'calendario.html': { name: 'Calendario Teletrabajo', tips: ['Gestiona la presencialidad y el trabajo remoto.'] },
-          'turnos.html': { name: 'Turnos Diarios', tips: ['Genera turnos de forma automática y optimizada.'] },
-          'cartas.html': { name: 'Carta Amonestación', tips: ['Crea documentos formales en segundos.'] },
-          'cambio-turnos.html': { name: 'Cambio de Turnos', tips: ['Gestiona solicitudes de cambio entre agentes.'] },
           'erlang.html': { name: 'Módulo Erlang', tips: ['Calcula la carga de trabajo y el personal necesario.'] }
         };
         this.messageElement = document.getElementById('iaMsg');
