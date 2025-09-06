@@ -406,8 +406,6 @@
                 if (Array.isArray(confirmacionRaw)) {
                     confirmacionRaw.forEach(row => {
                         const rawRut = findVal(row, ['Rut']);
-                        // ***** CORRECCIÓN CLAVE AQUÍ *****
-                        // Se busca por 'Semana de confirmaciom' y también por 'Semana' para más flexibilidad.
                         const weekString = findVal(row, ['Semana de confirmaciom', 'Semana']);
                         
                         if (rawRut && weekString) {
@@ -581,6 +579,9 @@
                 if (orderDiff !== 0) return orderDiff;
                 return a.nombre.localeCompare(b.nombre);
             });
+            
+            const confirmedList = transportList.filter(item => item.confirmacion === 'Confirmado');
+            const unconfirmedList = transportList.filter(item => item.confirmacion === 'No Confirmado');
 
             const sheetNameDate = parseISODateAsLocal(weekSelector.value);
             const d1 = String(sheetNameDate.getDate()).padStart(2, '0');
@@ -590,8 +591,7 @@
             const monthName = sunday.toLocaleString('es-ES', { month: 'long' });
             const sheetName = `semana del ${d1} al ${d2} de ${monthName} ${sunday.getFullYear()}`;
             
-            const worksheet = workbook.addWorksheet(sheetName);
-            worksheet.columns = [
+            const columns = [
                 { header: 'Transporte', key: 'transporteId', width: 12 }, { header: 'Sentido del viaje', key: 'sentido', width: 20 },
                 { header: 'Fecha', key: 'fecha', width: 15 }, { header: 'Hora', key: 'hora', width: 15 },
                 { header: 'Servicio', key: 'servicio', width: 15 }, { header: 'RUT', key: 'rut', width: 15 },
@@ -599,23 +599,78 @@
                 { header: 'Fono', key: 'fono', width: 15 }, { header: 'Confirmacion', key: 'confirmacion', width: 25 }
             ];
             const styleHeaderRow = (row) => row.eachCell(cell => { cell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF538DD5' } }; cell.font = { color: { argb: 'FFFFFFFF' }, bold: true }; cell.alignment = { vertical: 'middle', horizontal: 'center' }; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; });
-            styleHeaderRow(worksheet.getRow(1));
-            let transportCounter = 1, currentDay = null;
-            transportList.forEach(item => {
-                if (currentDay && currentDay !== item.rawDate.toDateString()) { styleHeaderRow(worksheet.addRow(worksheet.columns.map(c => c.header))); transportCounter = 1; }
-                currentDay = item.rawDate.toDateString();
-                const row = worksheet.addRow({ transporteId: transportCounter++, ...item });
-                const colors = { 'Arribo-00:00': 'FFFBE2D5', 'Arribo-07:00': 'FFF2CEEF', 'Arribo-08:00': 'FFF2CEEF', 'Zarpe-22:00': 'FFDAE9F8', 'Zarpe-00:00': 'FFDAF2D0' };
-                const rowColor = colors[`${item.sentido}-${item.hora}`];
-                if (rowColor) row.eachCell({ includeEmpty: true }, c => c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } });
-                row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
-                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
-                    if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(worksheet.columns[colNumber - 1].key)) cell.alignment = { horizontal: 'center' };
-                });
-            });
-            worksheet.addConditionalFormatting({ ref: `J2:J${worksheet.rowCount}`, rules: [ { type: 'cellIs', operator: 'equal', formulae: ['"No Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFFFC7CE' } } } }, { type: 'cellIs', operator: 'equal', formulae: ['"Confirmado"'], style: { fill: { type: 'pattern', pattern: 'solid', bgColor: { argb: 'FFC6EFCE' } } } } ] });
-            worksheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && row.getCell(1).value) { row.getCell(10).dataValidation = { type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'] }; } });
             
+            // --- Hoja Principal (SOLO CONFIRMADOS) ---
+            const worksheet = workbook.addWorksheet(sheetName);
+            worksheet.columns = columns;
+            styleHeaderRow(worksheet.getRow(1));
+            
+            if (confirmedList.length > 0) {
+                let transportCounter = 1, currentDay = null;
+                confirmedList.forEach(item => {
+                    if (currentDay && currentDay !== item.rawDate.toDateString()) { styleHeaderRow(worksheet.addRow(worksheet.columns.map(c => c.header))); transportCounter = 1; }
+                    currentDay = item.rawDate.toDateString();
+                    const row = worksheet.addRow({ transporteId: transportCounter++, ...item });
+                    const colors = { 'Arribo-00:00': 'FFFBE2D5', 'Arribo-07:00': 'FFF2CEEF', 'Arribo-08:00': 'FFF2CEEF', 'Zarpe-22:00': 'FFDAE9F8', 'Zarpe-00:00': 'FFDAF2D0' };
+                    const rowColor = colors[`${item.sentido}-${item.hora}`];
+                    if (rowColor) row.eachCell({ includeEmpty: true }, c => c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } });
+                    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                        if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(worksheet.columns[colNumber - 1].key)) cell.alignment = { horizontal: 'center' };
+                    });
+                });
+                
+                worksheet.eachRow((row, rowNumber) => { if (rowNumber > 1 && row.getCell(1).value) { row.getCell(10).dataValidation = { type: 'list', allowBlank: false, formulae: ['"Confirmado,No Confirmado"'] }; } });
+            }
+
+            // --- Hoja de No Confirmados ---
+            if (unconfirmedList.length > 0) {
+                const unconfirmedSheet = workbook.addWorksheet('No Confirmados');
+                const uniqueUnconfirmedNames = [...new Set(unconfirmedList.map(item => item.nombre))].sort();
+
+                // Definir y estilizar solo las columnas de la tabla principal (A-J)
+                unconfirmedSheet.columns = columns;
+                styleHeaderRow(unconfirmedSheet.getRow(1));
+                
+                // Poblar tabla principal (A-J) repitiendo encabezados por día
+                let unconfirmedCounter = 1;
+                let unconfirmedCurrentDay = null;
+                unconfirmedList.forEach(item => {
+                    if (unconfirmedCurrentDay && unconfirmedCurrentDay !== item.rawDate.toDateString()) {
+                        styleHeaderRow(unconfirmedSheet.addRow(columns.map(c => c.header))); // Usa 'columns' para no repetir el de la L
+                        unconfirmedCounter = 1;
+                    }
+                    unconfirmedCurrentDay = item.rawDate.toDateString();
+                    const row = unconfirmedSheet.addRow({ transporteId: unconfirmedCounter++, ...item });
+                    
+                    const colors = { 'Arribo-00:00': 'FFFBE2D5', 'Arribo-07:00': 'FFF2CEEF', 'Arribo-08:00': 'FFF2CEEF', 'Zarpe-22:00': 'FFDAE9F8', 'Zarpe-00:00': 'FFDAF2D0' };
+                    const rowColor = colors[`${item.sentido}-${item.hora}`];
+                    if (rowColor) row.eachCell({ includeEmpty: true }, c => c.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: rowColor } });
+
+                    row.eachCell({ includeEmpty: true }, (cell, colNumber) => {
+                        cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                        if (['transporteId', 'sentido', 'fecha', 'hora', 'servicio', 'confirmacion'].includes(unconfirmedSheet.columns[colNumber - 1].key)) cell.alignment = { horizontal: 'center' };
+                    });
+                });
+
+                // Crear la tabla separada en la columna L
+                const listHeaderCell = unconfirmedSheet.getCell('L1');
+                listHeaderCell.value = 'Agentes No confirmados';
+                listHeaderCell.fill = { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF538DD5' } };
+                listHeaderCell.font = { color: { argb: 'FFFFFFFF' }, bold: true };
+                listHeaderCell.alignment = { vertical: 'middle', horizontal: 'center' };
+                listHeaderCell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                
+                unconfirmedSheet.getColumn('L').width = 40;
+
+                uniqueUnconfirmedNames.forEach((name, index) => {
+                    const cell = unconfirmedSheet.getCell(`L${index + 2}`);
+                    cell.value = name;
+                    cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
+                });
+            }
+
+            // --- Hoja de Confirmados No Encontrados en Turnos ---
             const scheduledRuts = new Set(transportList.map(item => item.rut));
             const notFoundConfirmations = [];
             const selectedMondayFormatted = weekSelector.value;
