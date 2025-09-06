@@ -384,16 +384,94 @@
         .schedule-table td { font-size: 12px; font-weight: 500; height: 44px; color: var(--text-light); }
         .schedule-table .day-name { font-weight: 600; text-align: left; }
         .schedule-table .libre-day td { color: var(--text-medium); }
-        .schedule-table .libre-day input, .schedule-table .libre-day select { color: var(--text-medium); background-color: rgba(20, 22, 37, 0.2); }
+        .schedule-table .libre-day .time-input { color: var(--text-medium); background-color: rgba(20, 22, 37, 0.2); }
         .schedule-table .worked-hours { font-weight: 600; color: var(--text-light); text-align: center; }
         
-        .schedule-table input[type="time"] { 
+        /* --- ESTILOS PARA EL NUEVO SELECTOR DE HORA --- */
+        .custom-time-input {
+            position: relative;
+            width: 100%;
+        }
+        .time-input { 
             font-family: var(--font-family); font-size: 12px; 
-            padding: 4px; border: 1px solid var(--glass-border); 
+            padding: 4px 24px 4px 8px; border: 1px solid var(--glass-border); 
             border-radius: 4px; background-color: rgba(20, 22, 37, 0.4); 
             width: 100%; transition: all 0.2s ease; box-sizing: border-box;
             color: var(--text-light);
+            text-align: center;
         }
+        .time-input:hover { background-color: rgba(20, 22, 37, 0.6); }
+        .time-input:focus { 
+            background-color: var(--glass-bg); 
+            border-color: var(--color-primary-end); 
+            outline: none; 
+            box-shadow: 0 0 5px var(--color-glow);
+        }
+        .time-input-trigger {
+            position: absolute;
+            right: 5px;
+            top: 50%;
+            transform: translateY(-50%);
+            width: 16px;
+            height: 16px;
+            fill: var(--text-medium);
+            cursor: pointer;
+        }
+        .time-popup {
+            display: none;
+            position: absolute;
+            top: 105%;
+            left: 50%;
+            transform: translateX(-50%);
+            z-index: 500;
+            background: rgba(25, 28, 45, 0.9);
+            backdrop-filter: blur(10px);
+            border: 1px solid var(--glass-border);
+            border-radius: 6px;
+            box-shadow: 0 5px 15px rgba(0,0,0,0.3);
+            display: flex;
+            opacity: 0;
+            visibility: hidden;
+            transition: opacity 0.2s ease, transform 0.2s ease;
+            transform: translate(-50%, -10px);
+        }
+        .custom-time-input.open .time-popup {
+            display: flex;
+            opacity: 1;
+            visibility: visible;
+            transform: translate(-50%, 0);
+        }
+        .time-column {
+            display: flex;
+            flex-direction: column;
+            max-height: 200px;
+            overflow-y: auto;
+            border-right: 1px solid var(--glass-border);
+            /* Ocultar scrollbar */
+            scrollbar-width: none; /* Firefox */
+            -ms-overflow-style: none; /* IE y Edge */
+        }
+        .time-column::-webkit-scrollbar {
+            display: none; /* Chrome, Safari y Opera */
+        }
+        .time-column:last-child {
+            border-right: none;
+        }
+        .time-option {
+            padding: 8px 12px;
+            cursor: pointer;
+            text-align: center;
+            font-size: 13px;
+            transition: background-color 0.2s ease;
+        }
+        .time-option:hover {
+            background-color: rgba(142, 45, 226, 0.2);
+        }
+        .time-option.selected {
+            background-color: rgba(142, 45, 226, 0.4);
+            font-weight: bold;
+        }
+
         .schedule-table select { 
             font-family: var(--font-family); font-size: 12px; 
             padding: 4px; border: 1px solid var(--glass-border); 
@@ -401,8 +479,8 @@
             width: 100%; transition: all 0.2s ease; box-sizing: border-box; cursor: pointer;
             color: var(--text-light);
         }
-        .schedule-table input[type="time"]:hover, .schedule-table select:hover { background-color: rgba(20, 22, 37, 0.6); }
-        .schedule-table input[type="time"]:focus, .schedule-table select:focus { 
+        .schedule-table select:hover { background-color: rgba(20, 22, 37, 0.6); }
+        .schedule-table select:focus { 
             background-color: var(--glass-bg); 
             border-color: var(--color-primary-end); 
             outline: none; 
@@ -584,7 +662,7 @@
         <main class="simulator-view"><div class="config-group"><label>Selecciona la semana a simular</label><div class="week-selector-group"><div class="custom-select-wrapper" id="simCustomSelectWeek" style="flex: 1;"><select id="simWeekSelector"></select><div class="custom-select-trigger" id="simWeekTrigger">-- Selecciona una semana --</div><div class="custom-options" id="simWeekOptions"></div></div>
     <div class="actions-menu-wrapper">
         <button class="actions-menu-btn" id="actionsMenuBtn" title="Opciones">
-            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c1.4-.413-1.4-2.397 0-2.81l.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
+            <svg xmlns="http://www.w3.org/2000/svg" fill="currentColor" viewBox="0 0 16 16"><path d="M9.405 1.05c-.413-1.4-2.397-1.4-2.81 0l-.1.34a1.464 1.464 0 0 1-2.105.872l-.31-.17c-1.283-.698-2.686.705-1.987 1.987l.169.311a1.464 1.464 0 0 1-.872 2.105l-.34.1c-1.4.413-1.4 2.397 0 2.81l.34.1a1.464 1.464 0 0 1 .872 2.105l-.17.31c-.698 1.283.705 2.686 1.987 1.987l.311-.169a1.464 1.464 0 0 1 2.105.872l.1.34c.413 1.4 2.397 1.4 2.81 0l.1-.34a1.464 1.464 0 0 1 2.105-.872l.31.17c1.283.698 2.686-.705 1.987-1.987l-.169-.311a1.464 1.464 0 0 1 .872-2.105l.34-.1c-1.4-.413-1.4-2.397 0-2.81l.34-.1a1.464 1.464 0 0 1-.872-2.105l.17-.31c.698-1.283-.705-2.686-1.987-1.987l-.311.169a1.464 1.464 0 0 1-2.105-.872l-.1-.34zM8 10.93a2.929 2.929 0 1 1 0-5.86 2.929 2.929 0 0 1 0 5.858z"/></svg>
         </button>
         <div class="actions-menu-dropdown" id="actionsMenuDropdown">
             <div id="mainMenuView">
@@ -665,7 +743,7 @@
     initParticles();
     animateParticles();
 
-    // Lógica del simulador (sin cambios)
+    // Lógica del simulador
     document.addEventListener('DOMContentLoaded', function() {
         let allData = [], availableAgents = [], addedAgents = new Set(), fullAgentList = [];
         let selectedServices = ['01_Masivo', '10_Staff_Inbound'];
@@ -702,14 +780,18 @@
         simWeekSelector.addEventListener('change', handleWeekSelect);
         addAgentBtn.addEventListener('click', handleAddAgent);
         
-        simulationContainer.addEventListener('input', handleTableChange);
+        simulationContainer.addEventListener('input', handleTableInput);
         simulationContainer.addEventListener('change', handleTableChange);
+        simulationContainer.addEventListener('focusin', handleTableFocusIn);
+        simulationContainer.addEventListener('focusout', handleTableFocusOut);
         
         simulationContainer.addEventListener('click', (e) => {
             if (e.target.closest('.remove-agent-btn')) {
                 handleRemoveAgent(e);
             } else if (e.target.closest('.swap-agent-btn')) {
                 handleSwapButtonClick(e);
+            } else {
+                handleCustomTimePickerClick(e);
             }
         });
         
@@ -732,6 +814,9 @@
             }
             if (!e.target.closest('.swap-agent-btn') && !e.target.closest('.swap-agent-popup')) {
                 closeAllSwapPopups();
+            }
+            if (!e.target.closest('.custom-time-input')) {
+                closeAllTimePopups();
             }
         });
 
@@ -1011,6 +1096,25 @@
             applyDownloadBtn.disabled = !hasAgents;
         }
 
+        function createCustomTimeInput(initialValue, inputClass) {
+            const hours = Array.from({length: 24}, (_, i) => String(i).padStart(2, '0'));
+            const minutes = ['00', '30'];
+            
+            let hoursHtml = hours.map(h => `<div class="time-option" data-type="hour" data-value="${h}">${h}</div>`).join('');
+            let minutesHtml = minutes.map(m => `<div class="time-option" data-type="minute" data-value="${m}">${m}</div>`).join('');
+
+            return `
+                <div class="custom-time-input">
+                    <input type="text" class="time-input ${inputClass}" value="${initialValue}" maxlength="5" placeholder="--:--" />
+                    <svg class="time-input-icon time-input-trigger" viewBox="0 0 16 16"><path d="M8 3.5a.5.5 0 0 0-1 0V9a.5.5 0 0 0 .252.434l3.5 2a.5.5 0 0 0 .496-.868L8 8.71V3.5z"/><path d="M8 16A8 8 0 1 0 8 0a8 8 0 0 0 0 16zm7-8A7 7 0 1 1 1 8a7 7 0 0 1 14 0z"/></svg>
+                    <div class="time-popup">
+                        <div class="time-column hours-column">${hoursHtml}</div>
+                        <div class="time-column minutes-column">${minutesHtml}</div>
+                    </div>
+                </div>
+            `;
+        }
+        
         function createAgentSection(agentRut, weekStartISO) {
             try {
                 const agent = availableAgents.find(a => a.rut === agentRut) || fullAgentList.find(a => a.rut === agentRut);
@@ -1045,16 +1149,16 @@
 
                     originalTableRowsHTML += `<tr class="${isLibre ? 'libre-day' : ''}">
                         <td class="day-name">${dayName}</td>
-                        <td>${isLibre ? '--' : formatTime(iniVal)}</td>
-                        <td>${isLibre ? '--' : formatTime(finVal)}</td>
+                        <td>${isLibre ? '--:--' : formatTime(iniVal)}</td>
+                        <td>${isLibre ? '--:--' : formatTime(finVal)}</td>
                         <td>${isLibre ? '--' : colacionVal}</td>
                         <td class="worked-hours">${isLibre || isNaN(workedHours) ? '--' : workedHours.toFixed(1)}</td>
                     </tr>`;
 
                     modifiableTableRowsHTML += `<tr class="${isLibre ? 'libre-day' : ''}" data-day="${i}">
                         <td class="day-name">${dayName}</td>
-                        <td><input type="time" class="time-input start-time" value="${isLibre ? '' : formatTime(iniVal)}" step="1800"></td>
-                        <td><input type="time" class="time-input end-time" value="${isLibre ? '' : formatTime(finVal)}" step="1800"></td>
+                        <td>${createCustomTimeInput(isLibre ? '' : formatTime(iniVal), 'start-time')}</td>
+                        <td>${createCustomTimeInput(isLibre ? '' : formatTime(finVal), 'end-time')}</td>
                         <td><select class="colacion-select"><option value="0" ${colacionVal === 0 ? 'selected' : ''}>0</option><option value="30" ${colacionVal === 30 ? 'selected' : ''}>30</option><option value="60" ${colacionVal === 60 ? 'selected' : ''}>60</option></select></td>
                         <td class="worked-hours">${isLibre || isNaN(workedHours) ? '--' : workedHours.toFixed(1)}</td>
                     </tr>`;
@@ -1082,32 +1186,100 @@
                 return section;
             } catch (error) {
                 console.error("Error al crear la sección del agente:", error);
-                // showStatus("Error al mostrar los datos del agente: " + error.message, "error");
                 return null;
+            }
+        }
+        
+        // --- NUEVOS MANEJADORES DE EVENTOS ---
+        function handleTableFocusIn(e) {
+            // Selecciona todo el texto al hacer clic para facilitar la sobreescritura
+            if (e.target.classList.contains('time-input')) {
+                e.target.select();
+            }
+        }
+
+        function handleTableFocusOut(e) {
+            // Valida y formatea la hora cuando se deja de editar el campo
+            if (e.target.classList.contains('time-input')) {
+                const input = e.target;
+                let value = input.value;
+
+                if (value.match(/^\d{1,2}:\d{2}$/)) { // Formato 00:00
+                    let [hours, minutes] = value.split(':');
+                    hours = Math.min(parseInt(hours, 10), 23); // No más de 23 horas
+                    minutes = parseInt(minutes, 10);
+
+                    // Redondear minutos al intervalo 00 o 30 más cercano
+                    minutes = (minutes < 15 || minutes > 45) ? 0 : 30;
+                    
+                    input.value = `${String(hours).padStart(2, '0')}:${String(minutes).padStart(2, '0')}`;
+
+                } else if (value.match(/^\d{3,4}$/)) { // Formato 1400
+                    const hoursStr = value.length === 3 ? `0${value.slice(0, 1)}` : value.slice(0, 2);
+                    const minutesStr = value.slice(-2);
+                    input.value = `${hoursStr}:${minutesStr}`;
+                
+                } else if (value) {
+                    input.value = ''; // Si el formato es inválido, se limpia
+                }
+                updateAndValidateAgent(input.closest('.agent-section'));
+            }
+        }
+        
+        function handleTableInput(e) {
+            // Lógica para auto-formatear mientras se escribe
+            if (e.target.classList.contains('time-input')) {
+                const input = e.target;
+                const value = input.value;
+                // Auto-inserta los dos puntos ':' después de 2 dígitos
+                if (value.length === 2 && !value.includes(':')) {
+                    input.value = value + ':';
+                }
+                 // Previene que se borren los dos puntos
+                if (value.length === 2 && value.includes(':')) {
+                    input.value = value.replace(':', '');
+                }
             }
         }
         
         function handleTableChange(e) {
             const agentSection = e.target.closest('.agent-section');
-            if (agentSection) {
-                if (e.target.classList.contains('time-input')) {
-                    const timeValue = e.target.value;
-                    if (timeValue) {
-                        const [hours, minutes] = timeValue.split(':');
-                        const minutesInt = parseInt(minutes);
-                        let roundedMinutes = '00';
-                        let newHours = hours;
-                        
-                        if (minutesInt > 0 && minutesInt < 30) {
-                            roundedMinutes = '30';
-                        } else if (minutesInt >= 30) {
-                            roundedMinutes = '00';
-                            newHours = ((parseInt(hours) + 1) % 24).toString().padStart(2, '0');
-                        }
-                        e.target.value = `${newHours}:${roundedMinutes}`;
-                    }
-                }
+            if (agentSection && e.target.classList.contains('colacion-select')) {
                 updateAndValidateAgent(agentSection);
+            }
+        }
+
+        function closeAllTimePopups() {
+            document.querySelectorAll('.custom-time-input.open').forEach(picker => {
+                picker.classList.remove('open');
+            });
+        }
+
+        function handleCustomTimePickerClick(e) {
+            const timeOption = e.target.closest('.time-option');
+            if (timeOption) {
+                const timeInputContainer = e.target.closest('.custom-time-input');
+                const input = timeInputContainer.querySelector('.time-input');
+                const [hour, minute] = input.value.split(':');
+                
+                if (timeOption.dataset.type === 'hour') {
+                    input.value = `${timeOption.dataset.value}:${minute || '00'}`;
+                } else {
+                    input.value = `${hour || '00'}:${timeOption.dataset.value}`;
+                }
+                
+                timeInputContainer.classList.remove('open');
+                updateAndValidateAgent(timeInputContainer.closest('.agent-section'));
+                return;
+            }
+
+            // Abre el popup SÓLO si se hace clic en el ícono del reloj
+            if (e.target.closest('.time-input-trigger')) {
+                const timeInputContainer = e.target.closest('.custom-time-input');
+                 if (!timeInputContainer.classList.contains('open')) {
+                    closeAllTimePopups();
+                }
+                timeInputContainer.classList.toggle('open');
             }
         }
         
@@ -1546,7 +1718,6 @@
         }
         
         function showStatus(message, type) { 
-            // Re-implementing a more robust showStatus for the new UI
             if (type === 'success') {
                 statusContainer.className = 'status-area is-success';
                 statusContainer.querySelector('.success-text').textContent = message;
