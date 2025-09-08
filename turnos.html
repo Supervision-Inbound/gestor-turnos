@@ -339,20 +339,19 @@
         }
         function initParticles() {
             particlesArray = [];
-            let numberOfParticles = (canvas.height * canvas.width) / 9000; // AUMENTADO: Más partículas
+            let numberOfParticles = (canvas.height * canvas.width) / 9000;
             for (let i = 0; i < numberOfParticles; i++) {
                 let size = (Math.random() * 2) + 1;
                 let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
                 let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
-                let speedX = (Math.random() * 0.9) - 0.45; // AUMENTADO: Mayor velocidad
-                let speedY = (Math.random() * 0.9) - 0.45; // AUMENTADO: Mayor velocidad
+                let speedX = (Math.random() * 0.9) - 0.45;
+                let speedY = (Math.random() * 0.9) - 0.45;
                 particlesArray.push(new Particle(x, y, size, speedX, speedY));
             }
         }
         function connectParticles() {
             let opacityValue = 1;
             for (let a = 0; a < particlesArray.length; a++) {
-                // Conexiones cercanas (como antes)
                 for (let b = a; b < particlesArray.length; b++) {
                     let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2);
                     if (distance < (canvas.width / 7) * (canvas.height / 7)) {
@@ -365,11 +364,10 @@
                         ctx.stroke();
                     }
                 }
-                // NUEVO: Conexiones aleatorias a larga distancia
                 if (Math.random() < 0.005) {
                     const c = Math.floor(Math.random() * particlesArray.length);
                     if (c !== a) {
-                        ctx.strokeStyle = 'rgba(226, 45, 142, 0.15)'; // Color "agresivo" y semitransparente
+                        ctx.strokeStyle = 'rgba(226, 45, 142, 0.15)';
                         ctx.lineWidth = 1;
                         ctx.beginPath();
                         ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
@@ -433,7 +431,7 @@
                 }, 300);
             }, 1800);
 
-            const flowUrl = "https://prod-31.westus.logic.azure.com:443/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=2016-06-01&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=mMrr6cxbsMA-cVu8pBVkiaDbJ2oMTJPBKx3MB_QPmyQ";
+            const flowUrl = "https://default136d6ab55b55496f97cb2424247715.ed.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=iQVhRZddVOE3RtVzIpkGkzu9MI1bAzp0vmUWiJtcuIw";
 
             try {
                 const response = await fetch(flowUrl, { method: "POST" });
@@ -520,7 +518,22 @@
                 document.body.removeChild(a);
             }
         }
-
+        function getColacionDuration(rowData) {
+            // Se busca la columna por su nombre exacto
+            const rawValue = rowData['Dur_Colac'];
+            if (rawValue !== undefined && rawValue !== null) {
+                // Se convierte el valor a string, se eliminan espacios y se intenta parsear a número
+                const cleanValue = String(rawValue).trim();
+                const numValue = parseInt(cleanValue);
+                
+                if (!isNaN(numValue)) {
+                    // Si la conversión es exitosa, se devuelve el valor numérico
+                    if (numValue === 30) return 30;
+                    if (numValue === 60) return 60;
+                }
+            }
+            return null; // Devuelve null si el valor no es válido o la columna no existe
+        }
         async function createExcelWorkbookWithStyles() {
             fileName = ''; 
             const workbook = new ExcelJS.Workbook();
@@ -584,7 +597,11 @@
             const headers = ['SUPERVISOR / ANALISTA', 'HORA INGRESO', 'FURGON', 'INICIO TURNO', 'Break1', '30 MIN COLACIÓN', '60 MIN COLACIÓN', 'Break2', 'TERMINO TURNO', 'HORA SALIDA'];
             
             const processDataRows = (rIndex, data, startCol = 1) => { 
-                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = rowData['Dur_ Colac'] === 30 ? '30' : 'X'; row.getCell(startCol + 6).value = rowData['Dur_ Colac'] === 60 ? '60' : 'X'; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i > 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex; 
+                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; 
+                const duracionColacion = getColacionDuration(rowData);
+                row.getCell(startCol + 5).value = duracionColacion === 30 ? '30' : 'X'; 
+                row.getCell(startCol + 6).value = duracionColacion === 60 ? '60' : 'X'; 
+                const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i > 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex; 
             };
             const processInactiveDataRows = (rIndex, data, startCol = 1) => {
                 data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = 'X'; row.getCell(startCol + 6).value = 'X'; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); if (!cell.value && cell.value !== 0) cell.value = ''; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i !== 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex;
@@ -650,7 +667,7 @@
                 const border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } };
                 const mainHeaderCell = headerRow1.getCell(nightShiftStartCol);
                 const formattedDateHeader = `Turno de madrugada ${formatDate(fechaDia)}`;
-                mainHeaderCell.value = formattedDateHeader.replace(/,/g, ''); // Remover comas
+                mainHeaderCell.value = formattedDateHeader.replace(/,/g, '');
                 mainHeaderCell.fill = headerFill;
                 mainHeaderCell.font = headerFont;
                 mainHeaderCell.alignment = { horizontal: 'center', vertical: 'middle' };
@@ -669,8 +686,9 @@
                 nightShiftAgents.forEach(rowData => {
                     const row = worksheet.getRow(dataRowIndex);
                     row.getCell(nightShiftStartCol).value = rowData['Nombre'] || '';
-                    row.getCell(nightShiftStartCol + 2).value = rowData['Dur_ Colac'] === 30 ? 30 : 'X';
-                    row.getCell(nightShiftStartCol + 3).value = rowData['Dur_ Colac'] === 60 ? 60 : 'X';
+                    const duracionColacion = getColacionDuration(rowData);
+                    row.getCell(nightShiftStartCol + 2).value = duracionColacion === 30 ? 30 : 'X';
+                    row.getCell(nightShiftStartCol + 3).value = duracionColacion === 60 ? 60 : 'X';
                     for (let i = 0; i < 5; i++) {
                         const cell = row.getCell(nightShiftStartCol + i);
                         cell.border = border;
