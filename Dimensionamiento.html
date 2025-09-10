@@ -1,0 +1,273 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Power BI Dashboard</title>
+    <script src="https://cdn.tailwindcss.com"></script>
+    <link rel="preconnect" href="https://fonts.googleapis.com">
+    <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;500;600;700&display=swap" rel="stylesheet">
+    <style>
+        body {
+            font-family: 'Inter', sans-serif;
+            margin: 0;
+            padding: 0;
+            background-color: #f0f4f8; /* Fondo blanco suave */
+            overflow: hidden;
+            display: flex;
+            justify-content: center;
+            align-items: center;
+            flex-direction: column;
+            height: 100vh;
+            color: #333333; /* Texto gris oscuro */
+        }
+        
+        .neural-net {
+            position: absolute;
+            top: 0;
+            left: 0;
+            width: 100%;
+            height: 100%;
+            pointer-events: none;
+            z-index: 0;
+            opacity: 0.9;
+            background-color: #f0f4f8;
+        }
+        
+        .content-container {
+            z-index: 1;
+            position: relative;
+            width: 95%;
+            height: 95%;
+            display: flex;
+            flex-direction: column;
+            gap: 0.5rem; /* Espacio más reducido */
+            background-color: rgba(255, 255, 255, 0.8);
+            border-radius: 1.5rem;
+            padding: 1rem; /* Padding reducido */
+            box-shadow: 0 10px 20px rgba(0, 0, 0, 0.1);
+        }
+
+        .buttons-container {
+            display: flex;
+            gap: 1rem;
+            justify-content: flex-end;
+            padding: 0.5rem; /* Padding reducido */
+            flex-direction: row;
+        }
+
+        .button {
+            padding: 0.75rem 1.5rem;
+            border-radius: 9999px;
+            font-weight: 600;
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 6px rgba(0, 0, 0, 0.1);
+            background-color: #4a90e2; /* Azul brillante */
+            color: white;
+            border: none;
+            cursor: pointer;
+        }
+
+        .button:hover {
+            transform: translateY(-2px);
+            box-shadow: 0 6px 8px rgba(0, 0, 0, 0.2);
+            background-color: #5d9fe8;
+        }
+
+        .powerbi-frame {
+            flex-grow: 1;
+            border-radius: 0.75rem;
+            overflow: hidden;
+            box-shadow: 0 10px 15px rgba(0, 0, 0, 0.1);
+            border: 2px solid #e2e8f0;
+            background-color: white; /* Asegura que el iframe tenga un fondo blanco */
+        }
+
+        iframe {
+            width: 100%;
+            height: 100%;
+            border: none;
+            background-color: white;
+        }
+
+        .message-box {
+            position: fixed;
+            top: 20px;
+            left: 50%;
+            transform: translateX(-50%);
+            background-color: #4CAF50;
+            color: white;
+            padding: 15px 30px;
+            border-radius: 8px;
+            box-shadow: 0 4px 8px rgba(0, 0, 0, 0.2);
+            opacity: 0;
+            transition: opacity 0.5s ease-in-out;
+            z-index: 10;
+        }
+
+        .message-box.show {
+            opacity: 1;
+        }
+    </style>
+</head>
+<body class="bg-gray-100 text-gray-800">
+
+    <canvas id="neural-net-canvas" class="neural-net"></canvas>
+
+    <div class="content-container">
+        <div class="buttons-container">
+            <a id="full-screen-btn" class="button" target="_blank" rel="noopener noreferrer">
+                Ver en Pantalla Completa
+            </a>
+            <button id="refresh-data-btn" class="button">
+                Actualizar Datos
+            </button>
+        </div>
+
+        <div class="powerbi-frame">
+            <iframe id="powerbi-report" title="Reporte de Power BI"
+                src="https://app.powerbi.com/view?r=eyJrIjoiNGQ5NjNhYTAtYjU0Yi00ZDJlLWI1YTEtYWRhZTFmOWNjYmVlIiwidCI6IjEzNmQ2YWI1LTViNTUtNDk2Zi05N2NiLTI0MjQyNDc3MTVlZCIsImMiOjR9"
+                allowFullScreen="true">
+            </iframe>
+        </div>
+    </div>
+
+    <div id="message-box" class="message-box"></div>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', () => {
+            const fullScreenBtn = document.getElementById('full-screen-btn');
+            const refreshDataBtn = document.getElementById('refresh-data-btn');
+            const powerbiFrame = document.getElementById('powerbi-report');
+            const messageBox = document.getElementById('message-box');
+
+            // Set the full-screen URL dynamically
+            fullScreenBtn.href = powerbiFrame.src;
+
+            // Handle the refresh data button click
+            refreshDataBtn.addEventListener('click', () => {
+                const url = 'https://default136d6ab55b55496f97cb2424247715.ed.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/5a85445df3c24d228ceb18df22e12526/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=rnK1SqOjMcV_uDtF6csJTW9sQrgigki5A_-tSeoVpvI';
+                
+                fetch(url, {
+                    method: 'POST',
+                    headers: { 'Content-Type': 'application/json' },
+                    body: JSON.stringify({}) // Some Power Automate flows require a body
+                })
+                .then(response => {
+                    if (response.ok) {
+                        showMessage('Datos actualizados correctamente.', 'success');
+                    } else {
+                        showMessage('Error al actualizar los datos.', 'error');
+                    }
+                })
+                .catch(() => {
+                    showMessage('Error de red al intentar actualizar.', 'error');
+                });
+            });
+
+            // Function to show a message in the custom box
+            function showMessage(message, type) {
+                messageBox.textContent = message;
+                messageBox.style.backgroundColor = type === 'success' ? '#4CAF50' : '#f44336';
+                messageBox.classList.add('show');
+                setTimeout(() => {
+                    messageBox.classList.remove('show');
+                }, 3000);
+            }
+
+            // Neural Network Animation
+            const canvas = document.getElementById('neural-net-canvas');
+            const ctx = canvas.getContext('2d');
+            const nodes = [];
+            const numNodes = 100;
+            const maxDistance = 120;
+            const nodeSpeed = 0.5;
+
+            function resizeCanvas() {
+                canvas.width = window.innerWidth;
+                canvas.height = window.innerHeight;
+            }
+
+            class Node {
+                constructor() {
+                    this.x = Math.random() * canvas.width;
+                    this.y = Math.random() * canvas.height;
+                    this.vx = (Math.random() - 0.5) * nodeSpeed;
+                    this.vy = (Math.random() - 0.5) * nodeSpeed;
+                    this.radius = 2;
+                    this.pulse = Math.random() * Math.PI * 2;
+                }
+
+                update() {
+                    this.x += this.vx;
+                    this.y += this.vy;
+
+                    // Reappear on the other side if they move out of bounds
+                    if (this.x < 0) this.x = canvas.width;
+                    if (this.x > canvas.width) this.x = 0;
+                    if (this.y < 0) this.y = canvas.height;
+                    if (this.y > canvas.height) this.y = 0;
+
+                    this.pulse += 0.05;
+                }
+
+                draw() {
+                    const brightness = 0.5 + (Math.sin(this.pulse) + 1) / 4;
+                    ctx.beginPath();
+                    ctx.arc(this.x, this.y, this.radius, 0, Math.PI * 2);
+                    ctx.fillStyle = `rgba(0, 100, 255, ${brightness})`;
+                    ctx.shadowBlur = 15;
+                    ctx.shadowColor = `rgba(0, 100, 255, ${brightness})`;
+                    ctx.fill();
+                    ctx.shadowBlur = 0;
+                }
+            }
+
+            function drawLines() {
+                for (let i = 0; i < numNodes; i++) {
+                    for (let j = i + 1; j < numNodes; j++) {
+                        const dist = Math.sqrt(Math.pow(nodes[i].x - nodes[j].x, 2) + Math.pow(nodes[i].y - nodes[j].y, 2));
+                        if (dist < maxDistance) {
+                            const opacity = (1 - dist / maxDistance) * (Math.abs(Math.sin(nodes[i].pulse)) + Math.abs(Math.sin(nodes[j].pulse))) / 2;
+                            ctx.beginPath();
+                            ctx.moveTo(nodes[i].x, nodes[i].y);
+                            ctx.lineTo(nodes[j].x, nodes[j].y);
+                            ctx.strokeStyle = `rgba(74, 144, 226, ${opacity})`;
+                            ctx.lineWidth = 1;
+                            ctx.stroke();
+                        }
+                    }
+                }
+            }
+
+            function animate() {
+                requestAnimationFrame(animate);
+                ctx.fillStyle = 'rgba(240, 244, 248, 0.4)';
+                ctx.fillRect(0, 0, canvas.width, canvas.height);
+                
+                drawLines();
+                nodes.forEach(node => {
+                    node.update();
+                    node.draw();
+                });
+            }
+
+            window.addEventListener('resize', () => {
+                resizeCanvas();
+                nodes.length = 0;
+                for (let i = 0; i < numNodes; i++) {
+                    nodes.push(new Node());
+                }
+            });
+
+            // Initial setup
+            resizeCanvas();
+            for (let i = 0; i < numNodes; i++) {
+                nodes.push(new Node());
+            }
+            animate();
+        });
+    </script>
+</body>
+</html>
