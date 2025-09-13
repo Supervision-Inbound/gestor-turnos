@@ -1,56 +1,651 @@
 <!DOCTYPE html>
 <html lang="es">
 <head>
-  <meta charset="UTF-8">
-  <title>Datos desde Excel vía Power Automate</title>
-  <style>
-    body { font-family: Arial, sans-serif; padding: 20px; }
-    table { border-collapse: collapse; margin-top: 20px; width: 100%; }
-    th, td { border: 1px solid #ddd; padding: 8px; text-align: left; }
-    th { background-color: #f4f4f4; }
-    .error { color: red; margin-top: 20px; }
-  </style>
-</head>
-<body>
-  <h2>Datos desde Excel vía Power Automate</h2>
-  <div id="tabla"></div>
-  <div id="mensaje" class="error"></div>
-
-  <script>
-    async function cargarDatos() {
-      // 👉 URL del Flow de Power Automate
-      const flowUrl = "https://prod-31.westus.logic.azure.com:443/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=2016-06-01";
-
-      try {
-        const resp = await fetch(flowUrl, { method: "POST" });
-        if (!resp.ok) throw new Error("Error HTTP: " + resp.status);
-
-        const data = await resp.json();
-        console.log("Datos recibidos:", data);
-
-        if (!Array.isArray(data) || data.length === 0) {
-          document.getElementById("tabla").innerHTML = "<p>No hay datos en el Excel.</p>";
-          return;
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>WorkForce Analytics Platform</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/Chart.js/3.9.1/chart.min.js"></script>
+    <style>
+        * {
+            margin: 0;
+            padding: 0;
+            box-sizing: border-box;
         }
 
-        let html = "<table><tr>";
-        Object.keys(data[0]).forEach(k => html += `<th>${k}</th>`);
-        html += "</tr>";
-        data.forEach(row => {
-          html += "<tr>";
-          Object.values(row).forEach(v => html += `<td>${v}</td>`);
-          html += "</tr>";
+        :root {
+            --primary: #3b82f6;
+            --primary-dark: #2563eb;
+            --secondary: #06b6d4;
+            --accent: #14b8a6;
+            --success: #10b981;
+            --warning: #f59e0b;
+            --danger: #ef4444;
+            
+            /* --- Paleta de Colores Modo Claro (Default) --- */
+            --bg-gradient: linear-gradient(135deg, #f0f9ff 0%, #e0f2fe 50%, #ddd6fe 100%);
+            --text-primary: #1e293b;
+            --text-secondary: #64748b;
+            --text-tertiary: #94a3b8;
+            --sidebar-bg: linear-gradient(180deg, #ffffff 0%, #f8fafc 100%);
+            --card-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.8) 100%);
+            --header-bg: linear-gradient(135deg, rgba(255, 255, 255, 0.9) 0%, rgba(255, 255, 255, 0.7) 100%);
+            --kpi-card-bg: linear-gradient(135deg, #ffffff 0%, #f0f9ff 100%);
+            --form-control-bg: #f8fafc;
+            --border-color-light: #e2e8f0;
+            --border-color-dark: rgba(226, 232, 240, 0.3);
+            --table-row-bg: white;
+            --chart-grid-color: rgba(0, 0, 0, 0.1);
+            --chart-tick-color: #64748b;
+
+            --sidebar-width: 280px;
+        }
+
+        /* --- Paleta de Colores Modo Oscuro --- */
+        body.dark-mode {
+            --bg-gradient: linear-gradient(135deg, #1e293b 0%, #111827 50%, #3730a3 100%);
+            --text-primary: #f8fafc;
+            --text-secondary: #9ca3af;
+            --text-tertiary: #6b7280;
+            --sidebar-bg: linear-gradient(180deg, #1f2937 0%, #111827 100%);
+            --card-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.8) 100%);
+            --header-bg: linear-gradient(135deg, rgba(30, 41, 59, 0.9) 0%, rgba(30, 41, 59, 0.7) 100%);
+            --kpi-card-bg: linear-gradient(135deg, #334155 0%, #1e293b 100%);
+            --form-control-bg: #334155;
+            --border-color-light: #475569;
+            --border-color-dark: rgba(71, 85, 105, 0.5);
+            --table-row-bg: #1f2937;
+            --chart-grid-color: rgba(255, 255, 255, 0.1);
+            --chart-tick-color: #9ca3af;
+        }
+
+        body {
+            font-family: 'Inter', -apple-system, BlinkMacSystemFont, 'Segoe UI', Roboto, sans-serif;
+            background: var(--bg-gradient);
+            min-height: 100vh;
+            color: var(--text-primary);
+            overflow-x: hidden;
+            transition: background 0.3s ease, color 0.3s ease;
+        }
+
+        .sidebar {
+            background: var(--sidebar-bg);
+            border-right: 1px solid var(--border-color-light);
+            position: fixed; left: 0; top: 0; width: var(--sidebar-width); height: 100vh; backdrop-filter: blur(10px); padding: 30px 20px; overflow-y: auto; z-index: 100; transition: transform 0.3s ease; box-shadow: 4px 0 24px rgba(0, 0, 0, 0.05); display: flex; flex-direction: column;
+        }
+
+        .logo { border-bottom: 1px solid rgba(148, 163, 184, 0.1); display: flex; align-items: center; gap: 12px; margin-bottom: 20px; padding-bottom: 20px; }
+        .logo-icon { width: 45px; height: 45px; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border-radius: 12px; display: flex; align-items: center; justify-content: center; font-size: 24px; animation: pulse 2s infinite; }
+        @keyframes pulse { 0%, 100% { transform: scale(1); } 50% { transform: scale(1.05); } }
+        .logo-text { font-size: 1.3em; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+
+        .sidebar-config { border-top: 1px solid rgba(148, 163, 184, 0.1); color: var(--text-secondary); margin-top: 0; padding-top: 10px; }
+        .config-toggle-header { color: var(--text-secondary); display: flex; align-items: center; gap: 10px; padding: 14px 16px; font-weight: 600; cursor: pointer; border-radius: 12px; transition: background 0.3s ease, color 0.3s ease; }
+        .config-toggle-header:hover { background: rgba(59, 130, 246, 0.05); color: var(--primary); }
+        
+        .sidebar-config-content { max-height: 0; overflow: hidden; transition: max-height 0.5s ease-out; padding: 0 16px; }
+        .sidebar-config-content.show { max-height: 800px; }
+        .sidebar-config .form-group { margin-bottom: 15px; position: relative; }
+        .sidebar-config .form-label { color: var(--text-tertiary); display: flex; justify-content: space-between; align-items: baseline; font-size: 0.85em; margin-bottom: 5px; }
+        .sidebar-config .form-control { background: var(--form-control-bg); border: 1px solid var(--border-color-light); color: var(--text-primary); width: 100%; padding: 8px 10px; font-size: 0.9em; border-radius: 8px; appearance: none; }
+        .sidebar-config .form-group.divider {
+            padding-bottom: 15px;
+            margin-bottom: 15px;
+            border-bottom: 1px solid rgba(148, 163, 184, 0.1);
+        }
+        input[type="range"].form-control {
+            height: 5px;
+            background: linear-gradient(to right, var(--primary) 0%, var(--secondary) 100%);
+            outline: none;
+            cursor: pointer;
+            -webkit-appearance: none;
+            margin-top: 5px;
+            border: none;
+            border-radius: 5px;
+        }
+        input[type="range"].form-control::-webkit-slider-thumb {
+            -webkit-appearance: none;
+            appearance: none;
+            width: 18px;
+            height: 18px;
+            border-radius: 50%;
+            background: var(--primary);
+            border: 2px solid white;
+            box-shadow: 0 0 5px rgba(0, 0, 0, 0.2);
+            cursor: grab;
+            transition: background 0.3s ease, transform 0.3s ease;
+        }
+        .upload-btn {
+            width: 100%; padding: 10px; border: 1px dashed var(--primary); background: rgba(59, 130, 246, 0.05); color: var(--primary); border-radius: 8px; cursor: pointer; text-align: center; margin-top: 10px; font-weight: 600; transition: background 0.3s ease;
+        }
+
+        .main-content { margin-left: var(--sidebar-width); padding: 30px; min-height: 100vh; }
+        .header { background: var(--header-bg); border: 1px solid var(--border-color-dark); display: flex; justify-content: space-between; align-items: center; margin-bottom: 30px; padding: 20px; backdrop-filter: blur(10px); border-radius: 20px; box-shadow: 0 4px 24px rgba(0, 0, 0, 0.06); }
+        .header-title { font-size: 2em; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; }
+        .header-actions { display: flex; gap: 15px; align-items: center; }
+
+        .card { background: var(--card-bg); border: 1px solid var(--border-color-dark); backdrop-filter: blur(10px); border-radius: 20px; padding: 25px; margin-bottom: 25px; transition: all 0.3s ease; box-shadow: 0 4px 20px rgba(0, 0, 0, 0.08); }
+        .card-title { color: var(--text-primary); font-size: 1.3em; font-weight: 600; display: flex; align-items: center; gap: 10px; }
+        .card-header { display: flex; justify-content: space-between; align-items: center; margin-bottom: 20px; padding-bottom: 15px; border-bottom: 1px solid var(--border-color-dark); }
+
+        .kpi-grid { display: grid; grid-template-columns: repeat(auto-fit, minmax(160px, 1fr)); gap: 20px; margin-bottom: 25px; }
+        .grid-2 { display: grid; grid-template-columns: repeat(auto-fit, minmax(400px, 1fr)); gap: 25px; }
+
+        .kpi-card { background: var(--kpi-card-bg); border-radius: 15px; padding: 15px; text-align: center; transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0, 0, 0, 0.08); }
+        .kpi-icon { font-size: 1.5em; margin-bottom: 8px; }
+        .kpi-label { color: var(--text-secondary); font-size: 0.8em; font-weight: 500; }
+        .kpi-value { font-size: 1.8em; font-weight: 700; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); -webkit-background-clip: text; -webkit-text-fill-color: transparent; margin-bottom: 4px; }
+        
+        .table-responsive { overflow-x: auto; margin-top: 20px; }
+        table { width: 100%; border-collapse: collapse; }
+        thead { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); }
+        th { padding: 15px; text-align: left; font-weight: 600; color: white; }
+        td { padding: 15px; color: var(--text-secondary); border-bottom: 1px solid var(--border-color-dark); }
+        tbody tr { background: var(--table-row-bg); transition: background-color 0.3s ease; }
+        
+        body:not(.dark-mode) tbody tr:hover { background: #f0f9ff; }
+        body.dark-mode tbody tr:hover { background: #334155; }
+
+        .badge { display: inline-block; padding: 4px 8px; border-radius: 6px; font-weight: 600; font-size: 0.9em; }
+        body:not(.dark-mode) .badge { background: linear-gradient(135deg, rgba(59, 130, 246, 0.1) 0%, rgba(6, 182, 212, 0.1) 100%); color: #3b82f6; }
+        body:not(.dark-mode) .badge.success { background: linear-gradient(135deg, rgba(16, 185, 129, 0.1) 0%, rgba(5, 150, 105, 0.1) 100%); color: #10b981; }
+        body:not(.dark-mode) .badge.warning { background: linear-gradient(135deg, rgba(245, 158, 11, 0.1) 0%, rgba(217, 119, 6, 0.1) 100%); color: #f59e0b; }
+        body:not(.dark-mode) .badge.danger { background: linear-gradient(135deg, rgba(239, 68, 68, 0.1) 0%, rgba(220, 38, 38, 0.1) 100%); color: #ef4444; }
+        body.dark-mode .badge { background: rgba(255, 255, 255, 0.1); color: #93c5fd; }
+        body.dark-mode .badge.success { background: rgba(74, 222, 128, 0.1); color: #4ade80; }
+        body.dark-mode .badge.warning { background: rgba(251, 191, 36, 0.1); color: #facc15; }
+        body.dark-mode .badge.danger { background: rgba(248, 113, 113, 0.1); color: #f87171; }
+
+
+        .dark-mode-toggle { display: flex; align-items: center; gap: 8px; }
+        .switch { position: relative; display: inline-block; width: 44px; height: 24px; }
+        .switch input { opacity: 0; width: 0; height: 0; }
+        .slider { position: absolute; cursor: pointer; top: 0; left: 0; right: 0; bottom: 0; background-color: #ccc; transition: .4s; border-radius: 24px; }
+        .slider:before { position: absolute; content: ""; height: 18px; width: 18px; left: 3px; bottom: 3px; background-color: white; transition: .4s; border-radius: 50%; }
+        input:checked + .slider { background-color: var(--primary); }
+        input:checked + .slider:before { transform: translateX(20px); }
+        .slider .moon-icon, .slider .sun-icon { position: absolute; top: 50%; transform: translateY(-50%); font-size: 12px; }
+        .slider .sun-icon { left: 5px; opacity: 0; transition: opacity 0.4s; color: #f59e0b; }
+        .slider .moon-icon { right: 5px; opacity: 1; transition: opacity 0.4s; color: white; }
+        input:checked + .slider .sun-icon { opacity: 1; }
+        input:checked + .slider .moon-icon { opacity: 0; }
+        
+        .interval-selector { display: grid; grid-template-columns: 1fr 1fr; gap: 10px; margin-top: 5px; }
+        .interval-btn { padding: 8px 12px; border: 1px solid var(--border-color-light); border-radius: 10px; background-color: var(--form-control-bg); color: var(--text-secondary); font-weight: 600; text-align: center; cursor: pointer; transition: all 0.3s ease; }
+        .interval-btn:not(.active):hover { transform: translateY(-2px); box-shadow: 0 4px 10px rgba(0,0,0,0.05); }
+        .interval-btn.active { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; border-color: transparent; box-shadow: 0 8px 20px rgba(59, 130, 246, 0.3); transform: translateY(-2px); }
+        
+        .btn { padding: 10px 20px; border: none; border-radius: 10px; font-weight: 600; cursor: pointer; transition: all 0.3s ease; display: inline-flex; align-items: center; gap: 8px; }
+        .btn-primary { background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); color: white; }
+        .btn-secondary { background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); border: 1px solid rgba(148, 163, 184, 0.2); }
+        .btn:hover { transform: translateY(-2px); box-shadow: 0 10px 25px rgba(99, 102, 241, 0.3); }
+
+        #shiftDatePicker {
+            padding: 8px 12px; border-radius: 10px; border: 1px solid rgba(148, 163, 184, 0.2); background: rgba(148, 163, 184, 0.1); color: var(--text-secondary); font-family: inherit; font-size: 0.9em; font-weight: 600; cursor: pointer; line-height: normal;
+        }
+        #shiftDatePicker::-webkit-calendar-picker-indicator { cursor: pointer; opacity: 0.6; transition: opacity 0.3s; }
+        #shiftDatePicker::-webkit-calendar-picker-indicator:hover { opacity: 1; }
+        body.dark-mode #shiftDatePicker { background: rgba(255, 255, 255, 0.1); border-color: rgba(255, 255, 255, 0.2); }
+        body.dark-mode #shiftDatePicker::-webkit-calendar-picker-indicator { filter: invert(1); }
+
+        .shift-mode-column { display: none; }
+        body.shift-mode .shift-mode-column { display: table-cell; }
+
+        .menu-toggle { display: none; position: fixed; top: 30px; left: 30px; z-index: 101; background: linear-gradient(135deg, var(--primary) 0%, var(--secondary) 100%); border: none; color: white; padding: 10px; border-radius: 10px; cursor: pointer; }
+        @media (max-width: 1024px) { 
+            .sidebar { transform: translateX(-100%); } 
+            .sidebar.active { transform: translateX(0); } 
+            .main-content { margin-left: 0; } 
+            .menu-toggle { display: block; } 
+            .grid-2, .kpi-grid { grid-template-columns: 1fr; }
+        }
+    </style>
+</head>
+<body>
+
+    <button class="menu-toggle" onclick="toggleSidebar()">☰</button>
+
+    <aside class="sidebar" id="sidebar">
+        <div class="logo">
+            <div class="logo-icon">📊</div><div class="logo-text">WF Analytics</div>
+        </div>
+        
+        <div class="sidebar-config">
+            <div class="config-toggle-header" onclick="toggleSection('simParamsSidebar')">
+                <span class="icon">⚙️</span><span>Configuración de Simulación</span>
+            </div>
+            <div id="simParamsSidebar" class="sidebar-config-content show">
+                <div class="form-group divider">
+                    <label class="form-label">Total Llamadas del Día</label>
+                    <input type="text" class="form-control" id="totalDailyCalls" value="3.000">
+                </div>
+                <div class="form-group divider">
+                    <label class="form-label">Tipo de Distribución</label>
+                    <select class="form-control" id="distributionType" onchange="runSimulation()">
+                        <option value="uniform">Uniforme</option>
+                        <option value="morning">Pico Mañana</option>
+                        <option value="afternoon">Pico Tarde</option>
+                        <option value="bimodal" selected>Bimodal</option>
+                    </select>
+                </div>
+                
+                <div class="form-group">
+                    <label class="form-label"><span>ASA Objetivo (seg)</span><span class="slider-value" id="asaValue">22</span></label>
+                    <input type="range" class="form-control" id="targetAsa" value="22" min="5" max="60" step="1" oninput="document.getElementById('asaValue').textContent = this.value; runSimulation();">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><span>Nivel de Servicio Objetivo (%)</span><span class="slider-value" id="slValue">90</span></label>
+                    <input type="range" class="form-control" id="targetServiceLevel" value="90" min="50" max="99" step="1" oninput="document.getElementById('slValue').textContent = this.value; runSimulation();">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><span>TMO (segundos)</span><span class="slider-value" id="tmoValue">180</span></label>
+                    <input type="range" class="form-control" id="avgHandleTime" value="180" min="60" max="600" step="1" oninput="document.getElementById('tmoValue').textContent = this.value; runSimulation();">
+                </div>
+                <div class="form-group">
+                    <label class="form-label"><span>Productividad (%)</span><span class="slider-value" id="productividadValue">85</span></label>
+                    <input type="range" class="form-control" id="productividad" value="85" min="50" max="100" step="1" oninput="document.getElementById('productividadValue').textContent = this.value; runSimulation();">
+                </div>
+                 <div class="form-group">
+                    <label class="form-label"><span>Paciencia Promedio (seg)</span><span class="slider-value" id="patienceValue">120</span></label>
+                    <input type="range" class="form-control" id="avgPatience" value="120" min="30" max="300" step="10" oninput="document.getElementById('patienceValue').textContent = this.value; runSimulation();">
+                </div>
+                <div class="form-group divider">
+                    <label class="form-label"><span>Intervalo de Análisis</span></label>
+                    <div class="interval-selector">
+                        <button id="btn-interval-30" class="interval-btn" onclick="selectInterval(30, this)">30 min</button>
+                        <button id="btn-interval-60" class="interval-btn active" onclick="selectInterval(60, this)">60 min</button>
+                    </div>
+                    <input type="hidden" id="selectedInterval" value="60">
+                </div>
+                <div class="form-group">
+                    <input type="file" id="shiftFileInput" accept=".csv, .xlsx, application/vnd.openxmlformats-officedocument.spreadsheetml.sheet, application/vnd.ms-excel" style="display:none;">
+                    <button class="upload-btn" onclick="document.getElementById('shiftFileInput').click()">📤 Adjuntar Turnos (.xlsx)</button>
+                    <div id="fileName"></div>
+                </div>
+            </div>
+        </div>
+    </aside>
+
+    <main class="main-content">
+        
+        <section id="simulator" class="tool-section active">
+            <div class="header">
+                <h1 class="header-title">Simulador de Escenarios Diarios</h1>
+                <div class="header-actions">
+                    <div class="dark-mode-toggle">
+                        <label class="switch">
+                            <input type="checkbox" id="darkModeToggle" onchange="toggleDarkMode()">
+                            <span class="slider">
+                                <span class="sun-icon">☀️</span>
+                                <span class="moon-icon">🌙</span>
+                            </span>
+                        </label>
+                    </div>
+                    <input type="date" id="shiftDatePicker" onchange="runSimulation()" style="display:none;">
+                    <button class="btn btn-secondary" onclick="resetSimulation()"><span>🔄</span><span>Resetear</span></button>
+                    <button class="btn btn-primary" onclick="runSimulation()"><span>▶️</span><span>Ejecutar Simulación</span></button>
+                </div>
+            </div>
+
+            <div class="kpi-grid">
+                <div class="kpi-card"><div class="kpi-icon">🎯</div><div class="kpi-value" id="serviceLevelResult">-</div><div class="kpi-label">Nivel de Servicio</div></div>
+                <div class="kpi-card"><div class="kpi-icon">✅</div><div class="kpi-value" id="answerLevelResult">-</div><div class="kpi-label">Nivel de Atención</div></div>
+                <div class="kpi-card"><div class="kpi-icon">🔵</div><div class="kpi-value" id="abandonRateResult">-</div><div class="kpi-label">Tasa Abandono</div></div>
+                <div class="kpi-card"><div class="kpi-icon">☎️</div><div class="kpi-value" id="callsEnteredResult">-</div><div class="kpi-label">Llamadas Ingresadas</div></div>
+                <div class="kpi-card"><div class="kpi-icon">📞</div><div class="kpi-value" id="callsAnsweredResult">-</div><div class="kpi-label">Llamadas Atendidas</div></div>
+                <div class="kpi-card"><div class="kpi-icon">📉</div><div class="kpi-value" id="callsLostResult">-</div><div class="kpi-label">Llamadas Perdidas</div></div>
+                <div class="kpi-card"><div class="kpi-icon">💼</div><div class="kpi-value" id="occupancyResult">-</div><div class="kpi-label">Ocupación</div></div>
+            </div>
+
+            <div class="grid-2">
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><span>📊</span><span>Distribución de Llamadas</span></h3></div>
+                    <div class="chart-container" style="position: relative; height: 350px;"><canvas id="distributionChart"></canvas></div>
+                </div>
+                <div class="card">
+                    <div class="card-header"><h3 class="card-title"><span>👥</span><span>Requerimiento vs. Planificación</span></h3></div>
+                    <div class="chart-container" style="position: relative; height: 350px;"><canvas id="staffingChart"></canvas></div>
+                </div>
+            </div>
+
+            <div class="card">
+                <div class="card-header">
+                    <h3 class="card-title"><span>📋</span><span>Resultados Detallados</span></h3>
+                    <div class="card-actions"><button class="btn btn-primary" onclick="exportResults()"><span>📥</span><span>Exportar Excel</span></button></div>
+                </div>
+                <div class="table-responsive">
+                    <table id="resultsTable">
+                        <thead>
+                            <tr>
+                                <th>Intervalo</th>
+                                <th>Llamadas</th>
+                                <th>Agentes Requeridos</th>
+                                <th class="shift-mode-column">Agentes Planificados</th>
+                                <th class="shift-mode-column">Agentes Adicionales</th>
+                                <th>NS Esperado</th>
+                                <th>NA Esperado</th>
+                                <th>TA Esperado</th>
+                                <th>Ocupación</th>
+                            </tr>
+                        </thead>
+                        <tbody id="resultsTableBody"></tbody>
+                    </table>
+                </div>
+            </div>
+        </section>
+
+    </main>
+
+    <script>
+        let distributionChart = null, staffingChart = null, shiftData = [];
+
+        function toggleSidebar() { document.getElementById('sidebar').classList.toggle('active'); }
+        function toggleSection(sectionId) {
+            const section = document.getElementById(sectionId);
+            section.classList.toggle('show');
+            section.previousElementSibling?.classList.toggle('active');
+        }
+        function selectInterval(intervalValue, clickedButton) {
+            document.getElementById('selectedInterval').value = intervalValue;
+            document.querySelectorAll('.interval-btn').forEach(btn => btn.classList.remove('active'));
+            clickedButton.classList.add('active');
+            runSimulation();
+        }
+        function toggleDarkMode() {
+            document.body.classList.toggle('dark-mode');
+            const isDarkMode = document.body.classList.contains('dark-mode');
+            localStorage.setItem('darkMode', isDarkMode);
+            updateChartColors();
+        }
+        function updateChartColors() {
+            const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color').trim();
+            const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim();
+            const updateOptions = (chart) => {
+                if (!chart) return;
+                chart.options.scales.x.ticks.color = tickColor;
+                chart.options.scales.y.ticks.color = tickColor;
+                chart.options.scales.x.grid.color = gridColor;
+                chart.options.scales.y.grid.color = gridColor;
+                chart.options.plugins.legend.labels.color = tickColor;
+                chart.update();
+            };
+            updateOptions(staffingChart);
+            updateOptions(distributionChart);
+        }
+        function formatNumberInput(input) {
+            let value = input.value.replace(/\./g, '');
+            if (isNaN(value) || value.trim() === '') return;
+            input.value = Number(value).toLocaleString('es-CL');
+        }
+        function getStatusClass(value, thresholds) {
+            if (thresholds.type === 'high') { // Higher is better
+                if (value >= thresholds.success) return 'success';
+                if (value >= thresholds.warning) return 'warning';
+                return 'danger';
+            } else { // Lower is better
+                if (value <= thresholds.success) return 'success';
+                if (value <= thresholds.warning) return 'warning';
+                return 'danger';
+            }
+        }
+
+        function factorial(n){if(n<=1)return 1;let r=1;for(let i=2;i<=n;i++)r*=i;return r}
+        function erlangC(a,i){if(a<=i)return 1;let n=Math.pow(i,a)/factorial(a);let d=0;for(let k=0;k<a;k++)d+=Math.pow(i,k)/factorial(k);d+=n*a/(a-i);return n/d}
+        
+        function runSimulation() {
+            const intervalSize = parseInt(document.getElementById('selectedInterval').value, 10);
+            const totalIntervals = (24 * 60) / intervalSize;
+            const callsRaw = document.getElementById('totalDailyCalls').value.replace(/\./g, '');
+            const inputs = { calls: parseInt(callsRaw, 10) || 0, distType: document.getElementById('distributionType').value, aht: parseFloat(document.getElementById('avgHandleTime').value), asa: parseInt(document.getElementById('targetAsa').value), slTarget: parseFloat(document.getElementById('targetServiceLevel').value) / 100, prod: parseFloat(document.getElementById('productividad').value) / 100, patience: parseFloat(document.getElementById('avgPatience').value) };
+            const distribution = getDistribution(inputs.distType, inputs.calls, totalIntervals);
+            const planned = calculatePlannedAgents(document.getElementById('shiftDatePicker').value, intervalSize);
+            
+            const results = Array.from({length: totalIntervals}, (_, i) => {
+                const callsInterval = distribution[i];
+                const intensity = (callsInterval * inputs.aht) / (intervalSize * 60);
+                
+                let baseIdeal = 0, slIdeal = 1.0;
+                if (callsInterval > 0) {
+                    baseIdeal = Math.ceil(intensity);
+                    slIdeal = 0;
+                    while (slIdeal < inputs.slTarget && baseIdeal < 200) {
+                        baseIdeal++;
+                        if (baseIdeal > intensity) {
+                            const pW = erlangC(baseIdeal, intensity);
+                            slIdeal = 1 - pW * Math.exp(-(baseIdeal - intensity) * inputs.asa / inputs.aht);
+                        }
+                    }
+                }
+                const requeridos = Math.ceil(baseIdeal / inputs.prod);
+
+                const planificados = planned[i];
+                let serviceLevel, abandonRate, occupancy;
+
+                if (shiftData.length > 0) {
+                    const agentesRealesParaCalculo = Math.floor(planificados * inputs.prod);
+                    if (callsInterval > 0 && agentesRealesParaCalculo > 0) {
+                        if (agentesRealesParaCalculo > intensity) {
+                            const pW_real = erlangC(agentesRealesParaCalculo, intensity);
+                            serviceLevel = 1 - pW_real * Math.exp(-(agentesRealesParaCalculo - intensity) * inputs.asa / inputs.aht);
+                            const l = callsInterval / (intervalSize * 60), m = 1 / inputs.aht, t = 1 / inputs.patience;
+                            const den = (agentesRealesParaCalculo * m) - l + t;
+                            abandonRate = (den > 0 && inputs.patience > 0) ? (pW_real * t) / den : 1.0;
+                        } else {
+                            serviceLevel = 0;
+                            abandonRate = 1;
+                        }
+                        occupancy = Math.min(1, intensity / agentesRealesParaCalculo);
+                    } else {
+                        serviceLevel = callsInterval === 0 ? 1 : 0;
+                        abandonRate = callsInterval === 0 ? 0 : 1;
+                        occupancy = 0;
+                    }
+                } else {
+                    serviceLevel = slIdeal;
+                    occupancy = (baseIdeal > 0) ? Math.min(1, intensity / baseIdeal) : 0;
+                     if(callsInterval > 0 && inputs.patience > 0){
+                        const pW_ideal = erlangC(baseIdeal, intensity);
+                        const l=callsInterval/(intervalSize*60), m=1/inputs.aht, t=1/inputs.patience;
+                        const den = (baseIdeal*m)-l+t;
+                        abandonRate = (den > 0) ? (pW_ideal * t) / den : 1.0;
+                    } else {
+                        abandonRate = 0;
+                    }
+                }
+
+                const adicionales = Math.max(0, requeridos - planificados);
+                const timeLabel = `${Math.floor((i * intervalSize) / 60).toString().padStart(2, '0')}:${((i * intervalSize) % 60).toString().padStart(2, '0')}`;
+                
+                return { timeLabel, calls: Math.round(callsInterval), requeridos, planificados, adicionales, serviceLevel, occupancy, abandonRate };
+            });
+
+            updateKpis(results, inputs.calls);
+            updateCharts(results, planned, intervalSize);
+            updateTable(results);
+        }
+        
+        function updateCharts(results, planned, intervalSize){ const tickColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-tick-color').trim(); const gridColor = getComputedStyle(document.documentElement).getPropertyValue('--chart-grid-color').trim(); const maxLabels = 48; const skipFactor = Math.ceil(results.length / maxLabels); const ctxS = document.getElementById('staffingChart').getContext('2d'); if(staffingChart) staffingChart.destroy(); const dS = [{label: 'Agentes Requeridos', data: results.map(r => r.requeridos), borderColor: '#3b82f6', backgroundColor: 'rgba(59,130,246,0.1)', tension: 0.4, fill: true, pointRadius: intervalSize === 60 ? 3 : 1}]; if(shiftData.length > 0) { dS.push({label: 'Agentes Planificados', data: planned, borderColor: '#10b981', backgroundColor: 'rgba(16,185,129,0.1)', tension: 0.4, fill: true, pointRadius: intervalSize === 60 ? 3 : 1}); } staffingChart = new Chart(ctxS, { type: 'line', data: { labels: results.map((r, i) => i % skipFactor === 0 ? r.timeLabel : ''), datasets: dS }, options: { responsive: true, maintainAspectRatio: false, interaction: { mode: 'index', intersect: false }, plugins: { legend: { position: 'top', labels: { color: tickColor } }, tooltip: { callbacks: { title: (context) => results[context[0].dataIndex].timeLabel } } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor } }, x: { grid: { color: gridColor }, ticks: { color: tickColor, autoSkip: false, maxRotation: 45, minRotation: 45 } } } } }); const ctxD = document.getElementById('distributionChart').getContext('2d'); if(distributionChart) distributionChart.destroy(); distributionChart = new Chart(ctxD, { type: 'bar', data: { labels: results.map((r, i) => i % skipFactor === 0 ? r.timeLabel : ''), datasets: [{ label: 'Llamadas por Intervalo', data: results.map(r => r.calls), backgroundColor: 'rgba(59,130,246,0.5)' }] }, options: { responsive: true, maintainAspectRatio: false, plugins: { legend: { display: false }, tooltip: { callbacks: { title: (context) => results[context[0].dataIndex].timeLabel } } }, scales: { y: { beginAtZero: true, grid: { color: gridColor }, ticks: { color: tickColor } }, x: { grid: { color: gridColor }, ticks: { color: tickColor, autoSkip: false, maxRotation: 45, minRotation: 45 } } } } }); }
+        function getDistribution(type, totalCalls, intervals) { const hours = Array(intervals).fill(0); const intervalsPerHour = 60 / (1440/intervals); let dist; switch(type){ case 'uniform': dist = hours.map(() => totalCalls/intervals); break; case 'morning': dist = hours.map((_, i) => { const h = Math.floor(i/intervalsPerHour); if(h>=8&&h<=12)return totalCalls*0.15/intervalsPerHour; if(h>=6&&h<8)return totalCalls*0.08/intervalsPerHour; if(h>=13&&h<=17)return totalCalls*0.06/intervalsPerHour; if(h>=18&&h<=21)return totalCalls*0.03/intervalsPerHour; if(h>=22||h<=5)return totalCalls*0.01/intervalsPerHour; return totalCalls*0.04/intervalsPerHour; }); break; case 'afternoon': dist = hours.map((_, i) => { const h = Math.floor(i/intervalsPerHour); if(h>=14&&h<=18)return totalCalls*0.15/intervalsPerHour; if(h>=12&&h<14)return totalCalls*0.08/intervalsPerHour; if(h>=19&&h<=20)return totalCalls*0.06/intervalsPerHour; if(h>=8&&h<=11)return totalCalls*0.04/intervalsPerHour; if(h>=22||h<=5)return totalCalls*0.01/intervalsPerHour; return totalCalls*0.03/intervalsPerHour; }); break; case 'bimodal': dist = hours.map((_, i) => { const h = Math.floor(i/intervalsPerHour); if((h>=9&&h<=11)||(h>=15&&h<=17))return totalCalls*0.12/intervalsPerHour; if((h>=8&&h<9)||(h>=14&&h<15))return totalCalls*0.08/intervalsPerHour; if(h>=12&&h<=13)return totalCalls*0.05/intervalsPerHour; if(h>=18&&h<=20)return totalCalls*0.04/intervalsPerHour; if(h>=22||h<=5)return totalCalls*0.01/intervalsPerHour; return totalCalls*0.03/intervalsPerHour; }); break; } const sum = dist.reduce((a,b)=>a+b,0); return dist.map(v=>(v/sum)*totalCalls); }
+        function parseExcelDate(excelValue) { if (typeof excelValue === 'number') return new Date(Math.round((excelValue - 25569) * 86400 * 1000)); if (typeof excelValue === 'string') { const parts = excelValue.match(/(\d+)/g); if (parts && parts.length === 3) return new Date(parts[2], parts[1] - 1, parts[0]); } if (excelValue instanceof Date) return excelValue; return null; }
+        function parseExcelTime(timeValue) { if (timeValue instanceof Date) return timeValue.getHours(); if (typeof timeValue === 'number') { const totalSeconds = Math.round(timeValue * 86400); return Math.floor(totalSeconds / 3600); } if (typeof timeValue === 'string') { const ampmMatch = timeValue.match(/^(\d{1,2}):(\d{2})(?::(\d{2}))?\s*(AM|PM)?$/i); if (ampmMatch) { let hours = parseInt(ampmMatch[1]); const period = ampmMatch[4]; if (period) { if (period.toUpperCase() === 'PM' && hours !== 12) hours += 12; else if (period.toUpperCase() === 'AM' && hours === 12) hours = 0; } return hours; } const parts = timeValue.split(':'); if (parts.length >= 2) return parseInt(parts[0], 10); } return null; }
+        function calculatePlannedAgents(selectedDateStr, intervalMinutes) { const totalIntervals = (24 * 60) / intervalMinutes; const plannedByInterval = Array(totalIntervals).fill(0); if (!shiftData.length || !selectedDateStr) return plannedByInterval; const targetDate = new Date(selectedDateStr + 'T12:00:00Z'); const shiftsForDate = shiftData.filter(row => { const fecha = row.FECHA || row.Fecha; const servicio = row.SERVICIO || row.Servicio; const estado = row.ESTADO || row.Estado; if (!fecha || !servicio || !estado) return false; const rowDate = parseExcelDate(fecha); if (!rowDate) return false; const isSameDay = rowDate.getUTCFullYear() === targetDate.getUTCFullYear() && rowDate.getUTCMonth() === targetDate.getUTCMonth() && rowDate.getUTCDate() === targetDate.getUTCDate(); return isSameDay && servicio === '01_Masivo' && estado === 'Activo'; }); for (let interval = 0; interval < totalIntervals; interval++) { let agentCount = 0; const intervalStartMinutes = interval * intervalMinutes; shiftsForDate.forEach(shift => { const startHour = parseExcelTime(shift['INICIO TURNO']); const endHour = parseExcelTime(shift['FIN DEL TURNO']); if (startHour !== null && endHour !== null) { const startMinutes = startHour * 60; let endMinutes = endHour * 60; if (endMinutes === 0) endMinutes = 24 * 60; if (startMinutes < endMinutes) { if (intervalStartMinutes >= startMinutes && intervalStartMinutes < endMinutes) agentCount++; } else { if (intervalStartMinutes >= startMinutes || intervalStartMinutes < endMinutes) agentCount++; } } }); plannedByInterval[interval] = agentCount; } return plannedByInterval; }
+        
+        function updateKpis(results, totalCalls){ 
+            document.getElementById('callsEnteredResult').textContent = totalCalls.toLocaleString('es-CL');
+            let wS=0,wO=0,wA=0,cC=0;results.forEach(r=>{cC+=r.calls;wS+=r.calls*r.serviceLevel;wO+=r.calls*r.occupancy;wA+=r.calls*r.abandonRate});
+            const aSL=cC>0?(wS/cC)*100:100;const aO=cC>0?(wO/cC)*100:0;const aAR=cC>0?wA/cC:0;const aAL=1-aAR;const cL=Math.round(totalCalls*aAR);const cA=totalCalls-cL;
+            document.getElementById('serviceLevelResult').textContent=aSL.toFixed(1)+'%';document.getElementById('occupancyResult').textContent=aO.toFixed(1)+'%';document.getElementById('abandonRateResult').textContent=(aAR*100).toFixed(1)+'%';document.getElementById('answerLevelResult').textContent=(aAL*100).toFixed(1)+'%';document.getElementById('callsAnsweredResult').textContent=cA.toLocaleString('es-CL');document.getElementById('callsLostResult').textContent=cL.toLocaleString('es-CL');
+        }
+
+        function updateTable(results){ 
+            const t=document.getElementById('resultsTableBody'); 
+            t.innerHTML=''; 
+            results.forEach(r => { 
+                const a = 1 - r.abandonRate; 
+                const w = t.insertRow(); 
+                const adicClass = r.adicionales > 0 ? 'warning' : 'success';
+                const nsClass = getStatusClass(r.serviceLevel * 100, { success: 90, warning: 70, type: 'high' });
+                const naClass = getStatusClass(a * 100, { success: 90, warning: 70, type: 'high' });
+                const taClass = getStatusClass(r.abandonRate * 100, { success: 6, warning: 10, type: 'low' });
+
+                w.innerHTML=`<td><strong>${r.timeLabel}</strong></td><td>${r.calls}</td><td><span class="badge">${r.requeridos}</span></td><td class="shift-mode-column"><span class="badge">${r.planificados}</span></td><td class="shift-mode-column"><span class="badge ${adicClass}">${r.adicionales}</span></td><td><span class="badge ${nsClass}">${(r.serviceLevel*100).toFixed(1)}%</span></td><td><span class="badge ${naClass}">${(a*100).toFixed(1)}%</span></td><td><span class="badge ${taClass}">${(r.abandonRate*100).toFixed(1)}%</span></td><td>${(r.occupancy*100).toFixed(1)}%</td>`; 
+            }) 
+        }
+        
+        function exportResults() {
+            const today = new Date();
+            const dateString = today.getFullYear() + '-' + String(today.getMonth() + 1).padStart(2, '0') + '-' + String(today.getDate()).padStart(2, '0');
+            const intervalSize = parseInt(document.getElementById('selectedInterval').value, 10);
+            const fileName = `simulacion_wfm_${dateString}_${intervalSize}min.xlsx`;
+
+            const table = document.getElementById('resultsTable');
+            const data = [];
+            const headers = Array.from(table.querySelectorAll('thead th')).map(th => th.textContent);
+            const rows = table.querySelectorAll('tbody tr');
+
+            rows.forEach(row => {
+                const rowObject = {};
+                const cells = row.querySelectorAll('td');
+                headers.forEach((header, index) => {
+                    if (cells[index]) {
+                        let cellText = cells[index].textContent;
+                        if (cellText.includes('%')) {
+                            rowObject[header] = parseFloat(cellText.replace(/,/g, '.').replace('%', '')) / 100;
+                        } else if (!isNaN(cellText.replace(/,/g, '.')) && cellText.trim() !== '') {
+                            rowObject[header] = Number(cellText.replace(/,/g, '.'));
+                        } else {
+                            rowObject[header] = cellText;
+                        }
+                    }
+                });
+                data.push(rowObject);
+            });
+
+            const worksheet = XLSX.utils.json_to_sheet(data);
+            const headerStyle = { font: { bold: true, color: { rgb: "FFFFFF" }}, fill: { fgColor: { rgb: "2563EB" } } };
+            const successStyle = { fill: { fgColor: { rgb: "D1FAE5" } }, font: { color: { rgb: "065F46" } } };
+            const warningStyle = { fill: { fgColor: { rgb: "FEF3C7" } }, font: { color: { rgb: "92400E" } } };
+            const dangerStyle = { fill: { fgColor: { rgb: "FEE2E2" } }, font: { color: { rgb: "991B1B" } } };
+
+            const headerAddresses = Object.keys(worksheet).filter(key => key.match(/^[A-Z]1$/));
+            headerAddresses.forEach(address => { worksheet[address].s = headerStyle; });
+
+            data.forEach((row, rowIndex) => {
+                const excelRowIndex = rowIndex + 1;
+                
+                const nsCell = worksheet[XLSX.utils.encode_cell({c: headers.indexOf('NS Esperado'), r: excelRowIndex})];
+                if(nsCell) {
+                    if (nsCell.v < 0.7) nsCell.s = dangerStyle;
+                    else if (nsCell.v < 0.9) nsCell.s = warningStyle;
+                    else nsCell.s = successStyle;
+                }
+
+                const naCell = worksheet[XLSX.utils.encode_cell({c: headers.indexOf('NA Esperado'), r: excelRowIndex})];
+                if(naCell) {
+                    if (naCell.v < 0.7) naCell.s = dangerStyle;
+                    else if (naCell.v < 0.9) naCell.s = warningStyle;
+                    else naCell.s = successStyle;
+                }
+
+                const taCell = worksheet[XLSX.utils.encode_cell({c: headers.indexOf('TA Esperado'), r: excelRowIndex})];
+                if(taCell) {
+                    if (taCell.v > 0.10) taCell.s = dangerStyle;
+                    else if (taCell.v > 0.06) taCell.s = warningStyle;
+                    else taCell.s = successStyle;
+                }
+                
+                const adicCell = worksheet[XLSX.utils.encode_cell({c: headers.indexOf('Agentes Adicionales'), r: excelRowIndex})];
+                if(adicCell && adicCell.v > 0) adicCell.s = warningStyle;
+
+                ['NS Esperado', 'NA Esperado', 'TA Esperado', 'Ocupación'].forEach(colName => {
+                    const cell = worksheet[XLSX.utils.encode_cell({c: headers.indexOf(colName), r: excelRowIndex})];
+                    if(cell) cell.z = '0.0%';
+                });
+            });
+            
+            worksheet['!cols'] = headers.map(h => ({wch: h.length + 5}));
+            const workbook = XLSX.utils.book_new();
+            XLSX.utils.book_append_sheet(workbook, worksheet, "Resultados");
+            XLSX.writeFile(workbook, fileName);
+        }
+
+        function showNotification(m,t='info'){const n=document.createElement('div');n.className='notification';if(t==='danger'){n.style.background='linear-gradient(135deg, #ef4444 0%, #dc2626 100%)'}else if(t==='success'){n.style.background='linear-gradient(135deg, #10b981 0%, #059669 100%)'}n.innerHTML=`<div style="display:flex;align-items:center;gap:10px;"><span style="font-size:1.2em;">${t==='success'?'✔':'⚠'}</span><span>${m}</span></div>`;document.body.appendChild(n);setTimeout(()=>{n.style.animation='slideOutRight 0.3s ease';setTimeout(()=>document.body.removeChild(n),300)},3000)}
+        
+        function resetSimulation() { 
+            const callsInput = document.getElementById('totalDailyCalls'); callsInput.value = "3.000"; formatNumberInput(callsInput);
+            document.getElementById('distributionType').value = 'bimodal'; 
+            document.getElementById('targetAsa').value = 22; document.getElementById('asaValue').textContent = 22; 
+            document.getElementById('targetServiceLevel').value = 90; document.getElementById('slValue').textContent = 90; 
+            document.getElementById('avgHandleTime').value = 180; document.getElementById('tmoValue').textContent = 180; 
+            document.getElementById('productividad').value = 85; document.getElementById('productividadValue').textContent = 85; 
+            document.getElementById('avgPatience').value = 120; document.getElementById('patienceValue').textContent = 120; 
+            selectInterval(60, document.getElementById('btn-interval-60')); 
+            shiftData = []; 
+            document.getElementById('shiftFileInput').value = ''; 
+            document.getElementById('shiftDatePicker').style.display = 'none';
+            document.getElementById('fileName').textContent = ''; 
+            document.body.classList.remove('shift-mode'); 
+            if (distributionChart) distributionChart.destroy(); 
+            if (staffingChart) staffingChart.destroy(); 
+            document.getElementById('resultsTableBody').innerHTML = ''; 
+            ['serviceLevelResult', 'answerLevelResult', 'abandonRateResult', 'callsEnteredResult', 'callsAnsweredResult', 'callsLostResult', 'occupancyResult'].forEach(id => { document.getElementById(id).textContent = '-'; }); 
+            showNotification('Valores reseteados', 'info'); 
+            runSimulation(); 
+        }
+
+        document.getElementById('shiftFileInput').addEventListener('change', (event) => { 
+            const file = event.target.files[0]; 
+            if (!file) return; 
+            const reader = new FileReader(); 
+            reader.onload = function(e) { 
+                try { 
+                    const data = new Uint8Array(e.target.result); 
+                    const workbook = XLSX.read(data, {type: 'array', cellDates: true, dateNF: 'mm/dd/yyyy'}); 
+                    const sheetName = "Turnos"; 
+                    if (!workbook.SheetNames.includes(sheetName)) throw new Error(`El archivo no contiene una hoja llamada "${sheetName}"`); 
+                    const worksheet = workbook.Sheets[sheetName]; 
+                    shiftData = XLSX.utils.sheet_to_json(worksheet); 
+                    const dates = [...new Set(shiftData.map(r => r.FECHA || r.Fecha).filter(d => d))].map(d => parseExcelDate(d)).filter(d => d); 
+                    if (dates.length > 0) { 
+                        document.getElementById('shiftDatePicker').style.display = 'inline-block'; 
+                    } else { 
+                        throw new Error("No se encontraron fechas válidas en la hoja 'Turnos'."); 
+                    } 
+                    document.getElementById('fileName').textContent = file.name; 
+                    document.body.classList.add('shift-mode'); 
+                    showNotification('Archivo de turnos cargado correctamente', 'success'); 
+                    runSimulation(); 
+                } catch (error) { 
+                    showNotification(error.message || 'Error al leer el archivo', 'danger'); 
+                    console.error("Error al procesar archivo:", error); 
+                    resetSimulation(); 
+                } 
+            }; 
+            reader.readAsArrayBuffer(file); 
         });
-        html += "</table>";
 
-        document.getElementById("tabla").innerHTML = html;
-      } catch (err) {
-        console.error("Error al cargar datos:", err);
-        document.getElementById("mensaje").innerText = "Error al cargar datos: " + err.message;
-      }
-    }
+        document.addEventListener('DOMContentLoaded', () => {
+            if (localStorage.getItem('darkMode') === 'true') {
+                document.body.classList.add('dark-mode');
+                document.getElementById('darkModeToggle').checked = true;
+            }
 
-    cargarDatos();
-  </script>
+            const today = new Date();
+            const yyyy = today.getFullYear();
+            const mm = String(today.getMonth() + 1).padStart(2, '0');
+            const dd = String(today.getDate()).padStart(2, '0');
+            document.getElementById('shiftDatePicker').value = `${yyyy}-${mm}-${dd}`;
+            
+            const callsInput = document.getElementById('totalDailyCalls');
+            callsInput.addEventListener('input', () => {
+                formatNumberInput(callsInput);
+                runSimulation();
+            });
+            formatNumberInput(callsInput);
+            
+            document.querySelector('.sidebar-config .config-toggle-header').classList.add('active');
+            runSimulation(); 
+        });
+    </script>
 </body>
 </html>
