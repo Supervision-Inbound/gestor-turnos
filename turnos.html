@@ -3,7 +3,7 @@
 <head>
     <meta charset="UTF-8">
     <meta name="viewport" content="width=device-width, initial-scale=1.0">
-    <title>Gestiones Inbound - Generador de Turnos AI v3.0</title>
+    <title>Gestiones Inbound - Generador de Turnos AI v6.0 FINAL</title>
     <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
     <link rel="preconnect" href="https://fonts.googleapis.com">
     <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
@@ -42,13 +42,15 @@
         }
 
         #neuronCanvas {
-            position: fixed; top: 0; left: 0;
+            position: fixed;
+            top: 0; left: 0;
             width: 100%; height: 100%;
             z-index: 0; opacity: 0.7;
         }
 
         .main-container {
-            width: 100%; max-width: 900px;
+            width: 100%;
+            max-width: 900px;
             background: var(--glass-bg); backdrop-filter: blur(15px);
             border-radius: 24px; border: 1px solid var(--glass-border);
             box-shadow: 0 0 40px rgba(0, 0, 0, 0.5), 0 0 20px var(--color-glow);
@@ -58,16 +60,19 @@
         @media (min-width: 800px) { .main-container { grid-template-columns: 38% 62%; } }
 
         .illustration-panel {
-            padding: 40px; display: flex; flex-direction: column;
+            padding: 40px;
+            display: flex; flex-direction: column;
             justify-content: center; align-items: center; text-align: center;
             background: rgba(0, 0, 0, 0.2); border-right: 1px solid var(--glass-border);
         }
         .illustration-panel h2 {
-            font-size: 24px; font-weight: 700;
+            font-size: 24px;
+            font-weight: 700;
             margin-bottom: 12px; color: var(--text-light);
         }
         .illustration-panel p {
-            font-size: 15px; color: var(--text-medium);
+            font-size: 15px;
+            color: var(--text-medium);
             line-height: 1.6; max-width: 300px;
         }
 
@@ -76,7 +81,8 @@
         h1 { font-size: 28px; font-weight: 700; color: var(--text-light); }
         
         .upload-area {
-            border-radius: 12px; background: rgba(0, 0, 0, 0.2);
+            border-radius: 12px;
+            background: rgba(0, 0, 0, 0.2);
             display: flex; align-items: center; justify-content: center;
             min-height: 160px; margin-bottom: 25px;
             position: relative; overflow: hidden;
@@ -87,14 +93,16 @@
         .upload-area.is-loading .loading-content,
         .upload-area.is-success .success-content,
         .upload-area.is-error .error-content {
-            display: flex; flex-direction: column; align-items: center;
+            display: flex;
+            flex-direction: column; align-items: center;
             justify-content: center; gap: 15px; z-index: 10;
             width: 100%;
         }
 
         .techno-loader { position: relative; width: 80px; height: 80px; }
         .core-pulse {
-            width: 20%; height: 20%;
+            width: 20%;
+            height: 20%;
             background: #fff; border-radius: 50%;
             box-shadow: 0 0 10px #fff, 0 0 20px #fff, 0 0 30px var(--color-accent-light);
             position: absolute; top: 40%; left: 40%;
@@ -105,7 +113,8 @@
             50% { transform: scale(1.2); opacity: 1; }
         }
         .circuit-flow {
-            fill: none; stroke-width: 1.5; stroke: var(--color-primary-start);
+            fill: none;
+            stroke-width: 1.5; stroke: var(--color-primary-start);
             stroke-dasharray: 100; stroke-dashoffset: 100;
             animation: flow 3s linear infinite;
         }
@@ -113,13 +122,15 @@
         #flow-3 { animation-delay: 1s; }
         @keyframes flow { to { stroke-dashoffset: -100; } }
         .status-text-dynamic {
-            font-size: 16px; font-weight: 600; color: var(--text-medium);
+            font-size: 16px;
+            font-weight: 600; color: var(--text-medium);
             text-align: center; transition: opacity 0.3s ease;
             margin-top: 10px;
         }
         
         .success-icon svg path {
-            stroke: var(--color-success); stroke-dasharray: 29; stroke-dashoffset: 29;
+            stroke: var(--color-success);
+            stroke-dasharray: 29; stroke-dashoffset: 29;
             animation: drawCheck 0.4s 0.2s cubic-bezier(0.76, 0, 0.24, 1) forwards;
         }
         @keyframes drawCheck { to { stroke-dashoffset: 0; } }
@@ -135,21 +146,23 @@
         
         .custom-select-wrapper { position: relative; }
         .custom-select-trigger {
-            width: 100%; padding: 12px 15px; border-radius: 8px;
+            width: 100%;
+            padding: 12px 15px; border-radius: 8px;
             background: rgba(0, 0, 0, 0.2); border: 1px solid var(--glass-border);
-            color: var(--text-light); font-family: var(--font-family); font-size: 16px; cursor: pointer;
+            color: var(--text-light); font-family: var(--font-family); font-size: 16px;
+            cursor: pointer;
             display: flex; justify-content: space-between; align-items: center;
             transition: all 0.3s ease;
         }
         .custom-select-trigger:hover, .custom-select-wrapper.open .custom-select-trigger {
-            border-color: rgba(142, 45, 226, 0.7);
-            box-shadow: 0 0 15px var(--color-glow);
+            border-color: rgba(142, 45, 226, 0.7); box-shadow: 0 0 15px var(--color-glow);
         }
         .custom-select-trigger::after { content: '▼'; font-size: 12px; color: var(--text-medium); transition: transform 0.3s ease; }
         .custom-select-wrapper.open .custom-select-trigger::after { transform: rotate(180deg); }
         
         .custom-options {
-            position: absolute; top: 105%; left: 0; right: 0;
+            position: absolute;
+            top: 105%; left: 0; right: 0;
             background: rgba(20, 22, 37, 0.7); backdrop-filter: blur(10px);
             border-radius: 8px; box-shadow: 0 10px 20px rgba(0,0,0,0.2);
             z-index: 100; max-height: 200px; overflow-y: auto;
@@ -169,12 +182,14 @@
             background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
             color: white; border: none; padding: 14px 35px; border-radius: 10px;
             font-size: 16px; font-weight: 700; cursor: pointer;
-            transition: all 0.3s ease; box-shadow: 0 4px 15px rgba(0,0,0,0.3);
+            transition: all 0.3s ease;
+            box-shadow: 0 4px 15px rgba(0,0,0,0.3);
             background-size: 200% auto;
         }
         .button:hover { transform: translateY(-3px); box-shadow: 0 7px 30px var(--color-glow); background-position: right center; }
         .button:disabled {
-            opacity: 0.4; cursor: not-allowed; transform: none;
+            opacity: 0.4;
+            cursor: not-allowed; transform: none;
             box-shadow: 0 4px 15px rgba(0,0,0,0.3); background-position: left center;
         }
         .button.is-success {
@@ -185,7 +200,8 @@
         }
 
         .status-message {
-            text-align: center; margin-top: 20px; padding: 15px; border-radius: 10px;
+            text-align: center;
+            margin-top: 20px; padding: 15px; border-radius: 10px;
             display: none; animation: slideDown 0.5s;
         }
         @keyframes fadeIn { from { opacity: 0; } to { opacity: 1; } }
@@ -193,7 +209,6 @@
         .status-message.success { background: rgba(40, 167, 69, 0.2); border: 1px solid rgba(40, 167, 69, 0.5); color: #28a745; display: block; }
         .status-message.error { background: rgba(220, 53, 69, 0.2); border: 1px solid rgba(220, 53, 69, 0.5); color: var(--color-error); display: block; }
         
-        /* --- INICIO: ESTILOS PARA EL PANEL DE CONFIGURACIÓN (ADAPTADOS) --- */
         .settings-container { display: none; position: relative; margin-top: 20px; text-align: right; animation: fadeIn 0.5s; }
         .settings-button { background: transparent; border: none; cursor: pointer; color: var(--text-medium); padding: 5px; border-radius: 50%; transition: all 0.2s ease; }
         .settings-button:hover { background-color: rgba(142, 45, 226, 0.2); color: var(--text-light); }
@@ -201,19 +216,25 @@
         @keyframes blink-active { 50% { opacity: 0.4; } }
         
         .settings-panel {
-            display: none; position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
+            display: none;
+            position: absolute; bottom: 100%; right: 0; margin-bottom: 8px;
             background: var(--glass-bg); backdrop-filter: blur(10px);
             border-radius: 12px; box-shadow: 0 10px 25px rgba(0,0,0,0.2);
             padding: 20px; z-index: 100; width: 320px; text-align: left;
             border: 1px solid var(--glass-border);
         }
         .settings-panel h3 { font-size: 16px; margin-bottom: 15px; color: var(--text-light); }
+        .settings-panel .setting-group { margin-bottom: 20px; }
         #permanenciaInput {
-            width: 100%; padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);
+            width: 100%;
+            padding: 10px; border-radius: 8px; border: 1px solid var(--glass-border);
             background-color: rgba(0,0,0,0.2); font-family: var(--font-family);
-            font-size: 15px; margin-bottom: 15px; color: var(--text-light);
+            font-size: 15px; color: var(--text-light);
         }
         #permanenciaInput:focus { border-color: rgba(142, 45, 226, 0.7); box-shadow: 0 0 15px var(--color-glow); outline: none;}
+        .radio-group label { display: flex; align-items: center; margin-top: 10px; cursor: pointer; }
+        .radio-group input { margin-right: 10px; }
+
 
         .button-small {
             background-image: linear-gradient(45deg, var(--color-primary-start) 0%, var(--color-primary-end) 100%);
@@ -221,7 +242,6 @@
             font-size: 14px; font-weight: 600; cursor: pointer; transition: all 0.2s ease;
         }
         .button-small:hover { transform: translateY(-2px); box-shadow: 0 4px 15px var(--color-glow); }
-        /* --- FIN: ESTILOS PARA EL PANEL DE CONFIGURACIÓN --- */
 
     </style>
     <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
@@ -273,8 +293,23 @@
                     <svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="currentColor" width="24" height="24"><path d="M19.82 10.99 21 12l-1.18 1.01-.01.01c-.47 2.09-2.32 3.65-4.54 3.86l-.01.01L14 18.04V19a2 2 0 0 1-2 2 2 2 0 0 1-2-2v-.96l-1.25-1.17-.01-.01c-2.22-.21-4.07-1.77-4.54-3.86l-.01-.01L3 12l1.18-1.01.01-.01c.47-2.09 2.32-3.65 4.54-3.86l.01-.01L10 5.96V5a2 2 0 0 1 2-2 2 2 0 0 1 2 2v.96l1.25 1.17.01.01c2.22.21 4.07 1.77 4.54 3.86l.01.01ZM12 15a3 3 0 1 0 0-6 3 3 0 0 0 0 6Z"/></svg>
                 </button>
                 <div class="settings-panel" id="settingsPanel">
-                    <h3>Permanencia</h3>
-                    <input type="text" id="permanenciaInput" placeholder="Escribe aquí...">
+                    <div class="setting-group">
+                        <h3>Permanencia</h3>
+                        <input type="text" id="permanenciaInput" placeholder="Escribe aquí...">
+                    </div>
+                    <div class="setting-group">
+                        <h3>Configuración de Descansos</h3>
+                        <div class="radio-group">
+                            <label>
+                                <input type="radio" name="descansosOption" value="con" checked>
+                                Generar con descansos
+                            </label>
+                            <label>
+                                <input type="radio" name="descansosOption" value="sin">
+                                Generar sin descansos
+                            </label>
+                        </div>
+                    </div>
                     <button id="permanenciaAcceptBtn" class="button-small">Aceptar</button>
                 </div>
             </div>
@@ -289,6 +324,8 @@
     <script>
         let allData = null, turnosData = null, generatedWorkbook = null, fileName = '';
         let statusInterval, permanenciaText = '';
+        // NUEVO: Variable para controlar la generación de descansos
+        let generarConDescansos = true;
         
         const generateBtn = document.getElementById('generateBtn');
         const weekSelectorContainer = document.getElementById('weekSelectorContainer');
@@ -364,17 +401,6 @@
                         ctx.stroke();
                     }
                 }
-                if (Math.random() < 0.005) {
-                    const c = Math.floor(Math.random() * particlesArray.length);
-                    if (c !== a) {
-                        ctx.strokeStyle = 'rgba(226, 45, 142, 0.15)';
-                        ctx.lineWidth = 1;
-                        ctx.beginPath();
-                        ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
-                        ctx.lineTo(particlesArray[c].x, particlesArray[c].y);
-                        ctx.stroke();
-                    }
-                }
             }
         }
         function animateParticles() {
@@ -401,11 +427,18 @@
             e.stopPropagation();
             settingsPanel.style.display = settingsPanel.style.display === 'block' ? 'none' : 'block';
         });
+
+        // ACTUALIZADO: El botón Aceptar ahora guarda ambas configuraciones
         permanenciaAcceptBtn.addEventListener('click', () => {
             permanenciaText = permanenciaInput.value;
             settingsBtn.classList.toggle('is-active', permanenciaText.trim() !== '');
+            
+            const descansosValue = document.querySelector('input[name="descansosOption"]:checked').value;
+            generarConDescansos = (descansosValue === 'con');
+
             settingsPanel.style.display = 'none';
         });
+
         window.addEventListener('click', (e) => {
             if (!customSelect.contains(e.target)) customSelect.classList.remove('open');
             if (!settingsContainer.contains(e.target)) settingsPanel.style.display = 'none';
@@ -430,7 +463,6 @@
                     dynamicStatusText.style.opacity = '1';
                 }, 300);
             }, 1800);
-
             const flowUrl = "https://default136d6ab55b55496f97cb2424247715.ed.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/a6c5e734ae1d4bc8a2da0972cf1ed1e0/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=iQVhRZddVOE3RtVzIpkGkzu9MI1bAzp0vmUWiJtcuIw";
 
             try {
@@ -438,9 +470,7 @@
                 if (!response.ok) throw new Error("Respuesta de red no fue exitosa: " + response.status);
                 const rawData = await response.json();
                 if (!Array.isArray(rawData) || rawData.length === 0) throw new Error("No se recibieron datos.");
-
                 allData = rawData.map(row => { const newRow = { ...row }; const fechaKeys = ['Fecha', 'fecha', 'Date']; const iniKeys = ['Ini', 'ini', 'INICIO']; const finKeys = ['FIN', 'Fin', 'fin']; let dateComponent = null; for (const key of fechaKeys) { if (row[key] !== undefined) { dateComponent = excelSerialToDate(parseFloat(row[key])); break; } } newRow.Fecha = dateComponent; for (const key of iniKeys) { if (row[key] !== undefined) { newRow.Ini = parseDateTime(parseFloat(row[key]), dateComponent); break; } } for (const key of finKeys) { if (row[key] !== undefined) { newRow.FIN = parseDateTime(parseFloat(row[key]), dateComponent); break; } } return newRow; });
-                
                 clearInterval(statusInterval);
                 statusContainer.className = 'upload-area is-success';
                 populateWeekSelector(allData);
@@ -462,11 +492,11 @@
         
         function showStatus(message, type) { statusMessage.className = `status-message ${type}`; statusMessage.textContent = message; setTimeout(() => { statusMessage.className = 'status-message'; }, 4000); }
         function isLibre(row) { const ini = row['Ini']; const fin = row['FIN']; const iniStr = typeof ini === 'string' ? ini.trim().toUpperCase() : ''; const finStr = typeof fin === 'string' ? fin.trim().toUpperCase() : ''; const iniInvalid = !(ini instanceof Date); const finInvalid = !(fin instanceof Date); return iniStr.includes('LIBRE') || finStr.includes('LIBRE') || (iniInvalid && finInvalid); }
-        function formatTime(date) { if (!(date instanceof Date)) return ''; const d = date; return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
-        function formatDate(date) { if (!(date instanceof Date)) return ''; const d = normalizeDate(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'julio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
+        function formatTime(date) { if (!(date instanceof Date) && typeof date !== 'string') return ''; if (typeof date === 'string') return date; const d = date; return `${String(d.getHours()).padStart(2, '0')}:${String(d.getMinutes()).padStart(2, '0')}`; }
+        function formatDate(date) { if (!(date instanceof Date)) return ''; const d = normalizeDate(date); const days = ['domingo', 'lunes', 'martes', 'miércoles', 'jueves', 'viernes', 'sábado']; const months = ['enero', 'febrero', 'marzo', 'abril', 'mayo', 'junio', 'agosto', 'septiembre', 'octubre', 'noviembre', 'diciembre']; return `${days[d.getDay()]}, ${d.getDate()} de ${months[d.getMonth()]} del ${d.getFullYear()}`; }
         // --- FIN: LÓGICA DE DATOS Y FECHAS ---
 
-        // --- INICIO: LÓGICA COMPLETA Y FUNCIONAL DE GENERACIÓN DE EXCEL (VERSIÓN MEJORADA) ---
+        // --- INICIO: LÓGICA COMPLETA Y FUNCIONAL DE GENERACIÓN DE EXCEL ---
         generateBtn.addEventListener('click', generateExcel);
         weekSelector.addEventListener('change', handleWeekSelection);
        
@@ -519,27 +549,21 @@
             }
         }
         function getColacionDuration(rowData) {
-            // Se busca la columna por su nombre exacto
             const rawValue = rowData['Dur_Colac'];
             if (rawValue !== undefined && rawValue !== null) {
-                // Se convierte el valor a string, se eliminan espacios y se intenta parsear a número
                 const cleanValue = String(rawValue).trim();
-                const numValue = parseInt(cleanValue);
-                
-                if (!isNaN(numValue)) {
-                    // Si la conversión es exitosa, se devuelve el valor numérico
-                    if (numValue === 30) return 30;
-                    if (numValue === 60) return 60;
+                const numValue = parseInt(cleanValue, 10);
+                if (!isNaN(numValue) && (numValue === 30 || numValue === 60)) {
+                    return numValue;
                 }
             }
-            return null; // Devuelve null si el valor no es válido o la columna no existe
+            return null;
         }
         async function createExcelWorkbookWithStyles() {
-            fileName = ''; 
+            fileName = '';
             const workbook = new ExcelJS.Workbook();
             const sheetNames = ['Lunes', 'Martes', 'Miercoles', 'Jueves', 'Viernes', 'Sabado', 'Domingo'];
-            const jsDayToSheetIndex = [6, 0, 1, 2, 3, 4, 5]; 
-
+            const jsDayToSheetIndex = [6, 0, 1, 2, 3, 4, 5];
             sheetNames.forEach((sheetName, index) => {
                 const dayOfWeekToFind = jsDayToSheetIndex.indexOf(index);
                 const dayData = turnosData.filter(row => {
@@ -554,7 +578,6 @@
                     createStyledSheet(worksheet, dayData, fechaDia);
                 }
             });
-
             if (weekSelector && weekSelector.value) {
                 const monday = new Date(weekSelector.value);
                 const sunday = new Date(monday); sunday.setDate(monday.getDate() + 6);
@@ -569,9 +592,42 @@
             generatedWorkbook = workbook;
         }
         
+        // ================================================================================================
+        // === MOTOR DE ASIGNACIÓN DE DESCANSOS (BREAKS Y COLACIONES) ==
+        // ================================================================================================
+        
+        // Esta función será reemplazada más abajo por una versión actualizada
+        function asignarDescansosSegunPlan(dayData) {
+            // Este es un placeholder, la lógica real está en el bloque (function(){...})() al final del script.
+            return dayData;
+        }
+
+
         function createStyledSheet(worksheet, dayData, fechaDia) {
-            worksheet.columns = [ { width: 39.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10 } ];
             
+            // NUEVO: Lógica condicional para descansos
+            if (generarConDescansos) {
+                dayData = asignarDescansosSegunPlan(dayData);
+            } else {
+                // Modo "sin descansos": solo muestra la duración de la colación
+                dayData.forEach(agent => {
+                    agent['Break1Str'] = '';
+                    agent['Break2Str'] = '';
+                    const duracion = getColacionDuration(agent);
+                    if (duracion === 30) {
+                        agent['Colacion30'] = 30;
+                        agent['Colacion60'] = 'x';
+                    } else if (duracion === 60) {
+                        agent['Colacion30'] = 'x';
+                        agent['Colacion60'] = 60;
+                    } else {
+                        agent['Colacion30'] = 'x';
+                        agent['Colacion60'] = 'x';
+                    }
+                });
+            }
+
+            worksheet.columns = [ { width: 39.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10.5 }, { width: 10 } ];
             let rowIndex = 1;
             const fechaRow = worksheet.getRow(rowIndex);
             fechaRow.getCell(1).value = 'FECHA';
@@ -590,24 +646,24 @@
             const permanenciaCell = fechaRow.getCell(7);
             permanenciaCell.value = permanenciaText;
             permanenciaCell.font = { name: 'Calibri', size: 11, bold: true };
-            
             for (let i = 1; i <= 10; i++) { fechaRow.getCell(i).border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (i !== 1 && i !== 5) { fechaRow.getCell(i).alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; } }
             
             rowIndex = 2;
             const headers = ['SUPERVISOR / ANALISTA', 'HORA INGRESO', 'FURGON', 'INICIO TURNO', 'Break1', '30 MIN COLACIÓN', '60 MIN COLACIÓN', 'Break2', 'TERMINO TURNO', 'HORA SALIDA'];
-            
             const processDataRows = (rIndex, data, startCol = 1) => { 
-                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; 
-                const duracionColacion = getColacionDuration(rowData);
-                row.getCell(startCol + 5).value = duracionColacion === 30 ? '30' : 'X'; 
-                row.getCell(startCol + 6).value = duracionColacion === 60 ? '60' : 'X'; 
+                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 4).value = rowData['Break1Str'] || ''; row.getCell(startCol + 7).value = rowData['Break2Str'] || ''; 
+                row.getCell(startCol + 5).value = rowData['Colacion30'] || ''; 
+                row.getCell(startCol + 6).value = rowData['Colacion60'] || ''; 
                 const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i > 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex; 
             };
             const processInactiveDataRows = (rIndex, data, startCol = 1) => {
-                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = 'X'; row.getCell(startCol + 6).value = 'X'; for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); if (!cell.value && cell.value !== 0) cell.value = ''; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i !== 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex;
+                data.sort((a, b) => { const sA = a['Ini'] instanceof Date ? a['Ini'].getTime() : -1; const sB = b['Ini'] instanceof Date ? b['Ini'].getTime() : -1; if (sA !== sB) return sA - sB; const eA = a['FIN'] instanceof Date ? a['FIN'].getTime() : -1; const eB = b['FIN'] instanceof Date ? b['FIN'].getTime() : -1; return eA - eB; }).forEach(rowData => { const row = worksheet.getRow(rIndex); row.getCell(startCol).value = rowData['Nombre'] || ''; const iniCell = row.getCell(startCol + 3); iniCell.value = formatTime(rowData['Ini']); iniCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 4).value = rowData['Break1Str'] || ''; row.getCell(startCol + 7).value = rowData['Break2Str'] || ''; const finCell = row.getCell(startCol + 8); finCell.value = formatTime(rowData['FIN']); finCell.font = { name: 'Calibri', size: 11, bold: true }; row.getCell(startCol + 5).value = 'X'; row.getCell(startCol + 6).value = 'X';
+                for (let i = 0; i < 10; i++) { const cell = row.getCell(startCol + i); if (!cell.value && cell.value !== 0) cell.value = ''; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; if (!cell.font) cell.font = { name: 'Calibri', size: 11 }; if (i !== 0) cell.alignment = { horizontal: 'center', vertical: 'middle' }; } rIndex++; }); return rIndex;
             };
             const createHeaderRow = (rIndex, text, fill, startCol = 1) => { 
-                const row = worksheet.getRow(rIndex); headers.forEach((header, index) => { const cell = row.getCell(startCol + index); cell.value = index === 0 ? text : header; cell.fill = fill; cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri', size: 11 }; cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; }); return rIndex + 1; 
+                const row = worksheet.getRow(rIndex);
+                headers.forEach((header, index) => { const cell = row.getCell(startCol + index); cell.value = index === 0 ? text : header; cell.fill = fill; cell.font = { color: { argb: 'FFFFFFFF' }, bold: true, name: 'Calibri', size: 11 }; cell.alignment = { horizontal: 'center', vertical: 'middle', wrapText: true }; cell.border = { top: { style: 'thin' }, left: { style: 'thin' }, bottom: { style: 'thin' }, right: { style: 'thin' } }; });
+                return rIndex + 1; 
             };
             
             rowIndex = createHeaderRow(rowIndex, 'SUPERVISOR / ANALISTA', { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF104862' } });
@@ -646,7 +702,6 @@
                 rowIndex = processInactiveDataRows(rowIndex, inactivos);
             }
             
-            // --- Lógica para la tabla separada de turno madrugada ---
             const nightShiftStartCol = 12;
             worksheet.getColumn(nightShiftStartCol - 1).width = 10;
             worksheet.getColumn(nightShiftStartCol).width = 35;
@@ -686,9 +741,10 @@
                 nightShiftAgents.forEach(rowData => {
                     const row = worksheet.getRow(dataRowIndex);
                     row.getCell(nightShiftStartCol).value = rowData['Nombre'] || '';
-                    const duracionColacion = getColacionDuration(rowData);
-                    row.getCell(nightShiftStartCol + 2).value = duracionColacion === 30 ? 30 : 'X';
-                    row.getCell(nightShiftStartCol + 3).value = duracionColacion === 60 ? 60 : 'X';
+                    row.getCell(nightShiftStartCol + 1).value = rowData['Break1Str'] || '';
+                    row.getCell(nightShiftStartCol + 2).value = rowData['Colacion30'] || 'X';
+                    row.getCell(nightShiftStartCol + 3).value = rowData['Colacion60'] || 'X';
+                    row.getCell(nightShiftStartCol + 4).value = rowData['Break2Str'] || '';
                     for (let i = 0; i < 5; i++) {
                         const cell = row.getCell(nightShiftStartCol + i);
                         cell.border = border;
@@ -703,5 +759,196 @@
 
         document.addEventListener('DOMContentLoaded', loadDataFromFlow);
     </script>
+
+<script>
+(function(){
+    
+    // Sobreescribe la función de asignación para usar la nueva lógica de colaciones
+    window.asignarDescansosSegunPlan = function(dayData){
+
+        // =========================================================================
+        // === INICIO: LÓGICA DE ASIGNACIÓN DE COLACIONES Y BREAKS (INTEGRADA)      ===
+        // =========================================================================
+
+        // 1. Definición de ventanas y capacidades
+        const VENTANAS_COLACION = {
+            '00:00-08:00': { start: '03:00', end: '05:00' },'00:00-08:30': { start: '03:00', end: '05:00' },'00:00-09:00': { start: '03:00', end: '05:00' },'00:00-09:30': { start: '03:00', end: '05:00' },'00:00-10:00': { start: '03:00', end: '05:00' },'07:00-11:00': { start: '11:30', end: '12:00' },'07:00-14:00': { start: '11:00', end: '12:00' },'07:00-14:30': { start: '11:00', end: '12:00' },'07:00-15:00': { start: '11:00', end: '12:00' },'07:00-16:00': { start: '12:00', end: '13:00' },'07:00-17:00': { start: '12:00', end: '13:00' },'08:00-14:30': { start: '11:00', end: '12:00' },'08:00-16:00': { start: '12:00', end: '13:00' },'08:00-17:00': { start: '12:00', end: '14:00' },'08:00-18:00': { start: '13:00', end: '15:00' },'08:30-17:30': { start: '13:00', end: '15:00' },'08:30-18:30': { start: '13:00', end: '15:30' },'09:00-15:30': { start: '12:00', end: '13:00' },'09:00-17:00': { start: '14:00', end: '15:00' },'09:00-18:00': { start: '14:00', end: '16:00' },'09:00-19:00': { start: '14:00', end: '16:00' },'10:00-16:30': { start: '13:00', end: '14:00' },'10:00-17:00': { start: '13:00', end: '14:00' },'10:00-19:00': { start: '15:00', end: '16:00' },'10:00-20:00': { start: '15:00', end: '17:00' },'11:00-20:00': { start: '15:00', end: '16:00' },'12:00-18:30': { start: '14:00', end: '15:00' },'12:00-20:00': { start: '16:00', end: '17:00' },'12:00-22:00': { start: '16:00', end: '17:00' },'13:00-22:00': { start: '16:00', end: '17:00' },'14:00-00:00': { start: '16:00', end: '18:00' },'15:00-00:00': { start: '17:00', end: '19:00' },'16:00-00:00': { start: '18:00', end: '20:00' },'17:30-00:00': { start: '19:00', end: '20:00' }, '14:00-22:00': { start: '16:00', end: '17:00' }, 'fallback':    { start: '11:00', end: '15:00' }
+        };
+        const CAPACIDADES_COLACION = { '11': 5, '12': 5, '13': 5, '14': 9, '15': 9, '16': 7, '17': 7, '19': 3, 'madrugada': 1 };
+        
+        const VENTANAS_BREAKS = {
+            '00:00-08:00': { break1: { start: '02:00', end: '03:00' }, break2: { start: '07:00', end: '08:00' } },'00:00-08:30': { break1: { start: '02:00', end: '03:00' }, break2: { start: '07:00', end: '08:00' } },'00:00-09:00': { break1: { start: '02:00', end: '03:00' }, break2: { start: '07:00', end: '08:00' } },'00:00-09:30': { break1: { start: '02:00', end: '03:00' }, break2: { start: '07:00', end: '08:00' } },'00:00-10:00': { break1: { start: '02:00', end: '03:00' }, break2: { start: '07:00', end: '08:00' } },'07:00-11:00': { break1: { start: '08:30', end: '09:00' }, break2: { start: '10:00', end: '10:45' } },'07:00-14:00': { break1: { start: '08:30', end: '09:00' }, break2: { start: '13:00', end: '13:45' } },'07:00-14:30': { break1: { start: '08:30', end: '09:30' }, break2: { start: '13:00', end: '14:00' } },'07:00-15:00': { break1: { start: '08:30', end: '09:30' }, break2: { start: '13:00', end: '14:00' } },'07:00-16:00': { break1: { start: '08:30', end: '10:00' }, break2: { start: '14:30', end: '15:45' } },'07:00-17:00': { break1: { start: '08:30', end: '10:00' }, break2: { start: '14:30', end: '16:30' } },'08:00-12:00': { break1: { start: '09:30', end: '10:00' }, break2: { start: '10:45', end: '11:45' } },'08:00-13:00': { break1: { start: '09:30', end: '10:00' }, break2: { start: '11:45', end: '12:45' } },'08:00-14:30': { break1: { start: '09:30', end: '10:00' }, break2: { start: '13:00', end: '14:00' } },'08:00-16:00': { break1: { start: '09:30', end: '10:00' }, break2: { start: '14:00', end: '15:45' } },'08:00-17:00': { break1: { start: '09:45', end: '11:00' }, break2: { start: '15:45', end: '16:45' } },'08:00-18:00': { break1: { start: '09:45', end: '11:00' }, break2: { start: '15:45', end: '17:45' } },'08:30-17:30': { break1: { start: '10:30', end: '11:30' }, break2: { start: '16:45', end: '17:00' } },'08:30-18:30': { break1: { start: '10:30', end: '11:30' }, break2: { start: '16:45', end: '18:00' } },'09:00-15:30': { break1: { start: '10:45', end: '11:45' }, break2: { start: '14:30', end: '15:30' } },'09:00-17:00': { break1: { start: '10:45', end: '11:45' }, break2: { start: '15:45', end: '16:45' } },'09:00-18:00': { break1: { start: '10:45', end: '11:45' }, break2: { start: '16:45', end: '17:45' } },'09:00-19:00': { break1: { start: '10:45', end: '12:00' }, break2: { start: '16:45', end: '18:45' } },'10:00-16:30': { break1: { start: '11:45', end: '12:45' }, break2: { start: '15:00', end: '16:30' } },'10:00-17:00': { break1: { start: '11:45', end: '12:45' }, break2: { start: '15:00', end: '16:30' } },'10:00-19:00': { break1: { start: '11:45', end: '12:45' }, break2: { start: '17:00', end: '18:30' } },'10:00-20:00': { break1: { start: '11:45', end: '12:45' }, break2: { start: '18:00', end: '19:00' } },'11:00-20:00': { break1: { start: '12:45', end: '13:45' }, break2: { start: '17:30', end: '19:00' } },'12:00-18:30': { break1: { start: '16:30', end: '16:45' }, break2: { start: '16:30', end: '18:00' } },'12:00-20:00': { break1: { start: '13:45', end: '14:45' }, break2: { start: '18:00', end: '19:15' } },'12:00-22:00': { break1: { start: '13:45', end: '14:45' }, break2: { start: '19:00', end: '21:00' } },'13:00-22:00': { break1: { start: '14:45', end: '15:30' }, break2: { start: '19:00', end: '21:00' } },'14:00-00:00': { break1: { start: '19:00', end: '20:00' }, break2: { start: '21:00', end: '22:00' } },'15:00-00:00': { break1: { start: '20:00', end: '21:00' }, break2: { start: '22:00', end: '23:00' } },'16:00-00:00': { break1: { start: '20:00', end: '21:00' }, break2: { start: '22:30', end: '23:00' } },'17:30-00:00': { break1: { start: '21:00', end: '22:00' }, break2: { start: '22:30', end: '23:30' } },'18:00-00:00': { break1: { start: '20:00', end: '21:30' }, break2: { start: '22:00', end: '23:00' } },'19:00-00:00': { break1: { start: '21:00', end: '22:00' }, break2: { start: '22:00', end: '23:30' } },'20:00-00:00': { break1: { start: '21:45', end: '22:15' }, break2: { start: '23:00', end: '23:30' } }, '14:00-22:00': { break1: { start: '19:00', end: '20:00' }, break2: { start: '21:00', end: '22:00' } }
+        };
+
+        // 2. Funciones auxiliares
+        const addMinutes = (time, mins) => {
+            if (!time) return '';
+            const [hours, minutes] = time.split(':').map(Number);
+            const date = new Date();
+            date.setHours(hours, minutes + mins, 0, 0);
+            return `${String(date.getHours()).padStart(2, '0')}:${String(date.getMinutes()).padStart(2, '0')}`;
+        };
+        
+        const getCapacityForTime = (time, type) => {
+            if (!time) return 99;
+            const hour = parseInt(time.split(':')[0], 10);
+            if (type === 'colacion') {
+                if (hour >= 0 && hour < 7) return CAPACIDADES_COLACION['madrugada'];
+                return CAPACIDADES_COLACION[String(hour)] || 99;
+            } else { // type === 'break'
+                if (hour >= 0 && hour < 7) return 1; // Madrugada
+                if (hour >= 21) return 5; // Noche
+                return 3; // Dia
+            }
+        };
+
+        // 3. Inicializar trackers de capacidad
+        const colacionCapacityTracker = {};
+        const breakCapacityTracker = {};
+        for (let h = 0; h < 24; h++) {
+            for (let m = 0; m < 60; m += 15) {
+                const timeSlot = `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`;
+                colacionCapacityTracker[timeSlot] = 0;
+                breakCapacityTracker[timeSlot] = 0;
+            }
+        }
+        
+        // 4. Filtrar agentes del servicio 01_Masivo
+        const agentesActivos = dayData.filter(agent => agent['Estado'] === 'Activo' && agent['Servicio'] === '01_Masivo');
+        
+        // --- PROCESO DE COLACIONES ---
+        for (const agent of agentesActivos) {
+            const iniTurno = formatTime(agent['Ini']);
+            const finTurno = formatTime(agent['FIN']);
+            if (!iniTurno || !finTurno) continue;
+            const duracionColacion = getColacionDuration(agent);
+            if (!duracionColacion) { continue; }
+
+            const turnoKey = `${iniTurno}-${finTurno}`;
+            const ventana = VENTANAS_COLACION[turnoKey] || VENTANAS_COLACION['fallback'];
+            const candidatos = [];
+            let horaCandidata = ventana.start;
+
+            while (horaCandidata < ventana.end) {
+                // MEJORA DE SEGURIDAD: Asegura que la colación no sea antes de iniciar el turno
+                if (horaCandidata < iniTurno) {
+                    horaCandidata = addMinutes(horaCandidata, 15);
+                    continue;
+                }
+
+                const minutosCandidato = parseInt(horaCandidata.split(':')[1], 10);
+                if (duracionColacion === 60) {
+                    if (minutosCandidato !== 0) {
+                        horaCandidata = addMinutes(horaCandidata, 15);
+                        continue;
+                    }
+                } else {
+                    if (minutosCandidato !== 0 && minutosCandidato !== 30) {
+                        horaCandidata = addMinutes(horaCandidata, 15);
+                        continue;
+                    }
+                }
+
+                const finColacion = addMinutes(horaCandidata, duracionColacion);
+                if (finColacion <= finTurno || finTurno === "00:00") {
+                    let congestionTotal = 0;
+                    let esValido = true;
+                    for (let i = 0; i < duracionColacion; i += 15) {
+                        const bloqueActual = addMinutes(horaCandidata, i);
+                        congestionTotal += colacionCapacityTracker[bloqueActual] || 0;
+                        if ((colacionCapacityTracker[bloqueActual] || 0) >= getCapacityForTime(bloqueActual, 'colacion')) {
+                            esValido = false;
+                        }
+                    }
+                    candidatos.push({ hora: horaCandidata, congestion: congestionTotal, valido: esValido });
+                }
+                horaCandidata = addMinutes(horaCandidata, 15);
+            }
+
+            let mejorOpcion = null;
+            const candidatosValidos = candidatos.filter(c => c.valido);
+            if (candidatosValidos.length > 0) {
+                mejorOpcion = candidatosValidos.sort((a, b) => a.congestion - b.congestion)[0];
+            } else if (candidatos.length > 0) {
+                mejorOpcion = candidatos.sort((a, b) => a.congestion - b.congestion)[0];
+            }
+
+            if (mejorOpcion) {
+                agent.colacionAsignada = mejorOpcion.hora;
+                for (let i = 0; i < duracionColacion; i += 15) {
+                    const bloqueAfectado = addMinutes(mejorOpcion.hora, i);
+                    if (colacionCapacityTracker.hasOwnProperty(bloqueAfectado)) {
+                        colacionCapacityTracker[bloqueAfectado]++;
+                    }
+                }
+            }
+        }
+
+        // --- PROCESO DE BREAKS ---
+        const assignBreak = (breakType) => {
+            for (const agent of agentesActivos) {
+                const iniTurno = formatTime(agent['Ini']);
+                if (!iniTurno) continue;
+
+                const turnoKey = `${iniTurno}-${formatTime(agent['FIN'])}`;
+                const ventanasTurno = VENTANAS_BREAKS[turnoKey];
+                if (!ventanasTurno || !ventanasTurno[breakType]) continue;
+
+                const ventana = ventanasTurno[breakType];
+                let mejorOpcion = null;
+                
+                let candidatosBreak = [];
+                for (let horaCandidata = ventana.start; horaCandidata < ventana.end; horaCandidata = addMinutes(horaCandidata, 15)) {
+                    // MEJORA DE SEGURIDAD: Asegura que el break no sea antes de iniciar el turno
+                    if (horaCandidata < iniTurno) {
+                        continue;
+                    }
+                    candidatosBreak.push({ hora: horaCandidata, congestion: breakCapacityTracker[horaCandidata] || 0 });
+                }
+
+                if (candidatosBreak.length > 0) {
+                    candidatosBreak.sort((a,b) => a.congestion - b.congestion);
+                    const opcionMenosCongestionada = candidatosBreak[0].hora;
+                    if ((breakCapacityTracker[opcionMenosCongestionada] || 0) < getCapacityForTime(opcionMenosCongestionada, 'break')) {
+                        mejorOpcion = opcionMenosCongestionada;
+                    }
+                }
+
+                if (mejorOpcion) {
+                    agent[breakType === 'break1' ? 'break1Asignado' : 'break2Asignado'] = mejorOpcion;
+                    breakCapacityTracker[mejorOpcion]++;
+                }
+            }
+        };
+        
+        assignBreak('break1');
+        assignBreak('break2');
+
+        // Volcar todos los resultados al arreglo original
+        dayData.forEach(originalAgent => {
+            const processedAgent = agentesActivos.find(a => a.Nombre === originalAgent.Nombre);
+            if (processedAgent) {
+                if(processedAgent.colacionAsignada) {
+                    const duracion = getColacionDuration(processedAgent);
+                    if (duracion === 30) {
+                        originalAgent['Colacion30'] = processedAgent.colacionAsignada;
+                        originalAgent['Colacion60'] = 'x';
+                    } else if (duracion === 60) {
+                        originalAgent['Colacion60'] = processedAgent.colacionAsignada;
+                        originalAgent['Colacion30'] = 'x';
+                    }
+                } else {
+                    originalAgent['Colacion30'] = 'x';
+                    originalAgent['Colacion60'] = 'x';
+                }
+                originalAgent['Break1Str'] = processedAgent.break1Asignado || '';
+                originalAgent['Break2Str'] = processedAgent.break2Asignado || '';
+            }
+        });
+        
+        return dayData;
+    };
+})();
+</script>
 </body>
 </html>
