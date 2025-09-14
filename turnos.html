@@ -6,21 +6,19 @@
 <title>Generador de Turnos Futurista</title>
 <link rel="preconnect" href="https://fonts.googleapis.com">
 <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-<link href="https://fonts.googleapis.com/css2?family=Fira+Code:wght@400;600&display=swap" rel="stylesheet">
+<link href="https://fonts.googleapis.com/css2?family=Inter:wght@400;600&display=swap" rel="stylesheet">
 <script src="https://cdnjs.cloudflare.com/ajax/libs/exceljs/4.3.0/exceljs.min.js"></script>
 <style>
   :root {
     --bg-grad: radial-gradient(circle at 40% 30%, #0d1b2a 0%, #0a1a2a 30%, #11263d 70%, #081420 100%);
     --primary: #ffffff;
     --panel-bg: rgba(8, 20, 32, 0.72);
-    /* --- CORRECCIÓN DE COLOR AQUÍ --- */
-    --panel-border: rgba(0, 122, 255, 0.5); /* Ajustado a azul */
-    /* ------------------------------ */
+    --panel-border: rgba(0, 122, 255, 0.5); 
     --text: #ffffff;
     --muted: #9ec1d9;
-    --font: 'Fira Code', monospace;
+    --font: 'Inter', sans-serif;
     --success: #16a34a;
-    --accent: #00e5ff; /* Se mantiene para otros acentos como el loader */
+    --accent: #00e5ff; 
     --color-error: #dc3545;
   }
 
@@ -44,21 +42,20 @@
     border-radius: 22px;
     background: var(--panel-bg);
     border: 1px solid var(--panel-border);
-    /* --- CORRECCIÓN DE COLOR AQUÍ --- */
-    box-shadow: 0 0 40px rgba(0, 122, 255, 0.25), inset 0 0 0 1px rgba(255,255,255,0.04);
-    /* ------------------------------ */
-    animation: panelIn 700ms ease-out both, shadowPulse 3.6s ease-in-out infinite;
+    box-shadow: 0 0 40px rgba(66, 133, 244, 0.35), inset 0 0 0 1px rgba(255,255,255,0.04);
+    animation: panelIn 700ms ease-out both, shadowPulse 8s ease-in-out infinite;
     display: grid; grid-template-columns: 1fr; overflow: hidden;
   }
   @media (min-width: 800px) { .main-container { grid-template-columns: 38% 62%; } }
 
   @keyframes panelIn { from { opacity: 0; transform: scale(0.95) translateY(6px);} to { opacity: 1; transform: scale(1) translateY(0);} }
-  /* --- CORRECCIÓN DE COLOR AQUÍ --- */
+  
   @keyframes shadowPulse {
-      0%,100% { box-shadow:0 0 26px rgba(0, 122, 255, 0.25), inset 0 0 0 1px rgba(255,255,255,0.04); }
-      50% { box-shadow:0 0 48px rgba(0, 122, 255, 0.40), inset 0 0 0 1px rgba(255,255,255,0.04); }
+      0%, 100% { box-shadow: 0 0 35px rgba(66, 133, 244, 0.3), inset 0 0 0 1px rgba(255,255,255,0.04); } /* Azul */
+      25% { box-shadow: 0 0 50px rgba(219, 68, 55, 0.4), inset 0 0 0 1px rgba(255,255,255,0.04); } /* Rojo */
+      50% { box-shadow: 0 0 35px rgba(244, 180, 0, 0.3), inset 0 0 0 1px rgba(255,255,255,0.04); } /* Amarillo */
+      75% { box-shadow: 0 0 50px rgba(15, 157, 88, 0.4), inset 0 0 0 1px rgba(255,255,255,0.04); } /* Verde */
   }
-  /* ------------------------------ */
 
   .illustration-panel { padding: 30px; display:flex; flex-direction:column; justify-content:center; align-items:center; text-align:center; border-right:1px solid var(--panel-border); }
   .illustration-panel h2 { color: var(--primary); margin-bottom: .5rem; }
@@ -94,8 +91,26 @@
     animation: corePulse 1.5s ease-in-out infinite;
   }
   @keyframes corePulse { 0%,100%{transform:scale(0.8);opacity:0.7;} 50%{transform:scale(1.2);opacity:1;} }
-  .circuit-flow { fill:none; stroke-width:1.5; stroke:var(--accent); stroke-dasharray:100; stroke-dashoffset:100; animation:flow 3s linear infinite; }
+  
+  /* --- ÚNICO CAMBIO REALIZADO AQUÍ --- */
+  .circuit-flow { 
+    fill:none; 
+    stroke-width:1.5; 
+    /* Se elimina el 'stroke' estático para que la animación tome control total del color */
+    stroke-dasharray:100; 
+    stroke-dashoffset:100; 
+    /* Se añaden DOS animaciones: la de flujo original y la nueva de ciclo de color */
+    animation: flow 3s linear infinite, colorCycle 6s linear infinite; 
+  }
   @keyframes flow { to{stroke-dashoffset:-100;} }
+
+  /* Nueva animación para el ciclo de color de las líneas */
+  @keyframes colorCycle {
+      0%, 100% { stroke: #00e5ff; } /* Cian */
+      33%      { stroke: #ff00e5; } /* Magenta */
+      66%      { stroke: #a8ff00; } /* Verde Lima */
+  }
+  /* --- FIN DEL CAMBIO --- */
 
   #dynamicStatusText, .status-text-dynamic { margin-top: 10px; font-size: 14px; text-align: center; color: var(--muted); }
 
