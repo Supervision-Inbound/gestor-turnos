@@ -1,4 +1,4 @@
-ml>
+<!DOCTYPE html>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
@@ -27,6 +27,8 @@ ml>
       --color-orange: #f39c12;
       --color-red: #e74c3c;
       --color-teal: #1abc9c;
+      --color-pink: #e91e63;
+      --color-yellow: #f1c40f;
     }
 
     * { box-sizing: border-box; }
@@ -148,7 +150,6 @@ ml>
       z-index: 2;
     }
     
-    /* === NUEVAS ANIMACIONES DE ENTRADA === */
     @keyframes content-appear {
       from {
         opacity: 0;
@@ -161,9 +162,7 @@ ml>
     }
 
     .main-header h1, .main-header p, .card {
-      /* Ocultamos los elementos al inicio para que la animación funcione */
       opacity: 0; 
-      /* Asignamos la animación, con 'forwards' para que mantenga el estado final */
       animation: content-appear 0.6s ease-out forwards;
     }
     
@@ -191,13 +190,15 @@ ml>
         position: relative;
         border-top-width: 3px;
     }
-    /* Retraso escalonado para la animación de cada tarjeta */
+    
     .card:nth-child(1) { animation-delay: 0.3s; }
     .card:nth-child(2) { animation-delay: 0.4s; }
     .card:nth-child(3) { animation-delay: 0.5s; }
     .card:nth-child(4) { animation-delay: 0.6s; }
     .card:nth-child(5) { animation-delay: 0.7s; }
     .card:nth-child(6) { animation-delay: 0.8s; }
+    .card:nth-child(7) { animation-delay: 0.9s; }
+    .card:nth-child(8) { animation-delay: 1.0s; }
 
 
     .card:hover {
@@ -244,6 +245,14 @@ ml>
     .card.c-teal { border-top-color: var(--color-teal); }
     .card.c-teal .card-icon { background: linear-gradient(135deg, var(--color-teal), #118d75); }
     .card.c-teal:hover { box-shadow: 0 0 30px rgba(26, 188, 156, 0.5); }
+
+    .card.c-pink { border-top-color: var(--color-pink); }
+    .card.c-pink .card-icon { background: linear-gradient(135deg, var(--color-pink), #a01243); }
+    .card.c-pink:hover { box-shadow: 0 0 30px rgba(233, 30, 99, 0.5); }
+
+    .card.c-yellow { border-top-color: var(--color-yellow); }
+    .card.c-yellow .card-icon { background: linear-gradient(135deg, var(--color-yellow), #c5a10d); }
+    .card.c-yellow:hover { box-shadow: 0 0 30px rgba(241, 196, 15, 0.5); }
 
     /* IFRAME Y CONTENIDO */
     .content-frame {
@@ -348,7 +357,7 @@ ml>
 
         <li><a href="#" onclick="loadModule('cambio-turnos.html', this)" data-page="cambio-turnos">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></span>
-            <span class="nav-text">Cambio de Turnos</span>
+            <span class="nav-text">Cambios</span>
         </a></li>
 
         <li><a href="#" onclick="loadModule('calendario.html', this)" data-page="calendario">
@@ -366,6 +375,16 @@ ml>
             <span class="nav-text">Generador</span>
         </a></li>
         
+        <li><a href="#" onclick="loadModule('cartas.html', this)" data-page="cartas">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
+            <span class="nav-text">Cartas</span>
+        </a></li>
+
+        <li><a href="#" onclick="loadModule('transporte.html', this)" data-page="transporte">
+            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
+            <span class="nav-text">Transporte</span>
+        </a></li>
+
         <li><a href="#" onclick="loadModule('erlang.html', this)" data-page="erlang">
             <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></span>
             <span class="nav-text">Erlang</span>
@@ -373,7 +392,7 @@ ml>
 
         <li><a href="#" onclick="loadModule('Dimensionamiento.html', this)" data-page="dimensionamiento">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 14h10M7 10h6"></path></svg></span>
-            <span class="nav-text">Dimensionamiento</span>
+            <span class="nav-text">Dimensión</span>
         </a></li>
     </ul>
   </nav>
@@ -404,6 +423,16 @@ ml>
                 <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
                 <h2>Generador de Turnos Nuevos</h2>
                 <p>Asigna turnos a los nuevos agentes de forma eficiente.</p>
+            </a>
+            <a href="#" onclick="loadModule('cartas.html', document.querySelector('[data-page=cartas]'))" class="card c-pink">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
+                <h2>Carta Amonestación</h2>
+                <p>Crea documentos formales en segundos.</p>
+            </a>
+            <a href="#" onclick="loadModule('transporte.html', document.querySelector('[data-page=transporte]'))" class="card c-yellow">
+                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
+                <h2>Gestión de Transporte</h2>
+                <p>Genera reportes de arribo y zarpe de personal.</p>
             </a>
             <a href="#" onclick="loadModule('erlang.html', document.querySelector('[data-page=erlang]'))" class="card c-red">
                 <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></div>
