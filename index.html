@@ -1,95 +1,122 @@
-<!DOCTYPE html>
+ml>
 <html lang="es">
 <head>
   <meta charset="UTF-8" />
   <meta name="viewport" content="width=device-width, initial-scale=1.0" />
   <title>Gestor Operativo — Plataforma de Automatización</title>
-  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%236a11cb' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
+  <link rel="icon" href="data:image/svg+xml,%3Csvg xmlns='http://www.w3.org/2000/svg' viewBox='0 0 100 100'%3E%3Cpath fill='%23007bff' d='M50 0 L100 25 L100 75 L50 100 L0 75 L0 25 Z'%3E%3C/path%3E%3Cpath fill='%23ffffff' d='M50 20 L75 35 L75 65 L50 80 L25 65 L25 35 Z'%3E%3C/path%3E%3C/svg%3E">
   <link rel="preconnect" href="https://fonts.googleapis.com">
   <link rel="preconnect" href="https://fonts.gstatic.com" crossorigin>
-  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;700&display=swap" rel="stylesheet">
+  <link href="https://fonts.googleapis.com/css2?family=Manrope:wght@400;600;800&display=swap" rel="stylesheet">
   <style>
     :root {
-      --color-primary-start: #8e2de2;
-      --color-primary-end: #4a00e0;
-      --color-accent-light: #00bcd4;
-      --color-glow: rgba(142, 45, 226, 0.5);
-      --color-success: #28a745;
-      --color-error: #dc3545;
-      --font-family: 'Manrope', sans-serif;
-      --bg-dark: #0d1117;
-      --glass-bg: rgba(20, 22, 37, 0.6);
-      --glass-border: rgba(100, 120, 255, 0.2);
-      --text-light: #f0f0f0;
-      --text-medium: #a0a0b0;
+      --bg-grad: radial-gradient(circle at 40% 30%, #0d1b2a 0%, #0a1a2a 30%, #11263d 70%, #081420 100%);
+      --primary: #ffffff;
+      --panel-bg: rgba(8, 20, 32, 0.85);
+      --panel-border: rgba(0, 122, 255, 0.5);
+      --text: #ffffff;
+      --muted: #9ec1d9;
+      --font: 'Manrope', sans-serif;
+      --accent: #00e5ff;
+      --nav-height: 70px;
+
+      /* Paleta de colores para tarjetas */
+      --color-purple: #9b59b6;
+      --color-green: #2ecc71;
+      --color-blue: #3498db;
+      --color-orange: #f39c12;
+      --color-red: #e74c3c;
+      --color-teal: #1abc9c;
     }
 
     * { box-sizing: border-box; }
 
-    body {
+    html, body {
+      height: 100%;
       margin: 0;
-      font-family: var(--font-family);
-      background-color: var(--bg-dark);
-      color: var(--text-light);
-      display: flex;
-      min-height: 100vh;
+    }
+
+    body {
+      font-family: var(--font);
+      background: var(--bg-grad);
+      color: var(--text);
       overflow: hidden;
     }
 
-    /* BARRA LATERAL */
-    .sidebar {
-      width: 80px;
-      background: var(--glass-bg);
+    #neuronCanvas {
+      position: fixed;
+      inset: 0;
+      width: 100%;
+      height: 100%;
+      z-index: -1;
+      opacity: 0.85;
+      pointer-events: none;
+    }
+
+    /* BARRA DE NAVEGACIÓN SUPERIOR */
+    .top-nav {
+      height: var(--nav-height);
+      width: 100%;
+      background: var(--panel-bg);
       backdrop-filter: blur(15px);
-      border-right: 1px solid var(--glass-border);
-      padding: 24px 0;
+      border-bottom: 1px solid var(--panel-border);
+      padding: 0 24px;
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      z-index: 100;
+      position: fixed;
+      top: 0; left: 0;
+    }
+
+    .nav-header {
       display: flex;
       flex-direction: column;
-      align-items: center;
-      z-index: 10;
-      position: fixed;
-      top: 0; left: 0; height: 100vh;
-      transition: width 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-      overflow-x: hidden;
     }
-    .sidebar:hover {
-      width: 280px;
+    
+    @keyframes text-gradient-animation {
+        0% { background-position: 0% 50%; }
+        50% { background-position: 100% 50%; }
+        100% { background-position: 0% 50%; }
     }
 
-    .sidebar-header {
-      width: 240px;
-      padding: 0 16px;
-      margin-bottom: 32px;
-      opacity: 0;
-      transition: opacity 0.2s ease;
+    .nav-header h1 { 
+      margin: 0; 
+      font-size: 26px;
+      font-weight: 800;
+      background: linear-gradient(90deg, var(--color-purple), var(--color-blue), var(--color-green), var(--color-orange), var(--color-red), var(--color-teal), var(--color-purple));
+      background-size: 400% 400%;
+      -webkit-background-clip: text;
+      background-clip: text;
+      color: transparent;
+      animation: text-gradient-animation 10s ease-in-out infinite;
     }
-    .sidebar:hover .sidebar-header {
-      opacity: 1;
-    }
+    .nav-header h2 { margin: 0; font-size: 14px; font-weight: 500; color: var(--accent); }
 
-    .sidebar h1 { margin: 0; font-size: 20px; font-weight: 700; color: var(--text-light); }
-    .sidebar h2 { margin: 4px 0 0; font-size: 14px; font-weight: 500; color: var(--text-medium); }
-
-    .sidebar ul { list-style: none; padding: 0 16px; margin: 0; display: flex; flex-direction: column; gap: 8px; width: 100%; }
-
-    .sidebar a {
+    .nav-links {
+      list-style: none;
+      padding: 0;
+      margin: 0;
       display: flex;
       align-items: center;
-      gap: 16px;
-      width: 100%;
-      padding: 10px 16px;
+      gap: 8px;
+      height: 100%;
+    }
+
+    .nav-links a {
+      display: flex;
+      align-items: center;
+      gap: 12px;
+      padding: 8px 16px;
       border-radius: 8px;
       font-size: 15px;
       font-weight: 500;
       cursor: pointer;
-      color: var(--text-medium);
+      color: var(--muted);
       text-decoration: none;
       transition: all 0.2s ease;
       white-space: nowrap;
-    }
-    .sidebar:not(:hover) a {
-        justify-content: center;
-        padding: 10px 0;
+      height: 60%;
     }
     
     .nav-icon {
@@ -97,93 +124,140 @@
     }
     .nav-icon svg { width: 100%; height: 100%; stroke-width: 1.5; }
 
-    .nav-text {
-        opacity: 0;
-        visibility: hidden;
-        transition: opacity 0.2s ease, visibility 0.2s ease;
+    .nav-links a:hover {
+      color: var(--text);
+      background-color: rgba(0, 122, 255, 0.15);
     }
-    .sidebar:hover .nav-text {
-        opacity: 1;
-        visibility: visible;
-    }
-
-    .sidebar a:hover {
-      color: var(--text-light);
-      background-color: rgba(142, 45, 226, 0.2);
-    }
-    .sidebar a.active {
+    .nav-links a.active {
       color: #fff;
-      background: linear-gradient(90deg, var(--color-primary-start), var(--color-primary-end));
-      box-shadow: 0 4px 10px -2px rgba(142, 45, 226, 0.3);
+      font-weight: 700;
+      background: rgba(0, 122, 255, 0.2);
+      box-shadow: 0 0 15px rgba(0, 122, 255, 0.3), inset 0 0 0 1px rgba(0, 122, 255, 0.5);
     }
-    .sidebar a.active .nav-icon { color: #fff; }
-    .sidebar a.active svg { stroke: currentColor; }
+    .nav-links a.active .nav-icon { color: var(--accent); }
+    .nav-links a.active svg { stroke: currentColor; }
 
     /* CONTENIDO PRINCIPAL */
     .main {
-      flex: 1;
-      margin-left: 80px;
       padding: 32px;
+      padding-top: calc(var(--nav-height) + 32px);
       overflow-y: auto;
       height: 100vh;
-      transition: margin-left 0.3s cubic-bezier(0.4, 0, 0.2, 1);
-    }
-    .sidebar:hover ~ .main {
-        margin-left: 280px;
+      width: 100%;
+      position: relative;
+      z-index: 2;
     }
     
-    .main-header h1 { font-size: 28px; font-weight: 700; }
-    .main-header p { font-size: 16px; color: var(--text-medium); margin-top: -10px; }
+    /* === NUEVAS ANIMACIONES DE ENTRADA === */
+    @keyframes content-appear {
+      from {
+        opacity: 0;
+        transform: translateY(20px);
+      }
+      to {
+        opacity: 1;
+        transform: translateY(0);
+      }
+    }
 
-    /* TARJETAS DE MÓDULOS */
+    .main-header h1, .main-header p, .card {
+      /* Ocultamos los elementos al inicio para que la animación funcione */
+      opacity: 0; 
+      /* Asignamos la animación, con 'forwards' para que mantenga el estado final */
+      animation: content-appear 0.6s ease-out forwards;
+    }
+    
+    .main-header h1 { font-size: 28px; font-weight: 700; color: var(--primary); animation-delay: 0.1s; }
+    .main-header p { font-size: 16px; color: var(--muted); margin-top: -10px; animation-delay: 0.2s; }
+
+    /* ESTILOS MEJORADOS PARA TARJETAS */
     .card-grid {
         display: grid;
-        grid-template-columns: repeat(auto-fit, minmax(260px, 1fr));
+        grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
         gap: 24px;
         margin-top: 26px;
     }
+
     .card {
-        background: var(--glass-bg);
-        border: 1px solid var(--glass-border);
+        background: var(--panel-bg);
+        border: 1px solid var(--panel-border);
         border-radius: 12px;
         padding: 24px;
         cursor: pointer;
         text-decoration: none;
         color: inherit;
         transition: transform 0.2s ease, box-shadow 0.2s ease;
-        box-shadow: 0 0 10px rgba(0, 0, 0, 0.3);
+        overflow: hidden; 
+        position: relative;
+        border-top-width: 3px;
     }
+    /* Retraso escalonado para la animación de cada tarjeta */
+    .card:nth-child(1) { animation-delay: 0.3s; }
+    .card:nth-child(2) { animation-delay: 0.4s; }
+    .card:nth-child(3) { animation-delay: 0.5s; }
+    .card:nth-child(4) { animation-delay: 0.6s; }
+    .card:nth-child(5) { animation-delay: 0.7s; }
+    .card:nth-child(6) { animation-delay: 0.8s; }
+
+
     .card:hover {
         transform: translateY(-5px);
-        box-shadow: 0 0 20px var(--color-glow);
     }
+
     .card-icon {
         width: 48px;
         height: 48px;
         border-radius: 10px;
         display: grid;
         place-items: center;
-        background: linear-gradient(135deg, var(--color-primary-start), var(--color-primary-end));
         color: #fff;
+        transition: transform 0.3s ease;
     }
+    .card:hover .card-icon {
+        transform: scale(1.1);
+    }
+
     .card-icon svg { width: 28px; height: 28px; stroke-width: 1.5; }
-    .card h2 { margin: 16px 0 6px; font-size: 18px; font-weight: 700; color: var(--text-light); }
-    .card p { margin: 0; color: var(--text-medium); font-size: 14px; line-height: 1.6; }
+    .card h2 { margin: 16px 0 6px; font-size: 18px; font-weight: 700; color: var(--text); }
+    .card p { margin: 0; color: var(--muted); font-size: 14px; line-height: 1.6; }
+    
+    .card.c-purple { border-top-color: var(--color-purple); }
+    .card.c-purple .card-icon { background: linear-gradient(135deg, var(--color-purple), #5e3370); }
+    .card.c-purple:hover { box-shadow: 0 0 30px rgba(155, 89, 182, 0.5); }
+    
+    .card.c-blue { border-top-color: var(--color-blue); }
+    .card.c-blue .card-icon { background: linear-gradient(135deg, var(--color-blue), #217dbb); }
+    .card.c-blue:hover { box-shadow: 0 0 30px rgba(52, 152, 219, 0.5); }
+    
+    .card.c-green { border-top-color: var(--color-green); }
+    .card.c-green .card-icon { background: linear-gradient(135deg, var(--color-green), #1d9c53); }
+    .card.c-green:hover { box-shadow: 0 0 30px rgba(46, 204, 113, 0.5); }
+
+    .card.c-orange { border-top-color: var(--color-orange); }
+    .card.c-orange .card-icon { background: linear-gradient(135deg, var(--color-orange), #c87f0e); }
+    .card.c-orange:hover { box-shadow: 0 0 30px rgba(243, 156, 18, 0.5); }
+
+    .card.c-red { border-top-color: var(--color-red); }
+    .card.c-red .card-icon { background: linear-gradient(135deg, var(--color-red), #b9382b); }
+    .card.c-red:hover { box-shadow: 0 0 30px rgba(231, 76, 60, 0.5); }
+
+    .card.c-teal { border-top-color: var(--color-teal); }
+    .card.c-teal .card-icon { background: linear-gradient(135deg, var(--color-teal), #118d75); }
+    .card.c-teal:hover { box-shadow: 0 0 30px rgba(26, 188, 156, 0.5); }
 
     /* IFRAME Y CONTENIDO */
     .content-frame {
         width: 100%;
-        height: calc(100vh - 64px);
-        border: none;
+        height: calc(100vh - var(--nav-height) - 64px);
+        border: 1px solid var(--panel-border);
         display: none;
         background-color: transparent;
         border-radius: 12px;
-        border: 1px solid var(--glass-border);
     }
     .content-frame.active { display: block; }
     .home-content.hidden { display: none; }
 
-    /* Asistente IA con Bot Pulsante personalizado */
+    /* Asistente IA MEJORADO */
     .ia-helper {
       position: fixed;
       right: 24px;
@@ -194,13 +268,13 @@
       z-index: 100;
     }
     .ia-msg {
-      background: var(--glass-bg);
-      border: 1px solid var(--glass-border);
+      background: var(--panel-bg);
+      border: 1px solid var(--panel-border);
       padding: 12px 16px;
       border-radius: 10px;
       box-shadow: 0 5px 15px rgba(0, 0, 0, 0.2);
       font-size: 13px;
-      color: var(--text-medium);
+      color: var(--muted);
       backdrop-filter: blur(8px);
     }
     
@@ -211,114 +285,62 @@
         cursor: pointer;
         animation: float 3s ease-in-out infinite;
     }
-
     .ia-avatar {
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
-        position: relative;
-        z-index: 2;
+        width: 100%; height: 100%; display: flex; justify-content: center; align-items: center; position: relative; z-index: 2;
     }
-
     .ia-avatar-design {
-        position: relative;
-        width: 100%;
-        height: 100%;
-        display: flex;
-        justify-content: center;
-        align-items: center;
+        position: relative; width: 100%; height: 100%; display: flex; justify-content: center; align-items: center;
     }
-
     .ia-avatar-design .center-glow {
-        position: absolute;
-        width: 20px;
-        height: 20px;
-        border-radius: 50%;
+        position: absolute; width: 20px; height: 20px; border-radius: 50%;
         background-color: rgba(255, 255, 255, 0.8);
-        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.6), 0 0 20px 10px var(--color-accent-light);
+        box-shadow: 0 0 10px 5px rgba(255, 255, 255, 0.6), 0 0 20px 10px var(--accent);
         animation: subtle-pulse 1.5s infinite alternate;
     }
 
-    .ia-avatar-design .line {
-        position: absolute;
-        border-radius: 2px;
-        background: linear-gradient(to right, #8e2de2, #4a00e0);
-        box-shadow: 0 0 8px rgba(142, 45, 226, 0.7);
-    }
-    .ia-avatar-design .line.horizontal {
-        width: 60%;
-        height: 2px;
-        transform: translateY(-50%) rotate(45deg);
-        animation: line-rotate 6s linear infinite;
-    }
-    .ia-avatar-design .line.vertical {
-        height: 60%;
-        width: 2px;
-        transform: translateX(-50%) rotate(-45deg);
-        animation: line-rotate 6s linear infinite reverse;
+    @keyframes colorful-arc-animation {
+        0%   { border-color: var(--color-purple); box-shadow: 0 0 12px var(--color-purple); }
+        16%  { border-color: var(--color-blue);   box-shadow: 0 0 12px var(--color-blue); }
+        32%  { border-color: var(--color-green);  box-shadow: 0 0 12px var(--color-green); }
+        48%  { border-color: var(--color-orange); box-shadow: 0 0 12px var(--color-orange); }
+        64%  { border-color: var(--color-red);    box-shadow: 0 0 12px var(--color-red); }
+        80%  { border-color: var(--color-teal);   box-shadow: 0 0 12px var(--color-teal); }
+        100% { border-color: var(--color-purple); box-shadow: 0 0 12px var(--color-purple); }
     }
 
     .ia-avatar-design .arc {
         position: absolute;
         width: 50px;
         height: 50px;
-        border: 2px solid transparent;
+        border: 2px solid;
         border-radius: 50%;
-        animation: arc-rotate 8s linear infinite;
+        animation-name: arc-rotate, colorful-arc-animation;
+        animation-duration: 8s, 10s;
+        animation-timing-function: linear, linear;
+        animation-iteration-count: infinite, infinite;
     }
-    .ia-avatar-design .arc.blue {
-        border-top-color: #00bcd4;
-        border-left-color: #00bcd4;
-        transform: rotate(0deg);
-        animation: arc-rotate 8s linear infinite, blue-glow 2s infinite alternate;
-        box-shadow: 0 0 8px rgba(0, 188, 212, 0.7);
+    .ia-avatar-design .arc-1 {
+        clip-path: polygon(0% 0%, 50% 0%, 50% 50%, 0% 50%);
     }
-    .ia-avatar-design .arc.purple {
-        border-bottom-color: #8e2de2;
-        border-right-color: #8e2de2;
-        transform: rotate(180deg);
-        animation: arc-rotate 8s linear infinite reverse, purple-glow 2s infinite alternate;
-        box-shadow: 0 0 8px rgba(142, 45, 226, 0.7);
+    .ia-avatar-design .arc-2 {
+        clip-path: polygon(50% 50%, 100% 50%, 100% 100%, 50% 100%);
+        animation-delay: 0s, -5s;
     }
-
-    @keyframes subtle-pulse {
-        0% { transform: scale(1); opacity: 0.9; }
-        100% { transform: scale(1.05); opacity: 1; }
-    }
-
-    @keyframes line-rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    @keyframes arc-rotate {
-        0% { transform: rotate(0deg); }
-        100% { transform: rotate(360deg); }
-    }
-    @keyframes blue-glow {
-        0% { box-shadow: 0 0 8px rgba(0, 188, 212, 0.7); }
-        100% { box-shadow: 0 0 15px rgba(0, 188, 212, 1); }
-    }
-    @keyframes purple-glow {
-        0% { box-shadow: 0 0 8px rgba(142, 45, 226, 0.7); }
-        100% { box-shadow: 0 0 15px rgba(142, 45, 226, 1); }
-    }
-
-    @keyframes float {
-        0%, 100% { transform: translateY(0); }
-        50% { transform: translateY(-8px); }
-    }
+    
+    @keyframes subtle-pulse { 0% { transform: scale(1); opacity: 0.9; } 100% { transform: scale(1.05); opacity: 1; } }
+    @keyframes arc-rotate { 0% { transform: rotate(0deg); } 100% { transform: rotate(360deg); } }
+    @keyframes float { 0%, 100% { transform: translateY(0); } 50% { transform: translateY(-8px); } }
   </style>
 </head>
 <body>
+  <canvas id="neuronCanvas"></canvas>
 
-  <aside class="sidebar">
-    <div class="sidebar-header">
+  <nav class="top-nav">
+    <div class="nav-header">
         <h1>Gestor Operativo</h1>
         <h2>Plataforma IA</h2>
     </div>
-    <ul>
+    <ul class="nav-links">
         <li><a href="#" onclick="showHome(this)" id="home-link" class="active">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M3 9l9-7 9 7v11a2 2 0 0 1-2 2H5a2 2 0 0 1-2-2z"></path><polyline points="9 22 9 12 15 12 15 22"></polyline></svg></span>
             <span class="nav-text">Inicio</span>
@@ -331,93 +353,68 @@
 
         <li><a href="#" onclick="loadModule('calendario.html', this)" data-page="calendario">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></span>
-            <span class="nav-text">Calendario Teletrabajo</span>
+            <span class="nav-text">Calendario</span>
         </a></li>
 
         <li><a href="#" onclick="loadModule('turnos.html', this)" data-page="turnos">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></span>
-            <span class="nav-text">Turnos Diarios</span>
+            <span class="nav-text">Turnos</span>
         </a></li>
 
         <li><a href="#" onclick="loadModule('Genador-turnos.html', this)" data-page="Genador-turnos">
-            <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></span>
-            <span class="nav-text">Generador de Turnos Nuevos</span>
+            <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></span>
+            <span class="nav-text">Generador</span>
         </a></li>
-
-        <li><a href="#" onclick="loadModule('cartas.html', this)" data-page="cartas">
-            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></span>
-            <span class="nav-text">Carta Amonestación</span>
-        </a></li>
-
-        <li><a href="#" onclick="loadModule('transporte.html', this)" data-page="transporte">
-            <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></span>
-            <span class="nav-text">Gestión de Transporte</span>
-        </a></li>
-
+        
         <li><a href="#" onclick="loadModule('erlang.html', this)" data-page="erlang">
             <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></span>
             <span class="nav-text">Erlang</span>
         </a></li>
 
-        <!-- NUEVO: Dimensionamiento -->
         <li><a href="#" onclick="loadModule('Dimensionamiento.html', this)" data-page="dimensionamiento">
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 14h10M7 10h6"></path></svg></span>
             <span class="nav-text">Dimensionamiento</span>
         </a></li>
-        <!-- FIN NUEVO -->
     </ul>
-  </aside>
+  </nav>
 
   <main class="main">
     <section id="homeContent" class="home-content">
         <div class="main-header">
             <h1>Bienvenido a su Gestor Operativo</h1>
-            <p>Seleccione un módulo en el menú de la izquierda para comenzar a trabajar.</p>
+            <p>Seleccione un módulo en el menú superior para comenzar a trabajar.</p>
         </div>
         <div class="card-grid">
-            <a href="#" onclick="loadModule('cambio-turnos.html', document.querySelector('[data-page=cambio-turnos]'))" class="card">
+            <a href="#" onclick="loadModule('cambio-turnos.html', document.querySelector('[data-page=cambio-turnos]'))" class="card c-purple">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><polyline points="16 3 21 3 21 8"></polyline><line x1="4" y1="20" x2="21" y2="3"></line><polyline points="8 21 3 21 3 16"></polyline><line x1="20" y1="4" x2="3" y2="21"></line></svg></div>
                 <h2>Cambio de Turnos</h2>
                 <p>Gestiona solicitudes de cambio entre agentes.</p>
             </a>
-            <a href="#" onclick="loadModule('calendario.html', document.querySelector('[data-page=calendario]'))" class="card">
+            <a href="#" onclick="loadModule('calendario.html', document.querySelector('[data-page=calendario]'))" class="card c-blue">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="4" width="18" height="18" rx="2" ry="2"></rect><line x1="16" y1="2" x2="16" y2="6"></line><line x1="8" y1="2" x2="8" y2="6"></line><line x1="3" y1="10" x2="21" y2="10"></line></svg></div>
                 <h2>Calendario Teletrabajo</h2>
                 <p>Gestiona la presencialidad y el trabajo remoto.</p>
             </a>
-            <a href="#" onclick="loadModule('turnos.html', document.querySelector('[data-page=turnos]'))" class="card">
+            <a href="#" onclick="loadModule('turnos.html', document.querySelector('[data-page=turnos]'))" class="card c-green">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M12 20V10"></path><path d="M18 20V4"></path><path d="M6 20V16"></path></svg></div>
                 <h2>Turnos Diarios</h2>
                 <p>Genera turnos de forma automática y optimizada.</p>
             </a>
-            <a href="#" onclick="loadModule('Genador-turnos.html', document.querySelector('[data-page=Genador-turnos]'))" class="card">
-                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round" class="feather feather-user-plus"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
+            <a href="#" onclick="loadModule('Genador-turnos.html', document.querySelector('[data-page=Genador-turnos]'))" class="card c-orange">
+                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M16 21v-2a4 4 0 0 0-4-4H5a4 4 0 0 0-4 4v2"></path><circle cx="8.5" cy="7" r="4"></circle><line x1="20" y1="8" x2="20" y2="14"></line><line x1="23" y1="11" x2="17" y2="11"></line></svg></div>
                 <h2>Generador de Turnos Nuevos</h2>
                 <p>Asigna turnos a los nuevos agentes de forma eficiente.</p>
             </a>
-            <a href="#" onclick="loadModule('cartas.html', document.querySelector('[data-page=cartas]'))" class="card">
-                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><path d="M14 2H6a2 2 0 0 0-2 2v16a2 2 0 0 0 2 2h12a2 2 0 0 0 2-2V8z"></path><polyline points="14 2 14 8 20 8"></polyline><line x1="16" y1="13" x2="8" y2="13"></line><line x1="16" y1="17" x2="8" y2="17"></line></svg></div>
-                <h2>Carta Amonestación</h2>
-                <p>Crea documentos formales en segundos.</p>
-            </a>
-            <a href="#" onclick="loadModule('transporte.html', document.querySelector('[data-page=transporte]'))" class="card">
-                <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="1" y="3" width="15" height="13"></rect><polygon points="16 8 20 8 23 11 23 16 16 16 16 8"></polygon><circle cx="5.5" cy="18.5" r="2.5"></circle><circle cx="18.5" cy="18.5" r="2.5"></circle></svg></div>
-                <h2>Gestión de Transporte</h2>
-                <p>Genera reportes de arribo y zarpe de personal.</p>
-            </a>
-            <a href="#" onclick="loadModule('erlang.html', document.querySelector('[data-page=erlang]'))" class="card">
+            <a href="#" onclick="loadModule('erlang.html', document.querySelector('[data-page=erlang]'))" class="card c-red">
                 <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22c5.523 0 10-4.477 10-10S17.523 2 12 2 2 6.477 2 12s4.477 10 10 10z"></path><path d="M12 8v4l3 3"></path></svg></div>
                 <h2>Erlang</h2>
                 <p>Calcula la carga de trabajo y personal necesario.</p>
             </a>
-
-            <!-- NUEVA TARJETA: Dimensionamiento -->
-            <a href="#" onclick="loadModule('Dimensionamiento.html', document.querySelector('[data-page=dimensionamiento]'))" class="card">
+            <a href="#" onclick="loadModule('Dimensionamiento.html', document.querySelector('[data-page=dimensionamiento]'))" class="card c-teal">
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 14h10M7 10h6"></path></svg></div>
                 <h2>Dimensionamiento</h2>
                 <p>Agentes por intervalo de hora.</p>
             </a>
-            <!-- FIN NUEVA TARJETA -->
         </div>
     </section>
     <iframe id="moduleFrame" class="content-frame" src=""></iframe>
@@ -429,17 +426,92 @@
         <div class="ia-avatar">
             <div class="ia-avatar-design">
                 <div class="center-glow"></div>
-                <div class="line horizontal"></div>
-                <div class="line vertical"></div>
-                <div class="arc blue"></div>
-                <div class="arc purple"></div>
+                <div class="arc arc-1"></div>
+                <div class="arc arc-2"></div>
             </div>
         </div>
     </div>
   </div>
 
   <script>
-    const allLinks = document.querySelectorAll('.sidebar a');
+    // --- LÓGICA DE LA RED NEURONAL DE FONDO (CANVAS) ---
+    const canvas = document.getElementById('neuronCanvas');
+    const ctx = canvas.getContext('2d');
+    canvas.width = window.innerWidth;
+    canvas.height = window.innerHeight;
+    let particlesArray;
+    class Particle {
+        constructor(x, y, size, speedX, speedY) {
+            this.x = x; this.y = y; this.size = size;
+            this.speedX = speedX; this.speedY = speedY;
+            this.pulseSpeed = Math.random() * 0.02 + 0.005;
+            this.pulseOffset = Math.random() * Math.PI * 2;
+        }
+        draw() {
+            const pulse = Math.abs(Math.sin(this.pulseOffset + Date.now() * this.pulseSpeed));
+            const alpha = 0.5 + pulse * 0.5;
+            ctx.beginPath();
+            ctx.arc(this.x, this.y, this.size, 0, Math.PI * 2, false);
+            ctx.shadowBlur = 10;
+            ctx.shadowColor = `rgba(0, 122, 255, ${alpha})`;
+            ctx.fillStyle = `rgba(200, 225, 255, ${alpha})`;
+            ctx.fill();
+            ctx.shadowBlur = 0;
+        }
+        update() {
+            if (this.x > canvas.width || this.x < 0) this.speedX = -this.speedX;
+            if (this.y > canvas.height || this.y < 0) this.speedY = -this.speedY;
+            this.x += this.speedX; this.y += this.speedY;
+        }
+    }
+    function initParticles() {
+        particlesArray = [];
+        let numberOfParticles = (canvas.height * canvas.width) / 12000;
+        for (let i = 0; i < numberOfParticles; i++) {
+            let size = (Math.random() * 1.5) + 0.8;
+            let x = (Math.random() * ((innerWidth - size * 2) - (size * 2)) + size * 2);
+            let y = (Math.random() * ((innerHeight - size * 2) - (size * 2)) + size * 2);
+            let speedX = (Math.random() * 0.4) - 0.2;
+            let speedY = (Math.random() * 0.4) - 0.2;
+            particlesArray.push(new Particle(x, y, size, speedX, speedY));
+        }
+    }
+    function connectParticles() {
+        let opacityValue = 1;
+        for (let a = 0; a < particlesArray.length; a++) {
+            for (let b = a; b < particlesArray.length; b++) {
+                let distance = ((particlesArray[a].x - particlesArray[b].x) ** 2) + ((particlesArray[a].y - particlesArray[b].y) ** 2);
+                if (distance < (canvas.width / 10) * (canvas.height / 10)) {
+                    opacityValue = 1 - (distance / 20000);
+                    ctx.strokeStyle = `rgba(0, 122, 255, ${opacityValue * 0.25})`;
+                    ctx.lineWidth = 0.8;
+                    ctx.beginPath();
+                    ctx.moveTo(particlesArray[a].x, particlesArray[a].y);
+                    ctx.lineTo(particlesArray[b].x, particlesArray[b].y);
+                    ctx.stroke();
+                }
+            }
+        }
+    }
+    function animateParticles() {
+        requestAnimationFrame(animateParticles);
+        ctx.clearRect(0, 0, innerWidth, innerHeight);
+        for (let i = 0; i < particlesArray.length; i++) {
+            particlesArray[i].update();
+            particlesArray[i].draw();
+        }
+        connectParticles();
+    }
+    window.addEventListener('resize', () => {
+        canvas.width = innerWidth;
+        canvas.height = innerHeight;
+        initParticles();
+    });
+    initParticles();
+    animateParticles();
+
+    // --- LÓGICA DE NAVEGACIÓN Y ASISTENTE IA ---
+    const allLinks = document.querySelectorAll('.nav-links a');
 
     function updateActiveNav(activeLink) {
         allLinks.forEach(link => link.classList.remove('active'));
@@ -470,7 +542,7 @@
       constructor() {
         this.currentModule = 'home';
         this.moduleData = {
-          home: { name: 'Panel Principal', welcome: '¡Hola! Soy tu asistente inteligente. Te ayudo a optimizar tu flujo de trabajo.' },
+          home: { name: 'Panel Principal', welcome: '¡Hola! Soy tu asistente. Te ayudo a optimizar tu flujo de trabajo.' },
           'cambio-turnos.html': { name: 'Cambio de Turnos', tips: ['Gestiona solicitudes de cambio entre agentes.'] },
           'calendario.html': { name: 'Calendario Teletrabajo', tips: ['Gestiona la presencialidad y el trabajo remoto.'] },
           'turnos.html': { name: 'Turnos Diarios', tips: ['Genera turnos de forma automática y optimizada.'] },
@@ -478,9 +550,7 @@
           'cartas.html': { name: 'Carta Amonestación', tips: ['Crea documentos formales en segundos.'] },
           'transporte.html': { name: 'Gestión de Transporte', tips: ['Genera reportes de arribo y zarpe de personal.'] },
           'erlang.html': { name: 'Módulo Erlang', tips: ['Calcula la carga de trabajo y el personal necesario.'] },
-          /* NUEVO: soporte para Dimensionamiento */
           'Dimensionamiento.html': { name: 'Dimensionamiento', tips: ['Ve cuántos agentes hay por intervalo de hora.'] }
-          /* FIN NUEVO */
         };
         this.messageElement = document.getElementById('iaMsg');
         this.initializeIntelligence();
