@@ -199,6 +199,7 @@
     .card:nth-child(6) { animation-delay: 0.8s; }
     .card:nth-child(7) { animation-delay: 0.9s; }
     .card:nth-child(8) { animation-delay: 1.0s; }
+    .card:nth-child(9) { animation-delay: 1.1s; }
 
 
     .card:hover {
@@ -394,6 +395,11 @@
             <span class="nav-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 14h10M7 10h6"></path></svg></span>
             <span class="nav-text">Dimensión</span>
         </a></li>
+
+        <li><a href="#" onclick="loadModule('Validacion-turnos.html', this)" data-page="validacion-turnos">
+            <span class="nav-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></span>
+            <span class="nav-text">Validador</span>
+        </a></li>
     </ul>
   </nav>
 
@@ -443,6 +449,11 @@
                 <div class="card-icon"><svg viewBox="0 0 24 24" fill="none" stroke="currentColor"><rect x="3" y="3" width="18" height="18" rx="2" ry="2"></rect><path d="M7 14h10M7 10h6"></path></svg></div>
                 <h2>Dimensionamiento</h2>
                 <p>Agentes por intervalo de hora.</p>
+            </a>
+            <a href="#" onclick="loadModule('Validacion-turnos.html', document.querySelector('[data-page=validacion-turnos]'))" class="card c-blue">
+                <div class="card-icon"><svg xmlns="http://www.w3.org/2000/svg" width="24" height="24" viewBox="0 0 24 24" fill="none" stroke="currentColor" stroke-width="2" stroke-linecap="round" stroke-linejoin="round"><path d="M12 22s8-4 8-10V5l-8-3-8 3v7c0 6 8 10 8 10z"></path><path d="m9 12 2 2 4-4"></path></svg></div>
+                <h2>Validador de Turnos</h2>
+                <p>Valida y procesa los nuevos turnos asignados.</p>
             </a>
         </div>
     </section>
@@ -579,7 +590,8 @@
           'cartas.html': { name: 'Carta Amonestación', tips: ['Crea documentos formales en segundos.'] },
           'transporte.html': { name: 'Gestión de Transporte', tips: ['Genera reportes de arribo y zarpe de personal.'] },
           'erlang.html': { name: 'Módulo Erlang', tips: ['Calcula la carga de trabajo y el personal necesario.'] },
-          'Dimensionamiento.html': { name: 'Dimensionamiento', tips: ['Ve cuántos agentes hay por intervalo de hora.'] }
+          'Dimensionamiento.html': { name: 'Dimensionamiento', tips: ['Ve cuántos agentes hay por intervalo de hora.'] },
+          'Validacion-turnos.html': { name: 'Validador de Turnos', tips: ['Valida y procesa los nuevos turnos asignados.'] }
         };
         this.messageElement = document.getElementById('iaMsg');
         this.initializeIntelligence();
