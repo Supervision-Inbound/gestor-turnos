@@ -216,7 +216,7 @@
     </div>
 
     <script>
-        // --- VARIABLES GLOBALES Y CONFIGURACIÓN (LÓGICA ORIGINAL) ---
+        // --- VARIABLES GLOBALES Y CONFIGURACIÓN ---
         let fullProcessedData = []; 
         let processedData = []; 
         let dateSlider = null;
@@ -253,7 +253,7 @@
             elements.generateBtn.addEventListener('click', generateDocuments);
         });
 
-        // --- LÓGICA DE CARGA Y PROCESAMIENTO DE DATOS (LÓGICA ORIGINAL) ---
+        // --- LÓGICA DE CARGA Y PROCESAMIENTO DE DATOS ---
         async function loadDataFromFlow() {
             elements.statusContainer.className = 'status-area is-loading';
             const statusMessages = ["Iniciando conexión segura...", "Analizando topología de red...", "Solicitando datos de incidencias...", "Recibiendo streams de datos...", "Decodificando paquetes...", "Procesando registros..."];
@@ -269,11 +269,13 @@
             }, 1800);
 
             const flowUrl = "https://default136d6ab55b55496f97cb2424247715.ed.environment.api.powerplatform.com:443/powerautomate/automations/direct/workflows/bb1e934ddf4c43048271481e59dd0768/triggers/manual/paths/invoke?api-version=1&sp=%2Ftriggers%2Fmanual%2Frun&sv=1.0&sig=7Zbz8WFG5AWYbB3lYVhQghyLAiMrVM3szPSeaM7NICY";
+            const urlFinal = `${flowUrl}&cacheBuster=${new Date().getTime()}`;
 
             try {
-                const response = await fetch(flowUrl, { method: "POST" });
+                const response = await fetch(urlFinal, { method: "POST" });
                 if (!response.ok) throw new Error(`Error de red: ${response.status}`);
                 const rawData = await response.json();
+                
                 if (!Array.isArray(rawData) || rawData.length === 0) throw new Error("No se recibieron datos.");
 
                 processData(rawData);
@@ -337,30 +339,56 @@
             }
         }
 
-        // --- LÓGICA DE FILTRADO Y VISUALIZACIÓN (LÓGICA ORIGINAL) ---
+        // --- LÓGICA DE FILTRADO Y VISUALIZACIÓN ---
         function setupAndShowDateFilter(uniqueTimestamps) {
             const minTimestamp = uniqueTimestamps[0];
             const maxTimestamp = uniqueTimestamps[uniqueTimestamps.length - 1];
+            
             if (dateSlider) dateSlider.destroy();
+
             dateSlider = noUiSlider.create(elements.dateSlider, {
-                start: [minTimestamp, maxTimestamp], connect: true,
-                range: { min: minTimestamp, max: maxTimestamp }, step: 24 * 60 * 60 * 1000,
+                start: [minTimestamp, maxTimestamp],
+                connect: true,
+                range: { 
+                    'min': minTimestamp, 
+                    'max': maxTimestamp 
+                },
+                step: 24 * 60 * 60 * 1000,
             });
-            const formatDateForDisplay = (ts) => new Date(parseInt(ts)).toLocaleDateString('es-CL', { timeZone: 'UTC' });
-            dateSlider.on('slide', (values) => { applyFiltersAndShowResults(values.map(v => parseInt(v))); });
+
             dateSlider.on('update', (values) => {
-                 elements.sliderStartDate.textContent = formatDateForDisplay(values[0]);
-                 elements.sliderEndDate.textContent = formatDateForDisplay(values[1]);
+                const [start, end] = values.map(v => parseInt(v));
+                const formatDateForDisplay = (ts) => new Date(ts).toLocaleDateString('es-CL', { timeZone: 'UTC' });
+                
+                elements.sliderStartDate.textContent = formatDateForDisplay(start);
+                elements.sliderEndDate.textContent = formatDateForDisplay(end);
+                
+                applyFiltersAndShowResults([start, end]);
             });
+
             elements.dateFilterContainer.classList.remove('hidden');
-            applyFiltersAndShowResults(dateSlider.get(true));
         }
 
+        // --- FUNCIÓN DE FILTRADO CORREGIDA Y DEFINITIVA ---
         function applyFiltersAndShowResults(values) {
             const [startTimestamp, endTimestamp] = values;
+
+            // Se crean fechas de inicio y fin para comparar solo AÑO, MES y DÍA.
+            const startDate = new Date(startTimestamp);
+            const endDate = new Date(endTimestamp);
+
+            // Se normalizan a un formato de string YYYY-MM-DD para una comparación infalible.
+            const startDateStr = `${startDate.getFullYear()}-${String(startDate.getMonth() + 1).padStart(2, '0')}-${String(startDate.getDate()).padStart(2, '0')}`;
+            const endDateStr = `${endDate.getFullYear()}-${String(endDate.getMonth() + 1).padStart(2, '0')}-${String(endDate.getDate()).padStart(2, '0')}`;
+
             processedData = fullProcessedData.filter(row => {
-                const rowTimestamp = new Date(row.fecha).setHours(0,0,0,0);
-                return rowTimestamp >= startTimestamp && rowTimestamp <= endTimestamp;
+                const rowDate = row.fecha; // Ya es un objeto Date local gracias a asDate()
+                
+                // Se normaliza la fecha de la fila al mismo formato YYYY-MM-DD.
+                const rowDateStr = `${rowDate.getFullYear()}-${String(rowDate.getMonth() + 1).padStart(2, '0')}-${String(rowDate.getDate()).padStart(2, '0')}`;
+                
+                // La comparación de strings en este formato es 100% fiable para rangos de fechas.
+                return rowDateStr >= startDateStr && rowDateStr <= endDateStr;
             });
             showResults();
         }
@@ -379,7 +407,7 @@
             }
         }
 
-        // --- LÓGICA DE GENERACIÓN DE DOCUMENTOS (LÓGICA ORIGINAL) ---
+        // --- LÓGICA DE GENERACIÓN DE DOCUMENTOS ---
         function createWordDocument(incidentGroup) {
             const data = incidentGroup[0];
             const isPlural = incidentGroup.length > 1;
@@ -524,17 +552,57 @@
             }
         }
         
-        // --- FUNCIONES UTILITARIAS (LÓGICA ORIGINAL) ---
+        // --- FUNCIONES UTILITARIAS ---
         function groupData(data) { const grouped = {}; data.forEach(row => { const key = `${row.rut}-${row.incidencia}-${row.tipoCarta}`; if (!grouped[key]) { grouped[key] = []; } grouped[key].push(row); }); return Object.values(grouped); }
         function toProperCase(str) { return !str ? '' : str.toString().toLowerCase().split(' ').map(w => w.charAt(0).toUpperCase() + w.slice(1)).join(' '); }
         function showStatus(message, type = 'success') { elements.status.className = `status ${type}`; elements.status.textContent = message; elements.status.style.display = 'block'; }
         
-        function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
+        function excelSerialToDate(serial) {
+            if (typeof serial !== 'number' || serial < 1) return null;
+            const utc_days = Math.floor(serial - 25569);
+            const date_info = new Date(utc_days * 86400 * 1000);
+            const year = date_info.getUTCFullYear();
+            const month = date_info.getUTCMonth();
+            const day = date_info.getUTCDate();
+            return new Date(year, month, day);
+        }
+
+        function asDate(val) {
+            if (val instanceof Date) return val;
+            
+            const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val;
+            if (typeof num === 'number' && !isNaN(num)) {
+                const d = excelSerialToDate(num);
+                if (d) return d;
+            }
+            
+            if (typeof val === 'string') {
+                const parts = val.split(/[-/]/);
+                if (parts.length === 3) {
+                    let day, month, year;
+                    if (parts[2].length === 4) { // Formato DD-MM-YYYY
+                       day = parseInt(parts[0], 10);
+                       month = parseInt(parts[1], 10);
+                       year = parseInt(parts[2], 10);
+                    } else if (parts[0].length === 4) { // Formato YYYY-MM-DD
+                       year = parseInt(parts[0], 10);
+                       month = parseInt(parts[1], 10);
+                       day = parseInt(parts[2], 10);
+                    }
+                    if (!isNaN(day) && !isNaN(month) && !isNaN(year)) {
+                        return new Date(year, month - 1, day);
+                    }
+                }
+            }
+
+            const d2 = new Date(val);
+            return isNaN(d2) ? null : d2;
+        }
+
         function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
-        function asDate(val) { if (val instanceof Date) return val; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const d = excelSerialToDate(num); if (d) return d; } const d2 = new Date(val); return isNaN(d2) ? null : d2; }
         function fmtTime(val, dateRef) { if (val instanceof Date) return `${String(val.getHours()).padStart(2, '0')}:${String(val.getMinutes()).padStart(2, '0')}`; const num = typeof val === 'string' ? Number(val.replace(',', '.')) : val; if (typeof num === 'number' && !isNaN(num)) { const dt = parseDateTime(num, dateRef); if (dt) return `${String(dt.getHours()).padStart(2, '0')}:${String(dt.getMinutes()).padStart(2, '0')}`; if (num >= 0 && num < 1) { const totalMin = Math.round(num * 24 * 60); const h = Math.floor(totalMin / 60), m = totalMin % 60; return `${String(h).padStart(2, '0')}:${String(m).padStart(2, '0')}`; } } return (val ?? '').toString(); }
 
-        // --- LÓGICA DE LA RED NEURONAL DE FONDO (CANVAS) ---
+        // --- LÓGICA DE LA RED NEURONAL DE FONDO ---
         const canvas = document.getElementById('neuronCanvas');
         const ctx = canvas.getContext('2d');
         canvas.width = window.innerWidth;
