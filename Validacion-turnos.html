@@ -2,54 +2,39 @@
 <html lang="es">
 <head>
   <meta charset="UTF-8">
-  <title>Leer Google Sheets CSV</title>
+  <title>Ver Excel desde SharePoint</title>
   <style>
-    body { font-family: Arial, sans-serif; margin: 20px; }
-    table { border-collapse: collapse; width: 100%; margin-top: 10px; }
-    th, td { border: 1px solid #ccc; padding: 5px; text-align: left; }
-    th { background-color: #f4f4f4; }
+    body {
+      font-family: Arial, sans-serif;
+      margin: 0;
+      padding: 0;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      background: #f7f7f7;
+    }
+    h1 {
+      margin: 20px;
+    }
+    iframe {
+      border: none;
+      max-width: 95%;
+      background: white;
+      box-shadow: 0 4px 10px rgba(0,0,0,0.2);
+      border-radius: 8px;
+    }
   </style>
 </head>
 <body>
-  <h1>Tabla desde Google Sheets</h1>
-  <p id="estado">Cargando datos...</p>
-  <table id="tabla"></table>
+  <h1>Tabla de Turnos</h1>
 
-  <script>
-    const url = "https://docs.google.com/spreadsheets/d/e/2PACX-1vSiABN5-WZSgtYLJCk2UwRNyluiyU9G5u7Yah3Cd3Ozv8bp-mnoGOOa1uNomb1ZZQKJHKOCRgM-pDB7/pub?gid=2108440495&single=true&output=csv";
+  <iframe 
+    width="700" 
+    height="900" 
+    frameborder="0" 
+    scrolling="no" 
+    src="https://frontel-my.sharepoint.com/personal/andres_gonzalez_saesa_cl/_layouts/15/Doc.aspx?sourcedoc={77166985-8382-4990-a1d4-09ad8fd64354}&action=embedview&Item=Turnos&wdHideGridlines=True&wdDownloadButton=True&wdInConfigurator=True&wdInConfigurator=True">
+  </iframe>
 
-    async function cargarCSV() {
-      try {
-        const respuesta = await fetch(url);
-        if (!respuesta.ok) throw new Error("No se pudo descargar el CSV: código " + respuesta.status);
-        
-        const texto = await respuesta.text();
-        const filas = texto.trim().split("\n").map(linea => linea.split(","));
-        mostrarTabla(filas);
-        document.getElementById("estado").textContent = "";
-      } catch (e) {
-        document.getElementById("estado").textContent = "Error al cargar: " + e.message;
-      }
-    }
-
-    function mostrarTabla(data) {
-      const tabla = document.getElementById("tabla");
-      let html = "";
-      data.forEach((fila, idx) => {
-        html += "<tr>";
-        fila.forEach(celda => {
-          if (idx === 0) {
-            html += `<th>${celda}</th>`;
-          } else {
-            html += `<td>${celda}</td>`;
-          }
-        });
-        html += "</tr>";
-      });
-      tabla.innerHTML = html;
-    }
-
-    cargarCSV();
-  </script>
 </body>
 </html>
