@@ -421,7 +421,11 @@
     
     // --- INICIO: LÓGICA DE DATOS Y FECHAS ---
     function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
-    function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
+    
+    // --- MODIFICACIÓN REALIZADA AQUÍ ---
+    function parseDateTime(value, dateReference) { if (value === null || value === undefined || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value <= 1 && dateReference instanceof Date) { const totalMilliseconds = Math.round(value * 24 * 60 * 60 * 1000); const combinedDate = new Date(dateReference.getFullYear(), dateReference.getMonth(), dateReference.getDate()); combinedDate.setTime(combinedDate.getTime() + totalMilliseconds); return combinedDate; } return null; }
+    // --- FIN DE LA MODIFICACIÓN ---
+
     function normalizeDate(d) { if (!(d instanceof Date)) return null; const date = new Date(d); date.setHours(0, 0, 0, 0); return date; }
 
     async function loadDataFromFlow() {
@@ -637,9 +641,11 @@
         const supervisores = dayData.filter(row => row['Servicio'] === '10_Staff_Inbound' && row['Estado'] === 'Activo');
         rowIndex = processDataRows(rowIndex, supervisores);
         rowIndex = createHeaderRow(rowIndex, 'AGENTE MASIVO', { type: 'pattern', pattern: 'solid', fgColor: { argb: 'FF1F5A87' } });
-        const agentesSite = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar'] === 'Site');
+        
+        const agentesSite = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar']?.trim().toUpperCase() === 'SITE');
         rowIndex = processDataRows(rowIndex, agentesSite);
-        const teletrabajoData = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar'] === 'TT');
+        const teletrabajoData = dayData.filter(row => row['Servicio'] === '01_Masivo' && row['Estado'] === 'Activo' && row['Lugar']?.trim().toUpperCase() === 'TT');
+
         if (teletrabajoData.length > 0) {
             const teletrabajoHeaderRow = worksheet.getRow(rowIndex);
             worksheet.mergeCells(rowIndex, 1, rowIndex, 10);
