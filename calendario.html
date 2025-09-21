@@ -830,7 +830,10 @@
 
         // --- FUNCIONES UTILITARIAS ---
         function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
-        function parseDateTime(value, dateRef) { if (value === null || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value < 1 && dateRef instanceof Date) { const totalMs = Math.round(value * 24 * 60 * 60 * 1000); const combined = new Date(dateRef); combined.setHours(0,0,0,0); combined.setTime(combined.getTime() + totalMs); return combined; } return null; }
+        
+        // --- MODIFICACIÓN REALIZADA AQUÍ ---
+        function parseDateTime(value, dateRef) { if (value === null || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value <= 1 && dateRef instanceof Date) { const totalMs = Math.round(value * 24 * 60 * 60 * 1000); const combined = new Date(dateRef); combined.setHours(0,0,0,0); combined.setTime(combined.getTime() + totalMs); return combined; } return null; }
+        
         function normalizeDate(d) { if (!(d instanceof Date)) return null; const date = new Date(d); date.setHours(0, 0, 0, 0); return date; }
         const findKey = (o, names) => { if (!o || !names) return null; const norm = s => String(s).replace(/[\s_]+/g,'').toLowerCase(); const keys = Object.keys(o); const wanted = new Set(names.map(n => norm(n))); return keys.find(k => wanted.has(norm(k))); };
         const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : undefined; };
