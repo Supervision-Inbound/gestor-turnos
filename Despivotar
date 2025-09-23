@@ -1,0 +1,221 @@
+<!DOCTYPE html>
+<html lang="es">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Herramienta de Consolidación Automática</title>
+    <script src="https://cdnjs.cloudflare.com/ajax/libs/xlsx/0.18.5/xlsx.full.min.js"></script>
+    <style>
+        body { font-family: -apple-system, BlinkMacSystemFont, "Segoe UI", Roboto, Helvetica, Arial, sans-serif; margin: 0; padding: 2rem; background-color: #f4f7f9; color: #333; }
+        .container { max-width: 900px; margin: 0 auto; background-color: #ffffff; padding: 2rem; border-radius: 8px; box-shadow: 0 4px 12px rgba(0,0,0,0.1); }
+        h1 { color: #0056b3; text-align: center; }
+        p { text-align: center; color: #666; }
+        .step { border: 2px dashed #ccc; padding: 1.5rem; border-radius: 8px; margin-top: 1.5rem; }
+        .step h2 { margin-top: 0; color: #0056b3; }
+        .hidden { display: none; }
+        .sheet-selector button { display: block; width: 80%; margin: 0.8rem auto; padding: 1rem; font-size: 1.1rem; font-weight: bold; color: #fff; background-color: #007bff; border: none; border-radius: 5px; cursor: pointer; transition: background-color 0.3s ease; }
+        .sheet-selector button:hover { background-color: #0056b3; }
+        #final-result { text-align: center; font-weight: bold; color: #218838; margin-top: 1.5rem; padding: 1rem; background-color: #e9f7ec; border-radius: 5px; }
+    </style>
+</head>
+<body>
+
+    <div class="container">
+        <h1>Herramienta de Consolidación ⚙️</h1>
+        
+        <div id="step1" class="step">
+            <h2>Paso 1: Cargar Archivo Excel</h2>
+            <p>Selecciona el archivo que contiene las tablas de datos.</p>
+            <input type="file" id="excelFile" accept=".xlsx, .xls" style="display:block; margin:auto; padding: 1rem;">
+        </div>
+
+        <div id="step2" class="step hidden">
+            <h2>Paso 2: Seleccionar la Hoja de Datos</h2>
+            <p>Haz clic en la hoja que quieres procesar para generar el reporte consolidado.</p>
+            <div id="sheetSelector" class="sheet-selector"></div>
+        </div>
+        
+        <div id="final-result" class="hidden"></div>
+    </div>
+
+<script>
+    let workbook;
+
+    // **NUEVA ESTRUCTURA FIJA DE TABLAS**
+    const TABLE_DEFINITIONS = [
+        { name: 'Llamadas', headerRow: 1, startRow: 2 },
+        { name: 'TMO', headerRow: 50, startRow: 51 },
+        { name: 'Agentes Requeridos', headerRow: 99, startRow: 100 }
+    ];
+
+    document.getElementById('excelFile').addEventListener('change', handleFileSelect);
+
+    function excelSerialToDate(serial) {
+        const excelEpoch = new Date(Date.UTC(1899, 11, 30));
+        return new Date(excelEpoch.getTime() + serial * 24 * 60 * 60 * 1000);
+    }
+    function formatDate(date) {
+        if (!(date instanceof Date) || isNaN(date)) return '';
+        const day = String(date.getUTCDate()).padStart(2, '0');
+        const month = String(date.getUTCMonth() + 1).padStart(2, '0');
+        const year = date.getUTCFullYear();
+        return `${day}-${month}-${year}`;
+    }
+    function parseDate(dateInput, defaultYear = null) {
+        if (typeof dateInput === 'number') return excelSerialToDate(dateInput);
+        if (typeof dateInput !== 'string') return null;
+        const monthMap = {'ene':0,'feb':1,'mar':2,'abr':3,'may':4,'jun':5,'jul':6,'ago':7,'sep':8,'oct':9,'nov':10,'dic':11};
+        const parts = dateInput.toLowerCase().split(/[\/-]/);
+        if (parts.length < 2) return null;
+        let day, month, year;
+        if (parts.length === 3) {
+            day = parseInt(parts[0], 10); month = parseInt(parts[1], 10) - 1; year = parseInt(parts[2], 10);
+            if (year < 100) year += 2000;
+        } else {
+            day = parseInt(parts[0], 10); month = monthMap[parts[1].substring(0, 3)]; year = defaultYear;
+        }
+        if (!isNaN(day) && !isNaN(month) && year) return new Date(Date.UTC(year, month, day));
+        return null;
+    }
+
+    function findTargetYear(dateHeaders) {
+        for (const header of dateHeaders) {
+            const parsed = parseDate(header);
+            if (parsed) return parsed.getUTCFullYear();
+        }
+        return new Date().getFullYear();
+    }
+    
+    function unpivotTable(jsonData, tableDef) {
+        const unpivoted = [];
+        const metricName = tableDef.name;
+        const headers = jsonData[tableDef.headerRow - 1] || [];
+        const targetYear = findTargetYear(headers.slice(1));
+        for (let i = tableDef.startRow - 1; i < jsonData.length; i++) {
+            const rowData = jsonData[i];
+            if (!rowData || typeof rowData[0] !== 'number') {
+                break;
+            }
+            const interval = rowData[0];
+            for (let j = 1; j < headers.length; j++) {
+                const headerValue = headers[j];
+                if (headerValue === null || headerValue === undefined || headerValue === '') {
+                    continue;
+                }
+                const value = rowData[j];
+                const parsedDate = parseDate(headerValue, targetYear);
+                if (parsedDate) {
+                    unpivoted.push({
+                        Intervalo: interval, rawDate: parsedDate,
+                        metricName: metricName, metricValue: value
+                    });
+                }
+            }
+        }
+        return unpivoted;
+    }
+
+    function processAndConsolidate(sheetName) {
+        const finalResult = document.getElementById('final-result');
+        finalResult.textContent = 'Procesando, por favor espera...';
+        finalResult.classList.remove('hidden');
+
+        setTimeout(() => {
+            try {
+                const worksheet = workbook.Sheets[sheetName];
+                const jsonData = XLSX.utils.sheet_to_json(worksheet, { header: 1, raw: true, defval: null });
+
+                const allUnpivotedData = [];
+                TABLE_DEFINITIONS.forEach(def => allUnpivotedData.push(...unpivotTable(jsonData, def)));
+
+                const mergedData = new Map();
+                allUnpivotedData.forEach(row => {
+                    if (typeof row.Intervalo !== 'number') return;
+                    const roundedInterval = Math.round(row.Intervalo * 1e8) / 1e8;
+                    const key = row.rawDate.getTime() + '-' + roundedInterval;
+                    if (!mergedData.has(key)) {
+                        mergedData.set(key, { Intervalo: row.Intervalo, rawDate: row.rawDate });
+                    }
+                    mergedData.get(key)[row.metricName] = row.metricValue;
+                });
+                
+                const finalArray = Array.from(mergedData.values()).sort((a, b) => a.rawDate - b.rawDate || a.Intervalo - b.Intervalo);
+                
+                const finalData = finalArray
+                    .map(item => {
+                        const llamadas = Math.round((item.Llamadas !== null && item.Llamadas !== undefined) ? item.Llamadas : 0);
+                        const tmo = Math.round((item.TMO !== null && item.TMO !== undefined) ? item.TMO : 0);
+                        const agentes = Math.round((item["Agentes Requeridos"] !== null && item["Agentes Requeridos"] !== undefined) ? item["Agentes Requeridos"] : 0);
+                        
+                        return {
+                            Intervalo: item.Intervalo,
+                            Fecha: formatDate(item.rawDate),
+                            Llamadas: llamadas,
+                            TMO: tmo,
+                            "Agentes Requeridos": agentes
+                        };
+                    })
+                    .filter(item => item.Llamadas !== 0 || item.TMO !== 0 || item["Agentes Requeridos"] !== 0);
+
+                downloadExcel(finalData, `reporte_consolidado_${sheetName}.xlsx`);
+                finalResult.textContent = '¡Archivo consolidado generado con éxito!';
+            } catch (error) {
+                console.error("Error durante la consolidación:", error);
+                alert(`Ocurrió un error al procesar los datos.\n\nDetalle: ${error.message}`);
+                finalResult.classList.add('hidden');
+            }
+        }, 50);
+    }
+    
+    function handleFileSelect(event) {
+        const file = event.target.files[0];
+        if (!file) return;
+        const reader = new FileReader();
+        reader.onload = e => {
+            try {
+                const data = new Uint8Array(e.target.result);
+                if (data.length === 0) throw new Error("El archivo está vacío.");
+                workbook = XLSX.read(data, { type: 'array' });
+                if (!workbook.SheetNames || workbook.SheetNames.length === 0) throw new Error("El archivo no contiene ninguna hoja.");
+                
+                const sheetSelector = document.getElementById('sheetSelector');
+                sheetSelector.innerHTML = '';
+                workbook.SheetNames.forEach(name => {
+                    const button = document.createElement('button');
+                    button.textContent = name;
+                    button.onclick = () => processAndConsolidate(name);
+                    sheetSelector.appendChild(button);
+                });
+                document.getElementById('step2').classList.remove('hidden');
+                document.getElementById('final-result').classList.add('hidden');
+            } catch (error) {
+                console.error("Error al leer el archivo:", error);
+                alert(`Ocurrió un error al leer el archivo Excel.\n\nDetalle: ${error.message}`);
+                event.target.value = '';
+                document.getElementById('step2').classList.add('hidden');
+            }
+        };
+        reader.onerror = () => alert("No se pudo leer el archivo.");
+        reader.readAsArrayBuffer(file);
+    }
+
+    function downloadExcel(data, filename) {
+        const worksheet = XLSX.utils.json_to_sheet(data);
+        const range = XLSX.utils.decode_range(worksheet['!ref']);
+        for (let R = 1; R <= range.e.r; ++R) {
+            const intervalCell = worksheet[XLSX.utils.encode_cell({c: 0, r: R})];
+            if (intervalCell) { intervalCell.t = 'n'; intervalCell.z = 'hh:mm:ss'; }
+            
+            for (let C = 2; C <= 4; ++C) {
+                const metricCell = worksheet[XLSX.utils.encode_cell({c: C, r: R})];
+                if (metricCell) { metricCell.t = 'n'; metricCell.z = '0'; }
+            }
+        }
+        const newWorkbook = XLSX.utils.book_new();
+        XLSX.utils.book_append_sheet(newWorkbook, worksheet, 'Datos Consolidados');
+        XLSX.writeFile(newWorkbook, filename);
+    }
+</script>
+
+</body>
+</html>
