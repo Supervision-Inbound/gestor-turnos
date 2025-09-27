@@ -342,7 +342,7 @@
 
 
     // --- INICIO: LÓGICA DE LA APLICACIÓN DE TRANSPORTE ---
-    // Todo el código funcional de "transporte.html" se ha movido aquí, sin modificaciones en su lógica.
+    // Todo el código funcional de "transporte.html" se ha movido aquí.
     let allData = null, turnosData = null, generatedWorkbook = null, fileName = '', addressMap = null, confirmacionMap = null;
     let selectedHolidays = []; 
     
@@ -382,9 +382,7 @@
     const findVal = (o, names) => { const key = findKey(o, names); return key ? o[key] : undefined; };
     function excelSerialToDate(serial) { if (typeof serial !== 'number' || serial < 1) return null; const utcDate = new Date((serial - 25569) * 86400 * 1000); return new Date(utcDate.getTime() + (utcDate.getTimezoneOffset() * 60000)); }
 
-    // --- MODIFICACIÓN REALIZADA AQUÍ ---
     function parseDateTime(value, dateRef) { if (value === null || typeof value !== 'number') return null; if (value > 1) return excelSerialToDate(value); if (value >= 0 && value <= 1 && dateRef instanceof Date) { const totalMs = Math.round(value * 24 * 60 * 60 * 1000); const combined = new Date(dateRef); combined.setHours(0,0,0,0); combined.setTime(combined.getTime() + totalMs); return combined; } return null; }
-    // --- FIN DE LA MODIFICACIÓN ---
     
     function parseISODateAsLocal(isoString) {
         const [year, month, day] = isoString.split('-').map(Number);
@@ -403,20 +401,41 @@
     function ymdLocal(d){ const y=d.getFullYear(); const m=String(d.getMonth()+1).padStart(2,'0'); const da=String(d.getDate()).padStart(2,'0'); return `${y}-${m}-${da}`; }
     function formatRut(rutValue) { if (!rutValue) return null; const cleanRut = String(rutValue).replace(/[^0-9kK]/g, ''); if (cleanRut.length < 2) return cleanRut; const body = cleanRut.slice(0, -1); let dv = cleanRut.slice(-1).toUpperCase(); return `${body}-${dv}`; }
 
+    // ======================================================================================
+    // --- INICIO: FUNCIÓN CORREGIDA ---
+    // ======================================================================================
     function parseWeekString(weekText) {
         if (!weekText) return null;
         if (typeof weekText === 'number' && weekText > 1) { return getMonday(excelSerialToDate(weekText)); }
         if (typeof weekText !== 'string') return null;
+
+        // La expresión regular ahora captura también el día de fin para poder compararlos.
         const regex = /semana del\s+(\d{1,2})\s+al\s+(\d{1,2})\s+de\s+([\w\u00C0-\u017F]+)\s+del\s+(\d{4})/i;
         const match = weekText.match(regex);
+        
         if (match) {
             const monthMap = { 'enero': 0, 'febrero': 1, 'marzo': 2, 'abril': 3, 'mayo': 4, 'junio': 5, 'julio': 6, 'agosto': 7, 'septiembre': 8, 'octubre': 9, 'noviembre': 10, 'diciembre': 11 };
-            const day = parseInt(match[1], 10);
+            
+            // Extraemos ambos días
+            const startDay = parseInt(match[1], 10);
+            const endDay = parseInt(match[2], 10);
             const monthName = match[3].toLowerCase();
             const year = parseInt(match[4], 10);
-            const month = monthMap[monthName];
-            if (month !== undefined) { const date = new Date(year, month, day); if (!isNaN(date)) return getMonday(date); }
+            let month = monthMap[monthName];
+
+            if (month !== undefined) {
+                // Si el día de inicio es mayor que el de fin, el mes de inicio es el anterior.
+                // El mes en el texto corresponde al día de fin.
+                if (startDay > endDay) {
+                    month = month - 1; // El constructor de Date() maneja meses negativos (ej: mes -1 se convierte en diciembre del año anterior).
+                }
+
+                const date = new Date(year, month, startDay);
+                if (!isNaN(date)) return getMonday(date);
+            }
         }
+        
+        // El resto del código para parseo de fechas directas se mantiene
         try {
             const directDate = new Date(weekText);
             if (!isNaN(directDate.getTime())) {
@@ -424,8 +443,12 @@
                return getMonday(directDate);
             }
         } catch (error) { console.error(`Error al parsear la semana: "${weekText}"`, error); }
+        
         return null;
     }
+    // ======================================================================================
+    // --- FIN: FUNCIÓN CORREGIDA ---
+    // ======================================================================================
     
     async function fetchAllData() {
         statusContainer.className = 'upload-area is-loading';
